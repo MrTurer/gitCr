@@ -8,6 +8,8 @@ use Bitrix\Main\UserTable;
 
 class ExternalSystemTable extends Entity\DataManager
 {
+
+
     public static function getTableName()
     {
         return 'integration_external_system';

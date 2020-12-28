@@ -2,7 +2,7 @@
 
 namespace RNS\Integrations\Models;
 
-class UserMap implements \JsonSerializable
+class UserMap
 {
     /** @var string|null*/
     private $srcElementName;
@@ -10,6 +10,10 @@ class UserMap implements \JsonSerializable
     private $keyAttrName;
     /** @var string|null */
     private $displayAttrName;
+    /** @var string|null */
+    private $defaultExternalEmail;
+    /** @var bool */
+    private $ignoreAliens = false;
     /** @var UserMapItem[] */
     private $items = [];
 
@@ -68,6 +72,42 @@ class UserMap implements \JsonSerializable
     }
 
     /**
+     * @return string|null
+     */
+    public function getDefaultExternalEmail(): ?string
+    {
+        return $this->defaultExternalEmail;
+    }
+
+    /**
+     * @param string|null $defaultExternalEmail
+     * @return UserMap
+     */
+    public function setDefaultExternalEmail(?string $defaultExternalEmail): UserMap
+    {
+        $this->defaultExternalEmail = $defaultExternalEmail;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isIgnoreAliens(): bool
+    {
+        return $this->ignoreAliens;
+    }
+
+    /**
+     * @param bool $ignoreAliens
+     * @return UserMap
+     */
+    public function setIgnoreAliens(bool $ignoreAliens): UserMap
+    {
+        $this->ignoreAliens = $ignoreAliens;
+        return $this;
+    }
+
+    /**
      * @return UserMapItem[]
      */
     public function getItems(): array
@@ -83,13 +123,5 @@ class UserMap implements \JsonSerializable
     {
         $this->items = $items;
         return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function jsonSerialize()
-    {
-        return get_object_vars($this);
     }
 }

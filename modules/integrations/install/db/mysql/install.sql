@@ -23,16 +23,6 @@ CREATE TABLE `integration_external_system`
 )
 COMMENT = 'Внешние информационные системы';
 
-CREATE TABLE `integration_map_type`
-(
-    `id` INT NOT NULL AUTO_INCREMENT COMMENT 'Идентификатор',
-    `name` VARCHAR(50) NOT NULL COMMENT 'Название',
-    `code` VARCHAR(50) NOT NULL COMMENT 'Код',
-    `description` TEXT NULL COMMENT 'Описание',
-    CONSTRAINT `PK_integration_map_type` PRIMARY KEY (`id` ASC)
-)
-COMMENT = 'Тип сопоставления свойств';
-
 CREATE TABLE `integration_system_exchange_type`
 (
 	`id` INT NOT NULL AUTO_INCREMENT,

@@ -2,7 +2,11 @@
 
 namespace RNS\Integrations\Models;
 
-class ApiOptions extends OptionsBase
+/**
+ * Настройки для интеграции посредством API.
+ * @package RNS\Integrations\Models
+ */
+class ApiOptions extends OptionsBase implements \JsonSerializable
 {
     /** @var string */
     private $endpoint;
@@ -11,10 +15,11 @@ class ApiOptions extends OptionsBase
     /** @var string */
     private $password;
 
-    public static function createDefault()
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
     {
-        $result = new self;
-
-        return $result;
+        return array_merge(parent::jsonSerialize(), get_object_vars($this));
     }
 }

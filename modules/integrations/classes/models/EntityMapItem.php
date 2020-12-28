@@ -2,54 +2,46 @@
 
 namespace RNS\Integrations\Models;
 
-class EntityMapItem implements \JsonSerializable
+class EntityMapItem
 {
     /** @var string */
-    private $srcEntityId;
-    /** @var int */
-    private $destEntityId;
+    private $externalEntityId;
+    /** @var int|null */
+    private $internalEntityId;
 
     /**
      * @return string
      */
-    public function getSrcEntityId(): string
+    public function getExternalEntityId(): string
     {
-        return $this->srcEntityId;
+        return $this->externalEntityId;
     }
 
     /**
-     * @param string $srcEntityId
+     * @param string $externalEntityId
      * @return EntityMapItem
      */
-    public function setSrcEntityId(string $srcEntityId): EntityMapItem
+    public function setExternalEntityId(string $externalEntityId): EntityMapItem
     {
-        $this->srcEntityId = $srcEntityId;
+        $this->externalEntityId = $externalEntityId;
         return $this;
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getDestEntityId(): int
+    public function getInternalEntityId(): ?int
     {
-        return $this->destEntityId;
+        return $this->internalEntityId;
     }
 
     /**
-     * @param int $destEntityId
+     * @param int|null $internalEntityId
      * @return EntityMapItem
      */
-    public function setDestEntityId(int $destEntityId): EntityMapItem
+    public function setInternalEntityId(?int $internalEntityId): EntityMapItem
     {
-        $this->destEntityId = $destEntityId;
+        $this->internalEntityId = $internalEntityId;
         return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function jsonSerialize()
-    {
-        return get_object_vars($this);
     }
 }

@@ -2,13 +2,38 @@
 
 namespace RNS\Integrations\Models;
 
-class FilesOptions extends OptionsBase
+/**
+ * Настройки лоя интеграции путем обмена файлами.
+ * @package RNS\Integrations\Models
+ */
+class FilesOptions extends OptionsBase implements \JsonSerializable
 {
+    /** @var string */
+    private $fileLocation;
 
-    public static function createDefault()
+    /**
+     * @return string
+     */
+    public function getFileLocation(): string
     {
-        $result = new self;
+        return $this->fileLocation;
+    }
 
-        return $result;
+    /**
+     * @param string $fileLocation
+     * @return FilesOptions
+     */
+    public function setFileLocation(string $fileLocation): FilesOptions
+    {
+        $this->fileLocation = $fileLocation;
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return array_merge(parent::jsonSerialize(), get_object_vars($this));
     }
 }

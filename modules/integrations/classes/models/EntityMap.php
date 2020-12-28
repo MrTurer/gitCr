@@ -2,7 +2,7 @@
 
 namespace RNS\Integrations\Models;
 
-class EntityMap implements \JsonSerializable
+class EntityMap
 {
     /** @var string|null */
     private $srcElementName;
@@ -10,6 +10,8 @@ class EntityMap implements \JsonSerializable
     private $keyAttrName;
     /** @var string|null */
     private $displayAttrName;
+    /** @var int|null */
+    private $defaultEntityId;
     /** @var EntityMapItem[] */
     private $items = [];
 
@@ -68,6 +70,24 @@ class EntityMap implements \JsonSerializable
     }
 
     /**
+     * @return int|null
+     */
+    public function getDefaultEntityId(): ?int
+    {
+        return $this->defaultEntityId;
+    }
+
+    /**
+     * @param int|null $defaultEntityId
+     * @return EntityMap
+     */
+    public function setDefaultEntityId(?int $defaultEntityId): EntityMap
+    {
+        $this->defaultEntityId = $defaultEntityId;
+        return $this;
+    }
+
+    /**
      * @return EntityMapItem[]
      */
     public function getItems(): array
@@ -85,11 +105,21 @@ class EntityMap implements \JsonSerializable
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function jsonSerialize()
+    public function getExternalItem(string $id)
     {
-        return get_object_vars($this);
+        foreach ($this->items as $item) {
+            if ($item->getExternalEntityId() == $id) {
+                return $item;
+            }
+        }
+        return null;
+    }
+
+    public function addItem($externalEntityId, $internalEntityId = null)
+    {
+        $item = new EntityMapItem();
+        $item->setExternalEntityId($externalEntityId);
+        $item->setInternalEntityId($internalEntityId);
+        $this->items[]  = $item;
     }
 }

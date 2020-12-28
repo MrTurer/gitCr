@@ -87,18 +87,10 @@ class integrations extends CModule
             $DB->Query("insert into integration_exchange_type (name, code) values('Импорт/экспорт файлов', 'files')", true);
         }
 
-        $arCount = $DB->Query("select count(id) as CNT from integration_map_type", true)->Fetch();
-        if (is_array($arCount) && isset($arCount['CNT']) && intval($arCount['CNT']) <= 0) {
-            $DB->Query("insert into integration_map_type (name, code, description) values('Field to Field', 'FTF', 'поле переносится в поле')", true);
-            $DB->Query("insert into integration_map_type (name, code, description) values('Field to comment', 'FTC', 'значение поля вносится в комментарий сущности')", true);
-            $DB->Query("insert into integration_map_type (name, code, description) values('Object to Object', 'OTO', 'объект связан с объектом. ID system1 => ID system 2')", true);
-            $DB->Query("insert into integration_map_type (name, code, description) values('Link to Field', 'LTF', 'с указанием названия транзакции. Подставляется шаблон, если во внешней системе есть ссылки')", true);
-        }
-
         $arCount = $DB->Query("select count(id) as CNT from integration_external_system", true)->Fetch();
         if (is_array($arCount) && isset($arCount['CNT']) && intval($arCount['CNT']) <= 0) {
             $DB->Query("insert into integration_external_system (name, code, created_by, modified_by) values('Jira', 'jira', 1, 1)", true);
-            $DB->Query("insert into integration_external_system (name, code, created_by, modified_by) values('Outlook', 'outlook', 1, 1)", true);
+            $DB->Query("insert into integration_external_system (name, code, created_by, modified_by) values('MS Outlook', 'outlook', 1, 1)", true);
             $DB->Query("insert into integration_external_system (name, code, created_by, modified_by) values('MS Project', 'msproject', 1, 1)", true);
             $DB->Query("insert into integration_external_system (name, code, created_by, modified_by) values('SAP', 'sap', 1, 1)", true);
         }

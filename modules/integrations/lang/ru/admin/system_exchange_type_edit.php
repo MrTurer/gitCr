@@ -7,18 +7,20 @@ $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_API'] = 'Подключение';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_EMAIL'] = 'Правила разбора почты';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_FILES'] = 'Настройки файлов';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_PROJECTS'] = 'Проекты';
-$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_PROJ_FIELDS'] = 'Атрибуты проекта';
-$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_TASK_FIELDS'] = 'Атрибуты задачи';
-$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_TASK_TYPES'] = 'Типы задачи';
-$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_TASK_STATUSES'] = 'Статусы задачи';
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_ENTITY_TYPES'] = 'Сущности';
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_ENTITY_STATUSES'] = 'Статусы';
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_ENTITY_PROPS'] = 'Свойства сущности';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_USERS'] = 'Пользователи';
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_RESPONSIBLE'] = 'Ответственные';
 
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_GENERAL_SYSTEN'] = 'Информационная системы';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_GENERAL_EXCH_TYPE'] = 'Тип взаимодействия';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_GENERAL_EXCH_DIR'] = 'Направление';
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_GENERAL_TASK_LEVEL'] = 'Уровень задач, участвующих в синхронизации';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_GENERAL_SCHEDULE'] = 'Частота обхода агента';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_GENERAL_ACTIVE'] = 'Активно';
 
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_DATABASE_TYPE'] = 'СУБД';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_DATABASE_HOSTNAME'] = 'Имя сервера';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_DATABASE_PORT'] = 'Порт';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_DATABASE_DATABSENAME'] = 'База данных';
@@ -26,20 +28,30 @@ $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_DATABASE_USERNAME'] = 'Имя польз�
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_DATABASE_PASSWORD'] = 'Пароль';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_TEST_CONNECTION'] = 'Тест подключения';
 
-$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_PROJ_SOURCE_ELEM'] = 'Имя таблицы проектов во внешней системе';
-$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_GET_PROJECTS'] = 'Получить список проектов';
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_PROJ_SOURCE_ELEM'] = 'Источник во внешней системе';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_KEY_ATTR'] = 'Ключевое поле';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_DISPLAY_ATTR'] = 'Поле для вывода';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_SRC_PRJ'] = 'Проект во внешней системе';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_DEST_PRJ'] = 'Проект в СППР';
-$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_TASK_SOURCE_ELEM'] = 'Имя таблицы задач во внешней системе';
-$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_TASK_LEVEL'] = 'Уровень задач, участвующих в синхронизации';
-$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_SRC_ATTR'] = 'Имя поля во внешней системе';
-$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_TYPE'] = 'Тип сопоставления';
-$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_DEST_ATTR'] = 'Имя поля в СППР';
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_DEF_PRJ'] = 'Проект в СППР по умолчанию';
 
-$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_USER_SOURCE_ELEM'] = 'Имя таблицы пользователей во внешней системе';
-$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_GET_USERS'] = 'Получить список пользователей';
-$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_SRC_USER'] = 'Пользователь во внешней системе';
-$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_DEST_USER'] = 'Пользователь в СППР';
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_TASK_SOURCE_ELEM'] = 'Источник во внешней системе';
 
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_EXT_ENT_TYPE'] = 'Тип сущности во внешней системе';
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_EXT_PROP'] = 'Свойство во внешней системе';
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_INT_ENT_TYPE'] = 'Тип сущности в СППР';
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_INT_PROP'] = 'Свойство в СППР';
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_ENT_DEF_TYPE'] = 'Тип сущности по умолчанию';
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_ENT_DEF_PROP'] = 'Свойство сущности по умолчанию';
+
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_EXT_ENT_STATUS'] = 'Статус сущности во внешней системе';
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_INT_ENT_STATUS'] = 'Статус сущности в СППР';
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_ENT_DEF_STATUS'] = 'Статус сущности по умолчанию';
+
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_ADD_MAP'] = 'Добавить сопоставление';
+
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_USER_SOURCE_ELEM'] = 'Источник во внешней системе';
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_INT_USER'] = 'Пользователь в СППР';
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_EXT_USER'] = 'Пользователь во внешней системе';
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_USER_DEF_EXT_EMAIL'] = 'E-mail при отсутствии исполнителя';
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_USER_IGNORE_ALIENS'] = 'Игнорировать тех, кого нет в системе';

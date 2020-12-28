@@ -2,8 +2,14 @@
 
 namespace RNS\Integrations\Models;
 
+/**
+ * Настройки для интеграции с помощью запросов к СУБД.
+ * @package RNS\Integrations\Models
+ */
 class DatabaseOptions extends OptionsBase implements \JsonSerializable
 {
+    /** @var string */
+    private $type = 'pgsql';
     /** @var string */
     private $hostName;
     /** @var int */
@@ -14,6 +20,24 @@ class DatabaseOptions extends OptionsBase implements \JsonSerializable
     private $userName;
     /** @var string */
     private $password;
+
+    /**
+     * @return string
+     */
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string $type
+     * @return DatabaseOptions
+     */
+    public function setType(string $type): DatabaseOptions
+    {
+        $this->type = $type;
+        return $this;
+    }
 
     /**
      * @return string
@@ -103,13 +127,6 @@ class DatabaseOptions extends OptionsBase implements \JsonSerializable
     {
         $this->password = $password;
         return $this;
-    }
-
-    public static function createDefault()
-    {
-        $result = new self;
-
-        return $result;
     }
 
     /**

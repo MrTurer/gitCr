@@ -34,6 +34,14 @@ class SystemExchangeType
     }
 
     /**
+     * @return string
+     */
+    public function getSystemCode(): string
+    {
+        return $this->obj->getSystem()->getCode();
+    }
+
+    /**
      * @return int
      */
     public function getExchangeTypeId(): int
@@ -110,6 +118,22 @@ class SystemExchangeType
     }
 
     /**
+     * @param array $fields
+     * @return array
+     * @throws ArgumentException
+     * @throws \Bitrix\Main\ObjectPropertyException
+     * @throws \Bitrix\Main\SystemException
+     */
+    public static function getList(array $fields = []): array
+    {
+        $res = SystemExchangeTypeTable::getList([
+            'select' => empty($fields) ? ['*'] : $fields,
+            'filter' => ['=ACTIVE' => 'Y']
+        ]);
+        return $res->fetchAll();
+    }
+
+    /**
      * @param int $id
      * @return SystemExchangeType
      * @throws ArgumentException
@@ -121,7 +145,7 @@ class SystemExchangeType
     {
         $result = new self;
         if ($id > 0) {
-            $result->obj = SystemExchangeTypeTable::getByPrimary($id, ['select' => ['*', 'EXCHANGE_TYPE.CODE']])
+            $result->obj = SystemExchangeTypeTable::getByPrimary($id, ['select' => ['*', 'EXCHANGE_TYPE.CODE', 'SYSTEM.CODE']])
               ->fetchObject();
             $mapper = new JsonMapper();
             $mapper->bIgnoreVisibility = true;
@@ -132,14 +156,14 @@ class SystemExchangeType
                 $mapper->map($options, $result->options);
             }
 
-            $result->mapping = Mapping::createDefault();
+            $result->mapping = new Mapping();
             $mapping = json_decode($result->obj->getMapping());
             if (!empty($mapping)) {
                 $mapper->map($mapping, $result->mapping);
             }
         } else {
             $result->obj = SystemExchangeTypeTable::createObject();
-            $result->mapping = Mapping::createDefault();
+            $result->mapping = new Mapping();
         }
 
         return $result;
@@ -175,17 +199,21 @@ class SystemExchangeType
         $this->obj->save();
     }
 
+    /**
+     * @return ApiOptions|DatabaseOptions|EmailOptions|FilesOptions
+     * @throws ArgumentException
+     */
     public function createDefaultOptions()
     {
         switch ($this->getExchangeTypeCode()) {
             case ExchangeTypeTable::TYPE_API:
-                return ApiOptions::createDefault();
+                return new ApiOptions();
             case ExchangeTypeTable::TYPE_DATABASE:
-                return DatabaseOptions::createDefault();
+                return new DatabaseOptions();
             case ExchangeTypeTable::TYPE_EMAIL:
-                return EmailOptions::createDefault();
+                return new EmailOptions();
             case ExchangeTypeTable::TYPE_FILES:
-                return FilesOptions::createDefault();
+                return new FilesOptions();
             default:
                 throw new ArgumentException('Unsupported exchange type code.', 'exchangeTypeCode');
         }

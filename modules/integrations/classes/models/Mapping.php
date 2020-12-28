@@ -5,29 +5,29 @@ namespace RNS\Integrations\Models;
 use RNS\Integrations\Helpers\TableHelper;
 use RNS\Integrations\MapTypeTable;
 
-class Mapping implements \JsonSerializable
+class Mapping
 {
     /** @var EntityMap */
     private $projectMap;
-    /** @var EntityMap */
-    private $taskTypeMap;
-    /** @var EntityMap */
-    private $taskStatusMap;
-    /** @var AttributeMap */
-    private $projectAttrMap;
-    /** @var AttributeMap */
-    private $taskAttrMap;
+    /** @var EntityTypeMap */
+    private $entityTypeMap;
+    /** @var EntityStatusMap */
+    private $entityStatusMap;
+    /** @var PropertyMap */
+    private $entityPropertyMap;
     /** @var UserMap */
     private $userMap;
+    /** @var ResponsibleSettings */
+    private $responsibleSettings;
 
     public function __construct()
     {
         $this->projectMap = new EntityMap();
-        $this->taskTypeMap = new EntityMap();
-        $this->taskStatusMap = new EntityMap();
-        $this->projectAttrMap = new AttributeMap();
-        $this->taskAttrMap = new AttributeMap();
+        $this->entityTypeMap = new EntityTypeMap();
+        $this->entityStatusMap = new EntityStatusMap();
+        $this->entityPropertyMap = new PropertyMap();
         $this->userMap = new UserMap();
+        $this->responsibleSettings = new ResponsibleSettings();
     }
 
     /**
@@ -49,74 +49,56 @@ class Mapping implements \JsonSerializable
     }
 
     /**
-     * @return EntityMap
+     * @return EntityTypeMap
      */
-    public function getTaskTypeMap(): EntityMap
+    public function getEntityTypeMap(): EntityTypeMap
     {
-        return $this->taskTypeMap;
+        return $this->entityTypeMap;
     }
 
     /**
-     * @param EntityMap $taskTypeMap
+     * @param EntityTypeMap $entityTypeMap
      * @return Mapping
      */
-    public function setTaskTypeMap(EntityMap $taskTypeMap): Mapping
+    public function setEntityTypeMap(EntityTypeMap $entityTypeMap): Mapping
     {
-        $this->taskTypeMap = $taskTypeMap;
+        $this->entityTypeMap = $entityTypeMap;
         return $this;
     }
 
     /**
-     * @return EntityMap
+     * @return EntityStatusMap
      */
-    public function getTaskStatusMap(): EntityMap
+    public function getEntityStatusMap(): EntityStatusMap
     {
-        return $this->taskStatusMap;
+        return $this->entityStatusMap;
     }
 
     /**
-     * @param EntityMap $taskStatusMap
+     * @param EntityStatusMap $entityStatusMap
      * @return Mapping
      */
-    public function setTaskStatusMap(EntityMap $taskStatusMap): Mapping
+    public function setEntityStatusMap(EntityStatusMap $entityStatusMap): Mapping
     {
-        $this->taskStatusMap = $taskStatusMap;
+        $this->entityStatusMap = $entityStatusMap;
         return $this;
     }
 
     /**
-     * @return AttributeMap
+     * @return PropertyMap
      */
-    public function getProjectAttrMap(): AttributeMap
+    public function getEntityPropertyMap(): PropertyMap
     {
-        return $this->projectAttrMap;
+        return $this->entityPropertyMap;
     }
 
     /**
-     * @param AttributeMap $projectAttrMap
+     * @param PropertyMap $entityPropertyMap
      * @return Mapping
      */
-    public function setProjectAttrMap(AttributeMap $projectAttrMap): Mapping
+    public function setEntityPropertyMap(PropertyMap $entityPropertyMap): Mapping
     {
-        $this->projectAttrMap = $projectAttrMap;
-        return $this;
-    }
-
-    /**
-     * @return AttributeMap
-     */
-    public function getTaskAttrMap(): AttributeMap
-    {
-        return $this->taskAttrMap;
-    }
-
-    /**
-     * @param AttributeMap $taskAttrMap
-     * @return Mapping
-     */
-    public function setTaskAttrMap(AttributeMap $taskAttrMap): Mapping
-    {
-        $this->taskAttrMap = $taskAttrMap;
+        $this->entityPropertyMap = $entityPropertyMap;
         return $this;
     }
 
@@ -138,41 +120,21 @@ class Mapping implements \JsonSerializable
         return $this;
     }
 
-    public static function createDefault(): self
+    /**
+     * @return ResponsibleSettings
+     */
+    public function getResponsibleSettings(): ResponsibleSettings
     {
-        $result = new self;
-
-        $settings = require_once ($_SERVER['DOCUMENT_ROOT'] . '/local/modules/integrations/settings.php');
-
-        $projectFields = TableHelper::getTableColumns($settings['database']['projectTableName']);
-        $taskFields = TableHelper::getTableColumns($settings['database']['taskTableName']);
-
-        $items = [];
-        foreach ($projectFields as $projectField) {
-            $item = new AttributeMapItem();
-            $item->setMapTypeId(MapTypeTable::FTF);
-            $item->setDestAttrName($projectField->getName());
-            $items[] = $item;
-        }
-        $result->projectAttrMap->setItems($items);
-
-        $items = [];
-        foreach ($taskFields as $taskField) {
-            $item = new AttributeMapItem();
-            $item->setMapTypeId(MapTypeTable::FTF);
-            $item->setDestAttrName($taskField->getName());
-            $items[] = $item;
-        }
-        $result->taskAttrMap->setItems($items);
-
-        return $result;
+        return $this->responsibleSettings;
     }
 
     /**
-     * @inheritDoc
+     * @param ResponsibleSettings $responsibleSettings
+     * @return Mapping
      */
-    public function jsonSerialize()
+    public function setResponsibleSettings(ResponsibleSettings $responsibleSettings): Mapping
     {
-        return get_object_vars($this);
+        $this->responsibleSettings = $responsibleSettings;
+        return $this;
     }
 }

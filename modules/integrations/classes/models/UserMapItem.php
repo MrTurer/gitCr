@@ -2,54 +2,46 @@
 
 namespace RNS\Integrations\Models;
 
-class UserMapItem implements \JsonSerializable
+class UserMapItem
 {
     /** @var string */
-    private $srcEmail;
+    private $externalEmail;
     /** @var string */
-    private $destEmail;
+    private $internalEmail;
 
     /**
      * @return string
      */
-    public function getSrcEmail(): string
+    public function getExternalEmail(): string
     {
-        return $this->srcEmail;
+        return $this->externalEmail;
     }
 
     /**
-     * @param string $srcEmail
+     * @param string $externalEmail
      * @return UserMapItem
      */
-    public function setSrcEmail(string $srcEmail): UserMapItem
+    public function setExternalEmail(string $externalEmail): UserMapItem
     {
-        $this->srcEmail = $srcEmail;
+        $this->externalEmail = $externalEmail;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getDestEmail(): string
+    public function getInternalEmail(): string
     {
-        return $this->destEmail;
+        return $this->internalEmail;
     }
 
     /**
-     * @param string $destEmail
+     * @param string $internalEmail
      * @return UserMapItem
      */
-    public function setDestEmail(string $destEmail): UserMapItem
+    public function setInternalEmail(string $internalEmail): UserMapItem
     {
-        $this->destEmail = $destEmail;
+        $this->internalEmail = $internalEmail;
         return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function jsonSerialize()
-    {
-        return get_object_vars($this);
     }
 }
