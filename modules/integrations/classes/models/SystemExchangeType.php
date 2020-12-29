@@ -26,49 +26,49 @@ class SystemExchangeType
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getSystemId(): int
+    public function getSystemId(): ?int
     {
         return $this->obj->getSystemId();
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getSystemCode(): string
+    public function getSystemCode(): ?string
     {
         return $this->obj->getSystem()->getCode();
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getExchangeTypeId(): int
+    public function getExchangeTypeId(): ?int
     {
         return $this->obj->getExchangeTypeId();
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getExchangeTypeCode(): string
+    public function getExchangeTypeCode(): ?string
     {
-        return $this->obj->getExchangeType()->getCode();
+        return $this->obj->getExchangeType() ? $this->obj->getExchangeType()->getCode() : null;
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getDirection(): int
+    public function getDirection(): ?int
     {
         return $this->obj->getDirection();
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getSchedule(): string
+    public function getSchedule(): ?string
     {
         return $this->obj->getSchedule();
     }
@@ -82,9 +82,9 @@ class SystemExchangeType
     }
 
     /**
-     * @return OptionsBase
+     * @return OptionsBase|null
      */
-    public function getOptions(): OptionsBase
+    public function getOptions(): ?OptionsBase
     {
         return $this->options;
     }
@@ -141,7 +141,7 @@ class SystemExchangeType
      * @throws \Bitrix\Main\SystemException
      * @throws \Exception
      */
-    public static function getById(int $id)
+    public static function getById(?int $id)
     {
         $result = new self;
         if ($id > 0) {
@@ -163,6 +163,7 @@ class SystemExchangeType
             }
         } else {
             $result->obj = SystemExchangeTypeTable::createObject();
+            $result->options = new OptionsBase();
             $result->mapping = new Mapping();
         }
 
@@ -176,9 +177,14 @@ class SystemExchangeType
     {
         global $USER;
 
-        $mappings = ['entityTypeMap', 'entityStatusMap', 'entityPropertyMap', 'userMap'];
-        foreach ($mappings as $mapping) {
-            $fields['mapping'][$mapping]['items'] = $this->filterDeletedItems($fields['mapping'][$mapping]['items']);
+        if (!empty($fields['mapping'])) {
+            $mappings = ['entityTypeMap', 'entityStatusMap', 'entityPropertyMap', 'userMap'];
+            foreach ($mappings as $mapping) {
+                if (empty($fields['mapping'][$mapping]) || empty($fields['mapping'][$mapping]['items'])) {
+                    continue;
+                }
+                $fields['mapping'][$mapping]['items'] = $this->filterDeletedItems($fields['mapping'][$mapping]['items']);
+            }
         }
 
         $this->obj->setSystemId($fields['externalSystem']);
@@ -187,7 +193,7 @@ class SystemExchangeType
         $this->obj->setSchedule($fields['schedule']);
         $this->obj->setActive(!empty($fields['active']) ? 'Y' : 'N');
         if (!$this->obj->getId()) {
-            $this->obj->setCreateddBy($USER->GetID());
+            $this->obj->setCreatedBy($USER->GetID());
         }
         $this->obj->setModifiedBy($USER->GetID());
         $this->obj->setModified(DateTime::createFromTimestamp(time()));

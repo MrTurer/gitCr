@@ -17,6 +17,7 @@ abstract class DataProviderBase
         $this->mapping = $mapping;
     }
 
+    public abstract function isAvailable();
     public abstract function getProjects();
     public abstract function getEntities();
     public abstract function getUsers();

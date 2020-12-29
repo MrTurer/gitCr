@@ -10,57 +10,57 @@ class DatabaseOptions extends OptionsBase implements \JsonSerializable
 {
     /** @var string */
     private $type = 'pgsql';
-    /** @var string */
+    /** @var string|null */
     private $hostName;
-    /** @var int */
+    /** @var int|null */
     private $port;
-    /** @var string */
+    /** @var string|null */
     private $databaseName;
-    /** @var string */
+    /** @var string|null */
     private $userName;
-    /** @var string */
+    /** @var string|null */
     private $password;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getType(): string
+    public function getType(): ?string
     {
         return $this->type;
     }
 
     /**
-     * @param string $type
+     * @param string|null $type
      * @return DatabaseOptions
      */
-    public function setType(string $type): DatabaseOptions
+    public function setType(?string $type): DatabaseOptions
     {
         $this->type = $type;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getHostName(): string
+    public function getHostName(): ?string
     {
         return $this->hostName;
     }
 
     /**
-     * @param string $hostName
+     * @param string|null $hostName
      * @return DatabaseOptions
      */
-    public function setHostName(string $hostName): DatabaseOptions
+    public function setHostName(?string $hostName): DatabaseOptions
     {
         $this->hostName = $hostName;
         return $this;
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getPort(): int
+    public function getPort(): ?int
     {
         return $this->port;
     }
@@ -76,54 +76,54 @@ class DatabaseOptions extends OptionsBase implements \JsonSerializable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getDatabaseName(): string
+    public function getDatabaseName(): ?string
     {
         return $this->databaseName;
     }
 
     /**
-     * @param string $databaseName
+     * @param string|null $databaseName
      * @return DatabaseOptions
      */
-    public function setDatabaseName(string $databaseName): DatabaseOptions
+    public function setDatabaseName(?string $databaseName): DatabaseOptions
     {
         $this->databaseName = $databaseName;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getUserName(): string
+    public function getUserName(): ?string
     {
         return $this->userName;
     }
 
     /**
-     * @param string $userName
+     * @param string|null $userName
      * @return DatabaseOptions
      */
-    public function setUserName(string $userName): DatabaseOptions
+    public function setUserName(?string $userName): DatabaseOptions
     {
         $this->userName = $userName;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getPassword(): string
+    public function getPassword(): ?string
     {
         return $this->password;
     }
 
     /**
-     * @param string $password
+     * @param string|null $password
      * @return DatabaseOptions
      */
-    public function setPassword(string $password): DatabaseOptions
+    public function setPassword(?string $password): DatabaseOptions
     {
         $this->password = $password;
         return $this;

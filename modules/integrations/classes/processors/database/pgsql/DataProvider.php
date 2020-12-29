@@ -15,8 +15,16 @@ class DataProvider extends DataProviderBase
         parent::__construct($options, $mapping);
     }
 
+    public function isAvailable()
+    {
+        return extension_loaded('pgsql');
+    }
+
     public function getProjects()
     {
+        if (!$this->isAvailable()) {
+            return [];
+        }
         $this->connect();
 
         $map = $this->mapping->getProjectMap();
@@ -48,11 +56,18 @@ class DataProvider extends DataProviderBase
 
     public function getEntities()
     {
+        if (!$this->isAvailable()) {
+            return [];
+        }
 
+        return [];
     }
 
     public function getUsers()
     {
+        if (!$this->isAvailable()) {
+            return [];
+        }
         $this->connect();
 
         $map = $this->mapping->getUserMap();
