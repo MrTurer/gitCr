@@ -143,11 +143,23 @@ class EntityFacade
 
     public static function getExternalProjects(string $echangeTypeCode, OptionsBase $options, Mapping $mapping)
     {
+        $provider = self::getDataProvider($echangeTypeCode, $options, $mapping);
+        return $provider->getProjects();
+    }
+
+    public static function getExternalUsers(string $echangeTypeCode, OptionsBase $options, Mapping $mapping)
+    {
+        $provider = self::getDataProvider($echangeTypeCode, $options, $mapping);
+        return $provider->getUsers();
+    }
+
+    public static function getDataProvider(string $echangeTypeCode, OptionsBase $options, Mapping $mapping)
+    {
         $providerClassPath = $_SERVER['DOCUMENT_ROOT'] . '/local/modules/integrations/classes/processors/' . $echangeTypeCode . '/' .
           $options->getType() . '/DataProvider.php';
-        include($providerClassPath);
+        include_once($providerClassPath);
         $providerClass = "RNS\\Integrations\\Processors\\{$echangeTypeCode}\\{$options->getType()}\\DataProvider";
         $provider = new $providerClass($options, $mapping);
-        return $provider->getProjects();
+        return $provider;
     }
 }

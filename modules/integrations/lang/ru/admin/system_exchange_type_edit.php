@@ -30,7 +30,7 @@ $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_TEST_CONNECTION'] = 'Тест подкл�
 
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_PROJ_SOURCE_ELEM'] = 'Источник во внешней системе';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_KEY_ATTR'] = 'Ключевое поле';
-$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_DISPLAY_ATTR'] = 'Поле для вывода';
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_DISPLAY_ATTR'] = 'Поля для вывода';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_SRC_PRJ'] = 'Проект во внешней системе';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_DEST_PRJ'] = 'Проект в СППР';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_DEF_PRJ'] = 'Проект в СППР по умолчанию';
@@ -55,3 +55,11 @@ $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_INT_USER'] = 'Пользовател�
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_EXT_USER'] = 'Пользователь во внешней системе';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_USER_DEF_EXT_EMAIL'] = 'E-mail при отсутствии исполнителя';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_USER_IGNORE_ALIENS'] = 'Игнорировать тех, кого нет в системе';
+
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_RESP_DEF_RESP'] = 'Пользователь, на которого назначаются задачи, если ответственный, переданный при интеграции не был найден в СППР';
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_RESP_EXEC_LOAD'] = 'Исполнитель тот, кто загружает';
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_RESP_DEF_AUTHOR'] = 'Пользователь, который назначается автором, если переданный при интеграции не был найден в СППР';
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_RESP_AUTHOR_LOAD'] = 'Автор тот, кто загружает';
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_RESP_DEADLINE'] = 'Крайний срок по задачам, если дедлайн не был указан, дней';
+
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_DELETE_ITEM'] = 'Удал.';

@@ -4,30 +4,30 @@ namespace RNS\Integrations\Models;
 
 class ResponsibleSettings
 {
-    /** @var int */
+    /** @var int|null */
     private $defaultResponsibleId;
     /** @var bool */
-    private $executorLoading;
-    /** @var int */
+    private $executorLoading = false;
+    /** @var int|null */
     private $defaultAuthorId;
     /** @var bool */
-    private $authorLoading;
-    /** @var int */
+    private $authorLoading = false;
+    /** @var int|null */
     private $defaultDeadlineDays;
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getDefaultResponsibleId(): int
+    public function getDefaultResponsibleId(): ?int
     {
         return $this->defaultResponsibleId;
     }
 
     /**
-     * @param int $defaultResponsibleId
+     * @param int|null $defaultResponsibleId
      * @return ResponsibleSettings
      */
-    public function setDefaultResponsibleId(int $defaultResponsibleId): ResponsibleSettings
+    public function setDefaultResponsibleId(?int $defaultResponsibleId): ResponsibleSettings
     {
         $this->defaultResponsibleId = $defaultResponsibleId;
         return $this;
@@ -52,18 +52,18 @@ class ResponsibleSettings
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getDefaultAuthorId(): int
+    public function getDefaultAuthorId(): ?int
     {
         return $this->defaultAuthorId;
     }
 
     /**
-     * @param int $defaultAuthorId
+     * @param int|null $defaultAuthorId
      * @return ResponsibleSettings
      */
-    public function setDefaultAuthorId(int $defaultAuthorId): ResponsibleSettings
+    public function setDefaultAuthorId(?int $defaultAuthorId): ResponsibleSettings
     {
         $this->defaultAuthorId = $defaultAuthorId;
         return $this;
@@ -88,18 +88,18 @@ class ResponsibleSettings
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getDefaultDeadlineDays(): int
+    public function getDefaultDeadlineDays(): ?int
     {
         return $this->defaultDeadlineDays;
     }
 
     /**
-     * @param int $defaultDeadlineDays
+     * @param int|null $defaultDeadlineDays
      * @return ResponsibleSettings
      */
-    public function setDefaultDeadlineDays(int $defaultDeadlineDays): ResponsibleSettings
+    public function setDefaultDeadlineDays(?int $defaultDeadlineDays): ResponsibleSettings
     {
         $this->defaultDeadlineDays = $defaultDeadlineDays;
         return $this;

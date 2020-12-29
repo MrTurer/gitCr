@@ -176,6 +176,11 @@ class SystemExchangeType
     {
         global $USER;
 
+        $mappings = ['entityTypeMap', 'entityStatusMap', 'entityPropertyMap', 'userMap'];
+        foreach ($mappings as $mapping) {
+            $fields['mapping'][$mapping]['items'] = $this->filterDeletedItems($fields['mapping'][$mapping]['items']);
+        }
+
         $this->obj->setSystemId($fields['externalSystem']);
         $this->obj->setExchangeTypeId($fields['exchangeType']);
         $this->obj->setDirection($fields['exchangeDirection']);
@@ -217,5 +222,14 @@ class SystemExchangeType
             default:
                 throw new ArgumentException('Unsupported exchange type code.', 'exchangeTypeCode');
         }
+    }
+
+    private function filterDeletedItems(array $arr)
+    {
+        return array_values(array_filter($arr, function($item) {
+              return !isset($item['deleted']);
+          },
+          ARRAY_FILTER_USE_BOTH
+        ));
     }
 }

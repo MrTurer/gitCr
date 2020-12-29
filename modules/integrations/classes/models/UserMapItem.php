@@ -5,43 +5,43 @@ namespace RNS\Integrations\Models;
 class UserMapItem
 {
     /** @var string */
-    private $externalEmail;
-    /** @var string */
-    private $internalEmail;
+    private $internalId;
+    /** @var string|null */
+    private $externalId;
 
-    /**
+     /**
      * @return string
      */
-    public function getExternalEmail(): string
+    public function getInternalId(): string
     {
-        return $this->externalEmail;
+        return $this->internalId;
     }
 
     /**
-     * @param string $externalEmail
+     * @param string $internalId
      * @return UserMapItem
      */
-    public function setExternalEmail(string $externalEmail): UserMapItem
+    public function setInternalId(string $internalId): UserMapItem
     {
-        $this->externalEmail = $externalEmail;
+        $this->internalId = $internalId;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getInternalEmail(): string
+    public function getExternalId(): ?string
     {
-        return $this->internalEmail;
+        return $this->externalId;
     }
 
     /**
-     * @param string $internalEmail
+     * @param string|null $externalId
      * @return UserMapItem
      */
-    public function setInternalEmail(string $internalEmail): UserMapItem
+    public function setExternalId(?string $externalId): UserMapItem
     {
-        $this->internalEmail = $internalEmail;
+        $this->externalId = $externalId;
         return $this;
     }
 }

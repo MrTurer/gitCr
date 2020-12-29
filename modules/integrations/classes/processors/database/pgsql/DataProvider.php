@@ -24,6 +24,14 @@ class DataProvider extends DataProviderBase
         $keyField = $map->getKeyAttrName();
         $displayField = $map->getDisplayAttrName();
 
+        $displayField = explode(',', $displayField);
+
+        if (count($displayField) > 1) {
+            $displayField = implode("|| ', ' ||", $displayField);
+        } else {
+            $displayField = $displayField[0];
+        }
+
         $sql = "select {$keyField} as id, {$displayField} as name from {$tableName}";
 
         $res = pg_query($this->conn, $sql);
@@ -45,7 +53,33 @@ class DataProvider extends DataProviderBase
 
     public function getUsers()
     {
+        $this->connect();
 
+        $map = $this->mapping->getUserMap();
+        $tableName = $map->getSrcElementName();
+        $keyField = $map->getKeyAttrName();
+        $displayField = $map->getDisplayAttrName();
+
+        $displayField = explode(',', $displayField);
+
+        if (count($displayField) > 1) {
+            $displayField = implode(" || ', ' || ", $displayField);
+        } else {
+            $displayField = $displayField[0];
+        }
+
+        $sql = "select {$keyField} as id, {$displayField} as name from {$tableName}";
+
+        $res = pg_query($this->conn, $sql);
+
+        $data = [];
+        while ($row = pg_fetch_assoc($res)) {
+            $data[$row['id']] = $row['name'];
+        }
+
+        $this->disconnect();
+
+        return $data;
     }
 
     private function connect()

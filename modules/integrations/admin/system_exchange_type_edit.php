@@ -113,6 +113,31 @@ if ($ID > 0) {
         }
     }
 
+    $localUserOptions = [];
+    foreach ($localUsers['REFERENCE_ID'] as $i => $id) {
+        $localUserOptions[] = '<option value="'. $id . '">' . $localUsers['REFERENCE'][$i] . '</option>';
+    }
+
+    $externalUsers = [
+      'REFERENCE_ID' => [],
+      'REFERENCE' => []
+    ];
+    $users = EntityFacade::getExternalUsers($exchType, $obj->getOptions(), $obj->getMapping());
+    foreach ($users as $id => $name) {
+        $externalUsers['REFERENCE_ID'][] = $id;
+        $externalUsers['REFERENCE'][] = $name;
+    }
+    $externalUserOptions = [];
+    foreach ($externalUsers['REFERENCE_ID'] as $i => $id) {
+        $externalUserOptions[] = '<option value="'. $id . '">' . $externalUsers['REFERENCE'][$id] . '</option>';
+    }
+
+    foreach ($localUsers['REFERENCE_ID'] as $id) {
+        if (!$mapping->getUserMap()->getInternalItem($id)) {
+            $mapping->getUserMap()->addItem($id);
+        }
+    }
+
     $tabs = array_merge($tabs, [
       ['DIV' => 'tab-2', 'TAB' => Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_' . strtoupper($exchType))],
       ['DIV' => 'tab-3', 'TAB' => Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_PROJECTS')],
@@ -333,6 +358,11 @@ $tabControl->Begin();
                             <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_INT_ENT_TYPE') ?>
                         </div>
                     </td>
+                    <td class="adm-list-table-cell">
+                        <div class="adm-list-table-cell-inner">
+                            <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_DELETE_ITEM') ?>
+                        </div>
+                    </td>
                 </tr>
                 </thead>
                 <tbody>
@@ -344,11 +374,15 @@ $tabControl->Begin();
                         <td class="adm-list-table-cell">
                             <?= SelectBoxFromArray("mapping[entityTypeMap][items][{$i}][internalTypeId]", $entityTypes, $mapItem->getInternalTypeId()) ?>
                         </td>
+                        <td class="adm-list-table-cell">
+                            <?= InputType('checkbox', "mapping[entityTypeMap][items][{$i}][deleted]", false, false)?>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
                 <tr v-for="item in entityTypeMap.items">
                     <td class="adm-list-table-cell" v-html="entityTypeMapGetExtEntityTypeSelect(item)"></td>
                     <td class="adm-list-table-cell" v-html="entityTypeMapGetIntEntityTypeSelect(item)"></td>
+                    <td></td>
                 </tr>
                 </tbody>
             </table>
@@ -400,6 +434,11 @@ $tabControl->Begin();
                             <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_INT_ENT_STATUS') ?>
                         </div>
                     </td>
+                    <td class="adm-list-table-cell">
+                        <div class="adm-list-table-cell-inner">
+                            <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_DELETE_ITEM') ?>
+                        </div>
+                    </td>
                 </tr>
                 </thead>
                 <tbody>
@@ -417,6 +456,9 @@ $tabControl->Begin();
                         <td class="adm-list-table-cell">
                             <?= SelectBoxFromArray("mapping[entityStatusMap][items][{$i}][internalStatusId]", $entityStatuses, $mapItem->getInternalStatusId()) ?>
                         </td>
+                        <td class="adm-list-table-cell">
+                            <?= InputType('checkbox', "mapping[entityStatusMap][items][{$i}][deleted]", false, false)?>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
                 <tr v-for="item in entityStatusMap.items">
@@ -424,6 +466,7 @@ $tabControl->Begin();
                     <td class="adm-list-table-cell" v-html="entityStatusMapGetExtEntityStatusSelect(item)"></td>
                     <td class="adm-list-table-cell" v-html="entityStatusMapGetIntEntityTypeSelect(item)"></td>
                     <td class="adm-list-table-cell" v-html="entityStatusMapGetIntEntityStatusSelect(item)"></td>
+                    <td></td>
                 </tr>
                 </tbody>
             </table>
@@ -489,6 +532,11 @@ $tabControl->Begin();
                             <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_INT_PROP') ?>
                         </div>
                     </td>
+                    <td class="adm-list-table-cell">
+                        <div class="adm-list-table-cell-inner">
+                            <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_DELETE_ITEM') ?>
+                        </div>
+                    </td>
                 </tr>
                 </thead>
                 <tbody>
@@ -506,6 +554,9 @@ $tabControl->Begin();
                         <td class="adm-list-table-cell">
                             <?= SelectBoxFromArray("mapping[entityPropertyMap][items][{$i}][internalPropertyId]", $entityProps, $mapItem->getInternalPropertyId()) ?>
                         </td>
+                        <td class="adm-list-table-cell">
+                            <?= InputType('checkbox', "mapping[entityPropertyMap][items][{$i}][deleted]", false, false)?>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
                 <tr v-for="item in entityPropertyMap.items">
@@ -513,6 +564,7 @@ $tabControl->Begin();
                     <td class="adm-list-table-cell" v-html="entityPropertyMapGetExtEntityPropSelect(item)"></td>
                     <td class="adm-list-table-cell" v-html="entityPropertyMapGetIntEntityTypeSelect(item)"></td>
                     <td class="adm-list-table-cell" v-html="entityPropertyMapGetIntEntityPropSelect(item)"></td>
+                    <td></td>
                 </tr>
                 </tbody>
             </table>
@@ -556,7 +608,7 @@ $tabControl->Begin();
     </tr>
     <tr>
         <td class="adm-detail-content-cell-r" colspan="4">
-            <input type="button" value="<?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_ADD_MAP') ?>">
+            <input type="button" @click="userMapAddItem" value="<?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_ADD_MAP') ?>">
         </td>
     </tr>
     <tr>
@@ -574,11 +626,31 @@ $tabControl->Begin();
                             <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_EXT_USER') ?>
                         </div>
                     </td>
+                    <td class="adm-list-table-cell">
+                        <div class="adm-list-table-cell-inner">
+                            <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_DELETE_ITEM') ?>
+                        </div>
+                    </td>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-
+                <?php foreach ($mapping->getUserMap()->getItems() as $i => $item):?>
+                    <tr>
+                        <td class="adm-list-table-cell">
+                            <?= SelectBoxFromArray("mapping[userMap][items][{$i}][internalId]", $localUsers, $item->getInternalId()) ?>
+                        </td>
+                        <td class="adm-list-table-cell">
+                            <?= SelectBoxFromArray("mapping[userMap][items][{$i}][externalId]", $externalUsers, $item->getExternalId()) ?>
+                        </td>
+                        <td class="adm-list-table-cell">
+                            <?= InputType('checkbox', "mapping[userMap][items][{$i}][deleted]", false, false)?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+                <tr v-for="item in userMap.items">
+                    <td class="adm-list-table-cell" v-html="userMapGetIntUserSelect(item)"></td>
+                    <td class="adm-list-table-cell" v-html="userMapGetExtUserSelect(item)"></td>
+                    <td></td>
                 </tr>
                 </tbody>
             </table>
@@ -587,7 +659,40 @@ $tabControl->Begin();
     <?php $tabControl->BeginNextTab() ?>
     <!-- Ответственные -->
     <tr>
-        <td></td>
+        <td><?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_RESP_DEF_RESP') ?></td>
+        <td>
+            <?= SelectBoxFromArray('mapping[responsibleSettings][defaultResponsibleId]', $localUsers, $mapping->getResponsibleSettings()->getDefaultResponsibleId()) ?>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label for="active"><?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_RESP_EXEC_LOAD') ?></label>
+        </td>
+        <td>
+            <?= InputType('checkbox', 'mapping[responsibleSettings][executorLoading]', true, htmlspecialcharsbx($mapping->getResponsibleSettings()->isExecutorLoading())) ?>
+        </td>
+    </tr>
+    <tr>
+        <td><?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_RESP_DEF_AUTHOR') ?></td>
+        <td>
+            <?= SelectBoxFromArray('mapping[responsibleSettings][defaultAuthorId]', $localUsers, $mapping->getResponsibleSettings()->getDefaultAuthorId()) ?>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label for="active"><?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_RESP_AUTHOR_LOAD') ?></label>
+        </td>
+        <td>
+            <?= InputType('checkbox', 'mapping[responsibleSettings][authorLoading]', true, htmlspecialcharsbx($mapping->getResponsibleSettings()->isAuthorLoading())) ?>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_RESP_DEADLINE') ?>
+        </td>
+        <td>
+            <?= InputType('number', 'mapping[responsibleSettings][defaultDeadlineDays]', $mapping->getResponsibleSettings()->getDefaultDeadlineDays(), false, false, false, 'step="1"') ?>
+        </td>
     </tr>
     <?php endif; ?>
   </form>
@@ -614,6 +719,10 @@ $tabControl->End();
           },
           entityPropertyMap: {
             lastIndex: <?= count($mapping->getEntityPropertyMap()->getItems())?>,
+            items: []
+          },
+          userMap: {
+            lastIndex: <?= count($mapping->getUserMap()->getItems())?>,
             items: []
           }
         },
@@ -667,7 +776,20 @@ $tabControl->End();
           },
           entityPropertyMapGetIntEntityPropSelect(item) {
             return `<select name="mapping[entityPropertyMap][items][${item.idx}][internalPropertyId]" class="typeselect"><?= implode('', $entityPropertyOptions)?></select>`;
-          }
+          },
+
+          userMapAddItem() {
+            this.userMap.items.push({
+              idx: this.userMap.lastIndex
+            });
+            this.userMap.lastIndex++;
+          },
+          userMapGetIntUserSelect(item) {
+            return `<select name="mapping[userMap][items][${item.idx}][internalId]" class="typeselect"><?= implode('', $localUserOptions)?></select>`;
+          },
+          userMapGetExtUserSelect(item) {
+            return `<select name="mapping[userMap][items][${item.idx}][externalId]" class="typeselect"><?= implode('', $externalUserOptions)?></select>`;
+          },
         }
       });
     });

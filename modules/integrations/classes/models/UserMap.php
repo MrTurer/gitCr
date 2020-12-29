@@ -124,4 +124,22 @@ class UserMap
         $this->items = $items;
         return $this;
     }
+
+    public function getInternalItem(string $id)
+    {
+        foreach ($this->items as $item) {
+            if ($item->getInternalId() == $id) {
+                return $item;
+            }
+        }
+        return null;
+    }
+
+    public function addItem($internalId, $externalId = null)
+    {
+        $item = new UserMapItem();
+        $item->setInternalId($internalId);
+        $item->setExternalId($externalId);
+        $this->items[]  = $item;
+    }
 }
