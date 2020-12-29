@@ -24,7 +24,7 @@ CModule::AddAutoloadClasses(
     'RNS\Integrations\Models\UserMapItem' => 'classes/models/UserMapItem.php',
     'RNS\Integrations\Models\UserMap' => 'classes/models/UserMap.php',
     'RNS\Integrations\Models\ResponsibleSettings' => 'classes/models/ResponsibleSettings.php',
-    'RNS\Integrations\Models\MApping' => 'classes/models/MApping.php',
+    'RNS\Integrations\Models\Mapping' => 'classes/models/Mapping.php',
     'RNS\Integrations\Models\SystemExchangeType' => 'classes/models/SystemExchangeType.php',
     'RNS\Integrations\Processors\Database\Import' => 'classes/processors/database/Import.php',
     'RNS\Integrations\Processors\DataTransferBase' => 'classes/processors/DataTransferBase.php',
