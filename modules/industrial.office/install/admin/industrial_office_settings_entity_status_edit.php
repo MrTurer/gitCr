@@ -1,0 +1,1 @@
+<? require_once($_SERVER['DOCUMENT_ROOT'] . '/local/modules/industrial.office/admin/settings_entity_status_edit.php'); ?>
