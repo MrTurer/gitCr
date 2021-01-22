@@ -4,82 +4,82 @@ namespace RNS\Integrations\Models;
 
 class EntityStatusMapItem
 {
-    /** @var int */
+    /** @var mixed */
     private $externalTypeId;
-    /** @var int */
+    /** @var mixed */
     private $externalStatusId;
-    /** @var int */
+    /** @var mixed */
     private $internalTypeId;
-    /** @var int */
+    /** @var mixed */
     private $internalStatusId;
 
     /**
-     * @return int
+     * @return mixed
      */
-    public function getExternalTypeId(): int
+    public function getExternalTypeId()
     {
         return $this->externalTypeId;
     }
 
     /**
-     * @param int $externalTypeId
+     * @param mixed $externalTypeId
      * @return EntityStatusMapItem
      */
-    public function setExternalTypeId(int $externalTypeId): EntityStatusMapItem
+    public function setExternalTypeId($externalTypeId): EntityStatusMapItem
     {
         $this->externalTypeId = $externalTypeId;
         return $this;
     }
 
     /**
-     * @return int
+     * @return mixed
      */
-    public function getExternalStatusId(): int
+    public function getExternalStatusId()
     {
         return $this->externalStatusId;
     }
 
     /**
-     * @param int $externalStatusId
+     * @param mixed $externalStatusId
      * @return EntityStatusMapItem
      */
-    public function setExternalStatusId(int $externalStatusId): EntityStatusMapItem
+    public function setExternalStatusId($externalStatusId): EntityStatusMapItem
     {
         $this->externalStatusId = $externalStatusId;
         return $this;
     }
 
     /**
-     * @return int
+     * @return mixed
      */
-    public function getInternalTypeId(): int
+    public function getInternalTypeId()
     {
         return $this->internalTypeId;
     }
 
     /**
-     * @param int $internalTypeId
+     * @param mixed $internalTypeId
      * @return EntityStatusMapItem
      */
-    public function setInternalTypeId(int $internalTypeId): EntityStatusMapItem
+    public function setInternalTypeId($internalTypeId): EntityStatusMapItem
     {
         $this->internalTypeId = $internalTypeId;
         return $this;
     }
 
     /**
-     * @return int
+     * @return mixed
      */
-    public function getInternalStatusId(): int
+    public function getInternalStatusId()
     {
         return $this->internalStatusId;
     }
 
     /**
-     * @param int $internalStatusId
+     * @param mixed $internalStatusId
      * @return EntityStatusMapItem
      */
-    public function setInternalStatusId(int $internalStatusId): EntityStatusMapItem
+    public function setInternalStatusId($internalStatusId): EntityStatusMapItem
     {
         $this->internalStatusId = $internalStatusId;
         return $this;

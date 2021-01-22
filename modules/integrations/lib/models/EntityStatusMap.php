@@ -4,44 +4,44 @@ namespace RNS\Integrations\Models;
 
 class EntityStatusMap
 {
-    /** @var int|null */
+    /** @var mixed */
     private $defaultTypeId;
-    /** @var int|null */
+    /** @var mixed */
     private $defaultStatusId;
     /** @var EntityStatusMapItem[] */
     private $items = [];
 
     /**
-     * @return int|null
+     * @return mixed
      */
-    public function getDefaultTypeId(): ?int
+    public function getDefaultTypeId()
     {
         return $this->defaultTypeId;
     }
 
     /**
-     * @param int|null $defaultTypeId
+     * @param mixed $defaultTypeId
      * @return EntityStatusMap
      */
-    public function setDefaultTypeId(?int $defaultTypeId): EntityStatusMap
+    public function setDefaultTypeId($defaultTypeId): EntityStatusMap
     {
         $this->defaultTypeId = $defaultTypeId;
         return $this;
     }
 
     /**
-     * @return int|null
+     * @return mixed
      */
-    public function getDefaultStatusId(): ?int
+    public function getDefaultStatusId()
     {
         return $this->defaultStatusId;
     }
 
     /**
-     * @param int|null $defaultStatusId
+     * @param mixed $defaultStatusId
      * @return EntityStatusMap
      */
-    public function setDefaultStatusId(?int $defaultStatusId): EntityStatusMap
+    public function setDefaultStatusId($defaultStatusId): EntityStatusMap
     {
         $this->defaultStatusId = $defaultStatusId;
         return $this;

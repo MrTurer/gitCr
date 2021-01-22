@@ -4,6 +4,7 @@ namespace RNS\Integrations\Models;
 
 use Bitrix\Main\ArgumentException;
 use Bitrix\Main\Type\DateTime;
+use CAgent;
 use JsonMapper;
 use RNS\Integrations\ExchangeTypeTable;
 use RNS\Integrations\SystemExchangeTypeTable;
@@ -208,6 +209,8 @@ class SystemExchangeType
         $this->obj->setMapping(json_encode($fields['mapping'], JSON_UNESCAPED_UNICODE));
 
         $this->obj->save();
+
+        $this->addOrUpdateAgent();
     }
 
     /**
@@ -237,5 +240,41 @@ class SystemExchangeType
           },
           ARRAY_FILTER_USE_BOTH
         ));
+    }
+
+    private function addOrUpdateAgent()
+    {
+        $name = "\\RNS\\Integrations\\Processors\\IntegrationAgent::run({$this->getId()});";
+        $res = $list = CAgent::GetList([], ['NAME' => $name]);
+        if ($row = $res->Fetch()) {
+            CAgent::Update($row['ID'], [
+              'AGENT_INTERVAL' => $this->parseInterval(),
+              'ACTIVE' => $this->obj->getActive() ? 'Y' : 'N'
+            ]);
+        } else {
+            CAgent::AddAgent($name, 'integrations', 'N', $this->parseInterval());
+        }
+    }
+
+    private function parseInterval()
+    {
+        $result = 3600;
+        $schedule = $this->getSchedule();
+        if (!preg_match('/(\d+)\s*([hmd]+)/i', $schedule, $matches)) {
+            return $result;
+        }
+        $value = $matches[1];
+        switch ($matches[2]) {
+            case 'h':
+                $result = $value * 3600;
+                break;
+            case 'm':
+                $result = $value * 60;
+                break;
+            default:
+                $result = $value * 86400;
+                break;
+        }
+        return $result;
     }
 }

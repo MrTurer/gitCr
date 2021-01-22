@@ -2,6 +2,7 @@
 
 namespace RNS\Integrations\Processors\Database;
 
+use RNS\Integrations\Helpers\EntityFacade;
 use RNS\Integrations\Processors\DataTransferBase;
 
 /**
@@ -22,6 +23,8 @@ class Import extends DataTransferBase
 
     protected function execute()
     {
+        $provider = EntityFacade::getDataProvider($this->exchangeTypeCode, $this->options, $this->mapping);
+
 
     }
 }
