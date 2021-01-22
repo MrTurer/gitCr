@@ -4,82 +4,82 @@ namespace RNS\Integrations\Models;
 
 class PropertyMapItem
 {
-    /** @var int */
+    /** @var mixed */
     private $externalTypeId;
-    /** @var int */
+    /** @var mixed */
     private $externalPropertyId;
-    /** @var int */
+    /** @var mixed */
     private $internalTypeId;
-    /** @var int */
+    /** @var mixed */
     private $internalPropertyId;
 
     /**
-     * @return int
+     * @return mixed
      */
-    public function getExternalTypeId(): int
+    public function getExternalTypeId()
     {
         return $this->externalTypeId;
     }
 
     /**
-     * @param int $externalTypeId
+     * @param mixed $externalTypeId
      * @return PropertyMapItem
      */
-    public function setExternalTypeId(int $externalTypeId): PropertyMapItem
+    public function setExternalTypeId($externalTypeId): PropertyMapItem
     {
         $this->externalTypeId = $externalTypeId;
         return $this;
     }
 
     /**
-     * @return int
+     * @return mixed
      */
-    public function getExternalPropertyId(): int
+    public function getExternalPropertyId()
     {
         return $this->externalPropertyId;
     }
 
     /**
-     * @param int $externalPropertyId
+     * @param mixed $externalPropertyId
      * @return PropertyMapItem
      */
-    public function setExternalPropertyId(int $externalPropertyId): PropertyMapItem
+    public function setExternalPropertyId($externalPropertyId): PropertyMapItem
     {
         $this->externalPropertyId = $externalPropertyId;
         return $this;
     }
 
     /**
-     * @return int
+     * @return mixed
      */
-    public function getInternalTypeId(): int
+    public function getInternalTypeId()
     {
         return $this->internalTypeId;
     }
 
     /**
-     * @param int $internalTypeId
+     * @param mixed $internalTypeId
      * @return PropertyMapItem
      */
-    public function setInternalTypeId(int $internalTypeId): PropertyMapItem
+    public function setInternalTypeId($internalTypeId): PropertyMapItem
     {
         $this->internalTypeId = $internalTypeId;
         return $this;
     }
 
     /**
-     * @return int
+     * @return mixed
      */
-    public function getInternalPropertyId(): int
+    public function getInternalPropertyId()
     {
         return $this->internalPropertyId;
     }
 
     /**
-     * @param int $internalPropertyId
+     * @param mixed $internalPropertyId
      * @return PropertyMapItem
      */
-    public function setInternalPropertyId(int $internalPropertyId): PropertyMapItem
+    public function setInternalPropertyId($internalPropertyId): PropertyMapItem
     {
         $this->internalPropertyId = $internalPropertyId;
         return $this;

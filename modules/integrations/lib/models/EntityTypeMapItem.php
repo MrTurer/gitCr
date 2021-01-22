@@ -4,42 +4,42 @@ namespace RNS\Integrations\Models;
 
 class EntityTypeMapItem
 {
-    /** @var int */
+    /** @var mixed */
     private $externalTypeId;
-    /** @var int */
+    /** @var mixed */
     private $internalTypeId;
 
     /**
-     * @return int
+     * @return mixed
      */
-    public function getExternalTypeId(): int
+    public function getExternalTypeId()
     {
         return $this->externalTypeId;
     }
 
     /**
-     * @param int $externalTypeId
+     * @param mixed $externalTypeId
      * @return EntityTypeMapItem
      */
-    public function setExternalTypeId(int $externalTypeId): EntityTypeMapItem
+    public function setExternalTypeId($externalTypeId): EntityTypeMapItem
     {
         $this->externalTypeId = $externalTypeId;
         return $this;
     }
 
     /**
-     * @return int
+     * @return mixed
      */
-    public function getInternalTypeId(): int
+    public function getInternalTypeId()
     {
         return $this->internalTypeId;
     }
 
     /**
-     * @param int $internalTypeId
+     * @param mixed $internalTypeId
      * @return EntityTypeMapItem
      */
-    public function setInternalTypeId(int $internalTypeId): EntityTypeMapItem
+    public function setInternalTypeId($internalTypeId): EntityTypeMapItem
     {
         $this->internalTypeId = $internalTypeId;
         return $this;

@@ -71,10 +71,9 @@ if ($ID > 0) {
     $localUsers = EntityFacade::getUsers();
 
     $entityTypes = EntityFacade::getEntityTypes();
-    $entityStatuses = EntityFacade::getEntityStatuses();
     $entityProps = EntityFacade::getEntityProperties();
     $externalEntityTypes = EntityFacade::getExternalEntityTypes($systemCode);
-    $externalEntityStatuses = EntityFacade::getExternalEntityStatues($systemCode);
+    $externalEntityStatuses = EntityFacade::getExternalEntityStatuses($systemCode);
     $externalEntityProps = EntityFacade::getExternalEntityProperties($systemCode);
 
     $entityTypeOptions = [];
@@ -86,10 +85,6 @@ if ($ID > 0) {
         $externalEntityTypeOptions[] = '<option value="'. $id . '">' . $externalEntityTypes['REFERENCE'][$i] . '</option>';
     }
 
-    $entityStatusOptions = [];
-    foreach ($entityStatuses['REFERENCE_ID'] as $i => $id) {
-        $entityStatusOptions[] = '<option value="'. $id . '">' . $entityStatuses['REFERENCE'][$i] . '</option>';
-    }
     $externalEntityStatusOptions = [];
     foreach ($externalEntityStatuses['REFERENCE_ID'] as $i => $id) {
         $externalEntityStatusOptions[] = '<option value="'. $id . '">' . $externalEntityStatuses['REFERENCE'][$i] . '</option>';
@@ -395,13 +390,13 @@ $tabControl->Begin();
             <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_ENT_DEF_TYPE') ?>
         </td>
         <td class="adm-detail-content-cell-r">
-            <?= SelectBoxFromArray("mapping[entityStatusMap][defaultTypeId]", $entityTypes, $mapping->getEntityStatusMap()->getDefaultTypeId()) ?>
+            <?= SelectBoxFromArray("mapping[entityStatusMap][defaultTypeId]", $entityTypes, $mapping->getEntityStatusMap()->getDefaultTypeId(), '', 'id="mapping_entityStatusMap_defaultTypeId" onchange="entityStatusMapDefEntityTypeChange()"') ?>
         </td>
         <td class="adm-detail-content-cell-l">
             <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_ENT_DEF_STATUS') ?>
         </td>
         <td class="adm-detail-content-cell-r">
-            <?= SelectBoxFromArray("mapping[entityStatusMap][defaultStatusId]", $entityStatuses, $mapping->getEntityStatusMap()->getDefaultStatusId()) ?>
+            <?= SelectBoxFromArray("mapping[entityStatusMap][defaultStatusId]", [], '', '', 'id="mapping_entityStatusMap_defaultStatusId" data-value="' . $mapping->getEntityStatusMap()->getDefaultStatusId() . '"') ?>
         </td>
     </tr>
     <tr>
@@ -451,10 +446,10 @@ $tabControl->Begin();
                             <?= SelectBoxFromArray("mapping[entityStatusMap][items][{$i}][externalStatusId]", $externalEntityStatuses, $mapItem->getExternalStatusId()) ?>
                         </td>
                         <td class="adm-list-table-cell">
-                            <?= SelectBoxFromArray("mapping[entityStatusMap][items][{$i}][internalTypeId]", $entityTypes, $mapItem->getInternalTypeId()) ?>
+                            <?= SelectBoxFromArray("mapping[entityStatusMap][items][{$i}][internalTypeId]", $entityTypes, $mapItem->getInternalTypeId(), '', 'id="mapping_entityStatusMap_items_' . $i . '_internalTypeId" onchange="entityStatusMapEntityTypeChange(' . $i . ')"') ?>
                         </td>
                         <td class="adm-list-table-cell">
-                            <?= SelectBoxFromArray("mapping[entityStatusMap][items][{$i}][internalStatusId]", $entityStatuses, $mapItem->getInternalStatusId()) ?>
+                            <?= SelectBoxFromArray("mapping[entityStatusMap][items][{$i}][internalStatusId]", [], '', '', 'id="mapping_entityStatusMap_items_' . $i . '_internalStatusId" data-value="' . $mapItem->getInternalStatusId() . '"') ?>
                         </td>
                         <td class="adm-list-table-cell">
                             <?= InputType('checkbox', "mapping[entityStatusMap][items][{$i}][deleted]", false, false)?>
@@ -705,6 +700,51 @@ $tabControl->End();
 ?>
 <?php if ($ID > 0): ?>
 <script type="text/javascript">
+
+    function updateStatusListByIds(typesSelId, statusesSelId, selectVal) {
+      var typesSelect = BX(typesSelId);
+      var statusesSelect = BX(statusesSelId);
+      BX.ajax.runAction('integrations.api.entity.statuses', {data: {entityType: typesSelect.value}})
+        .then(function(response) {
+          if (response.status === 'success') {
+            var list = response.data.list;
+            BX.selectUtils.deleteAllOptions(statusesSelect);
+            list.forEach(function (item) {
+              BX.selectUtils.addNewOption(statusesSelect, item.UF_CODE, item.UF_RUS_NAME);
+            });
+            if (selectVal) {
+              BX.selectUtils.selectOption(statusesSelect, statusesSelect.getAttribute('data-value'));
+            }
+          }
+        }, function(result) {
+          console.log(result);
+        });
+    }
+
+    function updateStatusList(idx, selectVal) {
+      var typesSelId = 'mapping_entityStatusMap_items_' + idx + '_internalTypeId';
+      var statusesSelId = 'mapping_entityStatusMap_items_' + idx + '_internalStatusId';
+      updateStatusListByIds(typesSelId, statusesSelId, selectVal);
+    }
+
+    function entityStatusMapEntityTypeChange(idx) {
+      updateStatusList(idx);
+    }
+
+    function updateAllStatusLists() {
+      var idx = 0;
+      for (idx = 0;;idx++) {
+        var typesSelect = BX('mapping_entityStatusMap_items_' + idx + '_internalTypeId');
+        if (!typesSelect) break;
+        updateStatusList(idx, true);
+      }
+      updateStatusListByIds('mapping_entityStatusMap_defaultTypeId', 'mapping_entityStatusMap_defaultStatusId', true);
+    }
+
+    function entityStatusMapDefEntityTypeChange() {
+      updateStatusListByIds('mapping_entityStatusMap_defaultTypeId', 'mapping_entityStatusMap_defaultStatusId');
+    }
+
     BX.ready(function() {
       BX.Vue.create({
         el: '#settingsform',
@@ -741,10 +781,12 @@ $tabControl->End();
           },
 
           entityStatusMapAddItem() {
-            this.entityStatusMap.items.push({
-              idx: this.entityStatusMap.lastIndex
-            });
+            var item = {idx: this.entityStatusMap.lastIndex};
+            this.entityStatusMap.items.push(item);
             this.entityStatusMap.lastIndex++;
+            setTimeout(function() {
+              updateStatusList(item.idx);
+            }, 100);
           },
           entityStatusMapGetExtEntityTypeSelect(item) {
             return `<select name="mapping[entityStatusMap][items][${item.idx}][externalTypeId]" class="typeselect"><?= implode('', $externalEntityTypeOptions)?></select>`;
@@ -753,10 +795,10 @@ $tabControl->End();
             return `<select name="mapping[entityStatusMap][items][${item.idx}][externalStatusId]" class="typeselect"><?= implode('', $externalEntityStatusOptions)?></select>`;
           },
           entityStatusMapGetIntEntityTypeSelect(item) {
-            return `<select name="mapping[entityStatusMap][items][${item.idx}][internalTypeId]" class="typeselect"><?= implode('', $entityTypeOptions)?></select>`;
+            return `<select id="mapping_entityStatusMap_items_${item.idx}_internalTypeId" name="mapping[entityStatusMap][items][${item.idx}][internalTypeId]" class="typeselect" onchange="entityStatusMapEntityTypeChange(${item.idx})"><?= implode('', $entityTypeOptions)?></select>`;
           },
           entityStatusMapGetIntEntityStatusSelect(item) {
-            return `<select name="mapping[entityStatusMap][items][${item.idx}][internalStatusId]" class="typeselect"><?= implode('', $entityStatusOptions)?></select>`;
+            return `<select id="mapping_entityStatusMap_items_${item.idx}_internalStatusId" name="mapping[entityStatusMap][items][${item.idx}][internalStatusId]" class="typeselect"></select>`;
           },
 
           entityPropertyMapAddItem() {
@@ -792,6 +834,8 @@ $tabControl->End();
           },
         }
       });
+
+      updateAllStatusLists();
     });
 </script>
 <?php endif;?>

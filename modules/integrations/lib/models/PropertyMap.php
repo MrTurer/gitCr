@@ -8,9 +8,9 @@ class PropertyMap
     private $sourceElementName;
     /** @var string|null */
     private $keyPropertyName;
-    /** @var int|null */
+    /** @var mixed */
     private $defaultTypeId;
-    /** @var int|null */
+    /** @var mixed */
     private $defaultPropertyId;
     /** @var PropertyMapItem[] */
     private $items = [];
@@ -52,36 +52,36 @@ class PropertyMap
     }
 
     /**
-     * @return int|null
+     * @return mixed
      */
-    public function getDefaultTypeId(): ?int
+    public function getDefaultTypeId()
     {
         return $this->defaultTypeId;
     }
 
     /**
-     * @param int|null $defaultTypeId
+     * @param mixed $defaultTypeId
      * @return PropertyMap
      */
-    public function setDefaultTypeId(?int $defaultTypeId): PropertyMap
+    public function setDefaultTypeId($defaultTypeId): PropertyMap
     {
         $this->defaultTypeId = $defaultTypeId;
         return $this;
     }
 
     /**
-     * @return int|null
+     * @return mixed
      */
-    public function getDefaultPropertyId(): ?int
+    public function getDefaultPropertyId()
     {
         return $this->defaultPropertyId;
     }
 
     /**
-     * @param int|null $defaultPropertyId
+     * @param mixed $defaultPropertyId
      * @return PropertyMap
      */
-    public function setDefaultPropertyId(?int $defaultPropertyId): PropertyMap
+    public function setDefaultPropertyId($defaultPropertyId): PropertyMap
     {
         $this->defaultPropertyId = $defaultPropertyId;
         return $this;
