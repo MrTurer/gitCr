@@ -11,6 +11,8 @@ use RNS\Integrations\Models\SystemExchangeType;
  */
 abstract class DataTransferBase
 {
+    protected $systemCode;
+
     protected $exchangeTypeCode;
 
     protected $options;
@@ -23,6 +25,7 @@ abstract class DataTransferBase
     {
         $obj = SystemExchangeType::getById($systemExchangeTypeId);
 
+        $this->systemCode = $obj->getSystemCode();
         $this->exchangeTypeCode = $obj->getExchangeTypeCode();
         $this->options = $obj->getOptions();
         $this->mapping = $obj->getMapping();

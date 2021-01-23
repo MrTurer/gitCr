@@ -233,6 +233,16 @@ class SystemExchangeType
         }
     }
 
+    /**
+     * @param $id
+     * @return bool
+     * @throws \Exception
+     */
+    public static function delete($id)
+    {
+        return SystemExchangeTypeTable::delete($id)->isSuccess();
+    }
+
     private function filterDeletedItems(array $arr)
     {
         return array_values(array_filter($arr, function($item) {

@@ -2,6 +2,7 @@
 
 namespace RNS\Integrations\Processors\database\pgsql;
 
+use RNS\Integrations\Helpers\EntityFacade;
 use RNS\Integrations\Models\Mapping;
 use RNS\Integrations\Models\OptionsBase;
 use RNS\Integrations\Processors\DataProviderBase;
@@ -54,13 +55,45 @@ class DataProvider extends DataProviderBase
         return $data;
     }
 
-    public function getEntities()
+    /**
+     * Возвращает массив сущностей для импорта, у которых еще не проставлен признак того, что она уже сымпортирована.
+     * @param string $systemCode
+     * @return array
+     */
+    public function getEntities(string $systemCode)
     {
+        $result = [];
         if (!$this->isAvailable()) {
-            return [];
+            return $result;
         }
 
-        return [];
+        $srcTableName = $this->mapping->getEntityPropertyMap()->getSourceElementName();
+        $prjTableName = $this->mapping->getProjectMap()->getSrcElementName();
+        $prjKeyFieldName = $this->mapping->getProjectMap()->getKeyAttrName();
+        $refFieldName = $this->mapping->getEntityTypeMap()->getRefPropertyId();
+        $isSavedFieldName = $this->moduleOptions['database']['isSavedFieldName'];
+        $createdFieldName = $this->moduleOptions['database']['createdFieldName'][$systemCode];
+
+        $fields = EntityFacade::getExternalEntityProperties($systemCode);
+        $fieldNames = implode(', ', $fields['REFERENCE_ID']);
+
+        $sql =
+          "select {$fieldNames} from {$srcTableName} t
+           inner join {$prjTableName} p on t.{$refFieldName} = p.{$prjKeyFieldName}
+           where not t.{$isSavedFieldName}
+           order by t.{$createdFieldName}";
+
+        $this->connect();
+
+        $res = pg_query($this->conn, $sql);
+
+        while ($row = pg_fetch_assoc($res)) {
+            $result[] = $row;
+        }
+
+        $this->disconnect();
+
+        return $result;
     }
 
     public function getUsers()

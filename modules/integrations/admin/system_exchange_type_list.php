@@ -1,6 +1,7 @@
 <?php
 
 use Bitrix\Main\Localization\Loc;
+use RNS\Integrations\Models\SystemExchangeType;
 use RNS\Integrations\SystemExchangeTypeTable;
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_admin_before.php';
@@ -21,6 +22,14 @@ $tableId = 'integration_system_exchange_type';
 $sort = new CAdminSorting($tableId, 'id', 'asc');
 /** @var CAdminList $list */
 $list = new CAdminList($tableId, $sort);
+
+if ($objId = $list->GroupAction()) {
+    switch ($_REQUEST['action']) {
+        case 'delete':
+            SystemExchangeType::delete($objId);
+            break;
+    }
+}
 
 $headers = [
   [
@@ -58,6 +67,27 @@ while ($dr = $res->fetch()) {
 
     $htmlLink = 'integrations_system_exchange_type_edit.php?ID='.urlencode($dr['ID']).'&lang='.LANGUAGE_ID;
     $row->AddViewField("SYSTEM_NAME", '<a href="'.htmlspecialcharsbx($htmlLink).'">'.htmlspecialcharsEx($dr['SYSTEM_NAME']).'</a>');
+
+    $arActions = [
+      [
+        "ICON" => "edit",
+        "DEFAULT" => "Y",
+        "TEXT" => GetMessage("INTEGRATIONS_SYS_EXCH_TYPE_LIST_ACT_EDIT"),
+        "ACTION" => $list->ActionRedirect("integrations_system_exchange_type_edit.php?ID=".urlencode($dr['ID'])."&lang=".LANGUAGE_ID)
+      ],
+      [
+        "ICON" => "btn_download",
+        "TEXT" => GetMessage("INTEGRATIONS_SYS_EXCH_TYPE_LIST_ACT_RUN"),
+        "ACTION" => $list->ActionRedirect("integrations_system_exchange_type_run.php?ID=".urlencode($dr['ID'])."&lang=".LANGUAGE_ID)
+      ],
+      ["SEPARATOR" => true],
+      [
+        "ICON" => "delete",
+        "TEXT" => GetMessage("INTEGRATIONS_SYS_EXCH_TYPE_LIST_ACT_DELETE"),
+        "ACTION" => "if(confirm('".CUtil::JSEscape(GetMessage("INTEGRATIONS_SYS_EXCH_TYPE_LIST_ACT_DEL_CONFIRM"))."')) ".$list->ActionDoGroup($dr['ID'], "delete"),
+      ]
+    ];
+    $row->AddActions($arActions);
 }
 
 $context = [
