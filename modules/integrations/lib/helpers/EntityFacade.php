@@ -15,7 +15,8 @@ class EntityFacade
 {
     public static function getEntityTypes()
     {
-        $items = HLBlockHelper::getList('b_hlsys_entities', [], ['ID'], 'UF_CODE');
+        $items = HLBlockHelper::getList('b_hlsys_entities', ['ID', 'UF_NAME', 'UF_CODE'], ['ID'],
+          'UF_CODE', ['UF_ACTIVE' => 1]);
         $list = [
             'REFERENCE_ID' => [],
             'REFERENCE' => []
@@ -29,28 +30,12 @@ class EntityFacade
 
     public static function getExternalEntityTypes(string $systemCode)
     {
-        $data = [
-          'jira' => [
-            'REFERENCE_ID' => [1, 2, 3, 4, 5],
-            'REFERENCE' => [
-              'Эпик', 'История', 'Задача', 'Под-задача', 'Баг'
-            ]
-          ]
-        ];
-        return $data[$systemCode];
+        return self::getHLBlockItems('b_hlsys_external_entities', $systemCode);
     }
 
     public static function getExternalEntityStatuses(string $systemCode)
     {
-        $data = [
-          'jira' => [
-            'REFERENCE_ID' => [1, 2, 3, 4, 5, 6],
-            'REFERENCE' => [
-              'Ожидает выполнения', 'Выполняется', 'Открыт', 'Закрыт', 'Переоткрыт', 'Решен'
-            ]
-          ]
-        ];
-        return $data[$systemCode];
+        return self::getHLBlockItems('b_hlsys_external_entity_statuses', $systemCode);
     }
 
     public static function getEntityProperties()
@@ -106,63 +91,7 @@ class EntityFacade
 
     public static function getExternalEntityProperties(string $systemCode)
     {
-        $data = [
-          'jira' => [
-            'REFERENCE_ID' => [
-              'i.priority',
-              'p.project_id,',
-              'i.project_in_jira',
-              'i.issue_type',
-              'i.creator',
-              'i.resolution',
-              'i.fixversions',
-              'i.cf_sprint',
-              'i.parent_id',
-              'i.epic_link',
-              'i.epic_name',
-              'i.outwardissuelink',
-              'i.components',
-              'i.status',
-              'i.created',
-              'i.updated',
-              'i.risk_probability',
-              'i.risk_consequence',
-              'i.attachment',
-              'i.labels',
-              'i.security_level',
-              'i.timespent',
-              'i.cf_komentarii',
-              'i.cf_budjet',
-            ],
-            'REFERENCE' => [
-              'Приоритет задачи',
-              'Идентификатор проекта',
-              'Проект',
-              'Тип задачи',
-              'Автор',
-              'Решение',
-              'Фиксированные версии',
-              'Спринт',
-              'Родительская задача',
-              'Ссылка на эпик',
-              'Название эпика',
-              'Внешняя ссылка',
-              'Компоненты',
-              'Статус',
-              'Дата создания',
-              'Дата обновления',
-              'Вероятность риска',
-              'Последствия',
-              'Вложение',
-              'Метки',
-              'Уровень безопасности',
-              'Потраченное время',
-              'Комментарий',
-              'Бюджет',
-            ]
-          ]
-        ];
-        return $data[$systemCode];
+        return self::getHLBlockItems('b_hlsys_external_entity_properties', $systemCode);
     }
 
     /**
@@ -238,5 +167,20 @@ class EntityFacade
         $providerClass = "RNS\\Integrations\\Processors\\{$exchangeTypeCode}\\{$options->getType()}\\DataProvider";
         $provider = new $providerClass($options, $mapping);
         return $provider;
+    }
+
+    private static function getHLBlockItems(string $tableName, string $systemCode)
+    {
+        $items = HLBlockHelper::getList($tableName, ['ID', 'UF_NAME', 'UF_CODE'], ['ID'],
+          'UF_CODE', ['UF_SYSTEM_CODE' => $systemCode, 'UF_ACTIVE' => 1]);
+        $list = [
+          'REFERENCE_ID' => [],
+          'REFERENCE' => []
+        ];
+        foreach ($items as $key => $item) {
+            $list['REFERENCE_ID'][] = $key;
+            $list['REFERENCE'][] = $item['UF_NAME'];
+        }
+        return $list;
     }
 }

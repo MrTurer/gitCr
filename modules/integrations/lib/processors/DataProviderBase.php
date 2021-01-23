@@ -11,14 +11,17 @@ abstract class DataProviderBase
 
     protected $mapping;
 
+    protected $moduleOptions;
+
     protected function __construct(OptionsBase $options, Mapping $mapping)
     {
         $this->options = $options;
         $this->mapping = $mapping;
+        $this->moduleOptions = include($_SERVER['DOCUMENT_ROOT'] . '/local/modules/integrations/options.php');
     }
 
     public abstract function isAvailable();
     public abstract function getProjects();
-    public abstract function getEntities();
+    public abstract function getEntities(string $systemCode);
     public abstract function getUsers();
 }

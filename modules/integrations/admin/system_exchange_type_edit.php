@@ -332,6 +332,12 @@ $tabControl->Begin();
         <td class="adm-detail-content-cell-r">
             <?= SelectBoxFromArray("mapping[entityTypeMap][defaultTypeId]", $entityTypes, $mapping->getEntityPropertyMap()->getDefaultTypeId()) ?>
         </td>
+        <td class="adm-detail-content-cell-l">
+            <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_REF_ATTR') ?>
+        </td>
+        <td class="adm-detail-content-cell-r">
+            <?= InputType('text', 'mapping[entityTypeMap][refPropertyId]', $mapping->getEntityTypeMap()->getRefPropertyId(), false) ?>
+        </td>
     </tr>
     <tr>
         <td class="adm-detail-content-cell-r" colspan="4">
@@ -339,7 +345,7 @@ $tabControl->Begin();
         </td>
     </tr>
     <tr>
-        <td colspan="2">
+        <td colspan="4">
             <table class="adm-list-table">
                 <thead>
                 <tr class="adm-list-table-header">

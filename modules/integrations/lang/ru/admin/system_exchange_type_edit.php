@@ -34,6 +34,7 @@ $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_DISPLAY_ATTR'] = 'Поля для в�
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_SRC_PRJ'] = 'Проект во внешней системе';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_DEST_PRJ'] = 'Проект в СППР';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_DEF_PRJ'] = 'Проект в СППР по умолчанию';
+$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_REF_ATTR'] = 'Поле для связи с проектом';
 
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_TASK_SOURCE_ELEM'] = 'Источник во внешней системе';
 

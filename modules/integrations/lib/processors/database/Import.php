@@ -25,6 +25,8 @@ class Import extends DataTransferBase
     {
         $provider = EntityFacade::getDataProvider($this->exchangeTypeCode, $this->options, $this->mapping);
 
+        $entities = $provider->getEntities($this->systemCode);
+
 
     }
 }
