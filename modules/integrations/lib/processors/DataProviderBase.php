@@ -24,4 +24,5 @@ abstract class DataProviderBase
     public abstract function getProjects();
     public abstract function getEntities(string $systemCode);
     public abstract function getUsers();
+    public abstract function getEntityKeyById(string $systemCode, $id);
 }

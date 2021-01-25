@@ -125,10 +125,20 @@ class UserMap
         return $this;
     }
 
-    public function getInternalItem(string $id)
+    public function getItemByInternalId(string $id)
     {
         foreach ($this->items as $item) {
             if ($item->getInternalId() == $id) {
+                return $item;
+            }
+        }
+        return null;
+    }
+
+    public function getItemByExternalId(string $id)
+    {
+        foreach ($this->items as $item) {
+            if ($item->getExternalId() == $id) {
                 return $item;
             }
         }

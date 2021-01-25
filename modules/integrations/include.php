@@ -28,6 +28,7 @@ CModule::AddAutoloadClasses(
     'RNS\Integrations\Models\Mapping' => 'lib/models/Mapping.php',
     'RNS\Integrations\Models\SystemExchangeType' => 'lib/models/SystemExchangeType.php',
     'RNS\Integrations\Processors\Database\Import' => 'lib/processors/database/Import.php',
+    'RNS\Integrations\Processors\DataTransferResult' => 'lib/processors/DataTransferResult.php',
     'RNS\Integrations\Processors\DataTransferBase' => 'lib/processors/DataTransferBase.php',
     'RNS\Integrations\Processors\DataProviderBase' => 'lib/processors/DataProviderBase.php',
     'RNS\Integrations\Processors\IntegrationAgent' => 'lib/processors/IntegrationAgent.php',

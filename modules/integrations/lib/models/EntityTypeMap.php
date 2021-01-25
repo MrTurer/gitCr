@@ -64,4 +64,18 @@ class EntityTypeMap
         $this->items = $items;
         return $this;
     }
+
+    /**
+     * @param mixed $id
+     * @return EntityTypeMapItem|null
+     */
+    public function getItemByExternalTypeId($id)
+    {
+        foreach ($this->items as $item) {
+            if ($item->getExternalTypeId() == $id) {
+                return $item;
+            }
+        }
+        return null;
+    }
 }

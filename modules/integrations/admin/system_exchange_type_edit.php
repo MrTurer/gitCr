@@ -103,7 +103,7 @@ if ($ID > 0) {
 
     $externalProjects = EntityFacade::getExternalProjects($exchType, $obj->getOptions(), $obj->getMapping());
     foreach ($externalProjects as $id => $name) {
-        if (!$mapping->getProjectMap()->getExternalItem($id)) {
+        if (!$mapping->getProjectMap()->getItemByExternalId($id)) {
             $mapping->getProjectMap()->addItem($id);
         }
     }
@@ -124,11 +124,11 @@ if ($ID > 0) {
     }
     $externalUserOptions = [];
     foreach ($externalUsers['REFERENCE_ID'] as $i => $id) {
-        $externalUserOptions[] = '<option value="'. $id . '">' . $externalUsers['REFERENCE'][$id] . '</option>';
+        $externalUserOptions[] = '<option value="'. $id . '">' . $externalUsers['REFERENCE'][$i] . '</option>';
     }
 
     foreach ($localUsers['REFERENCE_ID'] as $id) {
-        if (!$mapping->getUserMap()->getInternalItem($id)) {
+        if (!$mapping->getUserMap()->getItemByInternalId($id)) {
             $mapping->getUserMap()->addItem($id);
         }
     }

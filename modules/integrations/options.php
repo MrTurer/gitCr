@@ -10,8 +10,9 @@ return [
     'projectTableName' => 'b_sonet_group',
     'taskTableName' => 'b_tasks',
     'isSavedFieldName' => 'is_saved',
-    'createdFieldName' => [
-      'jira' => 'created'
+    'jira' => [
+        'createdFieldName' => 'created',
+        'idFieldName' => 'issue_id'
     ]
   ]
 ];

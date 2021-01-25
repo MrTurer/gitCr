@@ -105,7 +105,7 @@ class EntityMap
         return $this;
     }
 
-    public function getExternalItem(string $id)
+    public function getItemByExternalId(string $id)
     {
         foreach ($this->items as $item) {
             if ($item->getExternalEntityId() == $id) {
