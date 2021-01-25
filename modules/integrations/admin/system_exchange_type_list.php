@@ -2,6 +2,7 @@
 
 use Bitrix\Main\Localization\Loc;
 use RNS\Integrations\Models\SystemExchangeType;
+use RNS\Integrations\Processors\IntegrationAgent;
 use RNS\Integrations\SystemExchangeTypeTable;
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_admin_before.php';
@@ -25,6 +26,14 @@ $list = new CAdminList($tableId, $sort);
 
 if ($objId = $list->GroupAction()) {
     switch ($_REQUEST['action']) {
+        case 'run':
+            try {
+                IntegrationAgent::run($ID);
+                ShowMessage(Array("TYPE"=>"OK", "MESSAGE"=>"Импорт выполнен."));
+            } catch (\Exception $ex) {
+                ShowMessage("Импорт не выполнен.\n" . $ex->getMessage());
+            }
+            break;
         case 'delete':
             SystemExchangeType::delete($objId);
             break;
@@ -78,7 +87,7 @@ while ($dr = $res->fetch()) {
       [
         "ICON" => "btn_download",
         "TEXT" => GetMessage("INTEGRATIONS_SYS_EXCH_TYPE_LIST_ACT_RUN"),
-        "ACTION" => $list->ActionRedirect("integrations_system_exchange_type_run.php?ID=".urlencode($dr['ID'])."&lang=".LANGUAGE_ID)
+        "ACTION" => $list->ActionDoGroup($dr['ID'], "run")
       ],
       ["SEPARATOR" => true],
       [

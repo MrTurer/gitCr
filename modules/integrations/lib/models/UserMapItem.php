@@ -4,24 +4,24 @@ namespace RNS\Integrations\Models;
 
 class UserMapItem
 {
-    /** @var string */
+    /** @var int */
     private $internalId;
     /** @var string|null */
     private $externalId;
 
      /**
-     * @return string
+     * @return int
      */
-    public function getInternalId(): string
+    public function getInternalId(): int
     {
         return $this->internalId;
     }
 
     /**
-     * @param string $internalId
+     * @param int $internalId
      * @return UserMapItem
      */
-    public function setInternalId(string $internalId): UserMapItem
+    public function setInternalId(int $internalId): UserMapItem
     {
         $this->internalId = $internalId;
         return $this;

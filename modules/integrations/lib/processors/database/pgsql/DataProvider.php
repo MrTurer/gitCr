@@ -72,7 +72,8 @@ class DataProvider extends DataProviderBase
         $prjKeyFieldName = $this->mapping->getProjectMap()->getKeyAttrName();
         $refFieldName = $this->mapping->getEntityTypeMap()->getRefPropertyId();
         $isSavedFieldName = $this->moduleOptions['database']['isSavedFieldName'];
-        $createdFieldName = $this->moduleOptions['database']['createdFieldName'][$systemCode];
+        $createdFieldName = $this->moduleOptions['database'][$systemCode]['createdFieldName'];
+        $idFieldName = $this->moduleOptions['database'][$systemCode]['idFieldName'];
 
         $fields = EntityFacade::getExternalEntityProperties($systemCode);
         $fieldNames = implode(', ', $fields['REFERENCE_ID']);
@@ -81,7 +82,7 @@ class DataProvider extends DataProviderBase
           "select {$fieldNames} from {$srcTableName} t
            inner join {$prjTableName} p on t.{$refFieldName} = p.{$prjKeyFieldName}
            where not t.{$isSavedFieldName}
-           order by t.{$createdFieldName}";
+           order by t.{$createdFieldName} ASC, t.{$idFieldName} ASC";
 
         $this->connect();
 
@@ -101,6 +102,7 @@ class DataProvider extends DataProviderBase
         if (!$this->isAvailable()) {
             return [];
         }
+
         $this->connect();
 
         $map = $this->mapping->getUserMap();
@@ -128,6 +130,31 @@ class DataProvider extends DataProviderBase
         $this->disconnect();
 
         return $data;
+    }
+
+    public function getEntityKeyById(string $systemCode, $id)
+    {
+        $result = false;
+        if (!$this->isAvailable()) {
+            return $result;
+        }
+
+        $mapping = $this->mapping->getEntityPropertyMap();
+        $srcTableName = $mapping->getSourceElementName();
+        $keyFieldName = $mapping->getKeyPropertyName();
+        $idFieldName = $this->moduleOptions['database'][$systemCode]['idFieldName'];
+
+        $this->connect();
+
+        $sql = "select {$keyFieldName} from {$srcTableName} where {$idFieldName} = {$id}";
+
+        $res = pg_query($this->conn, $sql);
+
+        if ($row = pg_fetch_row($res)) {
+            $result = $row[0];
+        }
+
+        return $result;
     }
 
     private function connect()

@@ -43,7 +43,10 @@ class EntityFacade
         $fixedFields = [
           'REFERENCE_ID' => [
             'TITLE',
+            'GROUP_ID',
+            'PARENT_ID',
             'PRIORITY',
+            'CREATED_BY',
             'RESPONSIBLE_ID',
             'DESCRIPTION',
             'CREATED_DATE',
@@ -55,7 +58,10 @@ class EntityFacade
           ],
           'REFERENCE' => [
             'Название задачи',
+            'Идентификатор проекта',
+            'Идентификатор родительской задачи',
             'Приоритет задачи',
+            'Автор',
             'Ответственный',
             'Описание задачи',
             'Дата создания',
@@ -110,18 +116,6 @@ class EntityFacade
         while ($row = $res->GetNext()) {
             $result['REFERENCE_ID'][] = $row['ID'];
             $result['REFERENCE'][] = $row['NAME'];
-        }
-        return $result;
-    }
-
-    public static function getTasks()
-    {
-        \CModule::IncludeModule('tasks');
-
-        $res = CTasks::GetList([], ['STATUS' => '2']);
-        $result = [];
-        while ($row = $res->GetNext()) {
-            $result[] = $row;
         }
         return $result;
     }

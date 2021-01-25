@@ -3,6 +3,7 @@
 namespace RNS\Integrations\Processors;
 
 use CEventLog;
+use RNS\Integrations\Models\Mapping;
 use RNS\Integrations\Models\SystemExchangeType;
 
 /**
@@ -17,10 +18,19 @@ abstract class DataTransferBase
 
     protected $options;
 
+    /** @var Mapping */
     protected $mapping;
 
-    protected $errors = [];
+    /** @var DataTransferResult */
+    protected $result;
 
+    /**
+     * @param int $systemExchangeTypeId
+     * @throws \Bitrix\Main\ArgumentException
+     * @throws \Bitrix\Main\ObjectPropertyException
+     * @throws \Bitrix\Main\SystemException
+     * @throws \Exception
+     */
     public function run(int $systemExchangeTypeId)
     {
         $obj = SystemExchangeType::getById($systemExchangeTypeId);
@@ -31,6 +41,10 @@ abstract class DataTransferBase
         $this->mapping = $obj->getMapping();
 
         $this->execute();
+
+        if (!$this->result->success) {
+            throw new \Exception(implode("\n", $this->result->errors));
+        }
     }
 
     public function getCapabilities()
@@ -38,9 +52,14 @@ abstract class DataTransferBase
         return [];
     }
 
+    public function getResult()
+    {
+        return $this->result;
+    }
+
     protected function addError(string $errorText)
     {
-        $this->errors[] = $errorText;
+        $this->result->errors[] = $errorText;
     }
 
     protected function log(string $message, string $eventType, string $severity = 'ERROR')

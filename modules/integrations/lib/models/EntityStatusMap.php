@@ -64,4 +64,14 @@ class EntityStatusMap
         $this->items = $items;
         return $this;
     }
+
+    public function getItemByExternalStatusId($typeId, $statusId)
+    {
+        foreach ($this->items as $item) {
+            if ($item->getExternalTypeId() == $typeId && $item->getExternalStatusId() == $statusId) {
+                return $item;
+            }
+        }
+        return null;
+    }
 }

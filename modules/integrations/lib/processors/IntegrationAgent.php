@@ -7,6 +7,13 @@ use RNS\Integrations\SystemExchangeTypeTable;
 
 class IntegrationAgent
 {
+    /**
+     * @param int $id
+     * @return string
+     * @throws \Bitrix\Main\ArgumentException
+     * @throws \Bitrix\Main\ObjectPropertyException
+     * @throws \Bitrix\Main\SystemException
+     */
     public static function run(int $id)
     {
         $systemExchangeType = SystemExchangeType::getById($id);
