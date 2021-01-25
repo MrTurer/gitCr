@@ -166,13 +166,15 @@ class DataProvider extends DataProviderBase
             return;
         }
 
-        $isSavedField = $this->integrationOptions->getIsSavedFieldName();
+        $tableName = $this->integrationOptions->getEntitySource();
         $keyFieldName = $this->integrationOptions->getEntityKeyField();
         $fieldName = $this->integrationOptions->getIsSavedFieldName();
 
         $this->connect();
 
-        $sql = "update {$isSavedField} set {$fieldName} = {$saved} where {$keyFieldName} = {$id}";
+        $val = $saved ? 't' : 'f';
+
+        $sql = "update {$tableName} set {$fieldName} = '{$val}' where {$keyFieldName} = '{$id}'";
 
         pg_exec($this->conn, $sql);
 
