@@ -1,7 +1,10 @@
 <?php
 
+use Bitrix\Main\Entity\Query\Join;
+use Bitrix\Main\Entity\ReferenceField;
 use Bitrix\Main\Localization\Loc;
 use RNS\Integrations\ExternalSystemTable;
+use RNS\Integrations\SystemExchangeTypeTable;
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_admin_before.php';
 require_once($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/main/admin_tools.php');
@@ -64,6 +67,16 @@ $headers = [
         'sort' => 'created',
     ],
     [
+        'id' => 'IMPORT_ACTIVE',
+        'content' => Loc::getMessage("INTEGRATIONS_SYSTEM_LIST_FIELD_IMPORT"),
+        'default' => true,
+    ],
+    [
+        'id' => 'EXPORT_ACTIVE',
+        'content' => Loc::getMessage("INTEGRATIONS_SYSTEM_LIST_FIELD_EXPORT"),
+        'default' => true,
+    ],
+    [
         'id' => 'DESCRIPTION',
         'content' => Loc::getMessage("INTEGRATIONS_SYSTEM_LIST_FIELD_DESCRIPTION")
     ]
@@ -72,11 +85,39 @@ $headers = [
 $USER_FIELD_MANAGER->AdminListAddHeaders($entityId, $headers);
 $list->AddHeaders($headers);
 
-$res = ExternalSystemTable::getList([
-    'select' => ['*'],
-    'order' => [strtoupper($sort->getField()) => $sort->getOrder()]
-  ]);
-while ($dr = $res->fetch()) {
+$res = ExternalSystemTable::query()
+  ->registerRuntimeField('IMPORT',
+        new ReferenceField(
+          'IMPORT',
+    SystemExchangeTypeTable::class,
+          Join::on('this.ID', 'ref.SYSTEM_ID')->where('ref.DIRECTION',  SystemExchangeTypeTable::DIRECTION_IMPORT),
+          [
+            'join_type' => 'LEFT'
+          ]
+    )
+  )
+  ->registerRuntimeField('EXPORT',
+    new ReferenceField(
+      'EXPORT',
+      SystemExchangeTypeTable::class,
+      Join::on('this.ID', 'ref.SYSTEM_ID')->where('ref.DIRECTION',  SystemExchangeTypeTable::DIRECTION_EXPORT),
+      [
+        'join_type' => 'LEFT'
+      ]
+    )
+  )
+  ->setSelect(['ID', 'NAME', 'CREATED', 'DESCRIPTION', 'IMPORT_ACTIVE' => 'IMPORT.ACTIVE', 'EXPORT_ACTIVE' => 'EXPORT.ACTIVE'])
+  ->addOrder(strtoupper($sort->getField()), $sort->getOrder())
+  ->fetchAll();
+
+$valueYes = Loc::getMessage("INTEGRATIONS_SYSTEM_LIST_FIELD_VALUE_ACTIVE");
+$valueNo = Loc::getMessage("INTEGRATIONS_SYSTEM_LIST_FIELD_VALUE_INACTIVE");
+$valueNull = Loc::getMessage("INTEGRATIONS_SYSTEM_LIST_FIELD_VALUE_NOTSET");
+
+foreach ($res as $dr) {
+
+    $dr['IMPORT_ACTIVE'] = !is_null($dr['IMPORT_ACTIVE']) ? ($dr['IMPORT_ACTIVE'] == 'Y' ? $valueYes : $valueNo) : $valueNull;
+    $dr['EXPORT_ACTIVE'] = !is_null($dr['EXPORT_ACTIVE']) ? ($dr['EXPORT_ACTIVE'] == 'Y' ? $valueYes : $valueNo) : $valueNull;
 
     $row = &$list->addRow('ID', $dr, 'integrations_system_edit.php?lang='.LANGUAGE_ID.'&ID='.$dr['ID']);
 
