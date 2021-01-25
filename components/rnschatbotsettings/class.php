@@ -21,12 +21,12 @@ class RnschatbotSettings extends \CBitrixComponent implements Controllerable
 
     public function saveFormAction($settings)
     {
-        if (!Loader::includeModule('rnschatbot')) {
+        if (!Loader::includeModule('rns.notification')) {
             echo GetMessage("ACCESS_DENIED");
             return false;
         }
         global $USER;
-        $entities = \Bitrix\Rnschatbot\RnsBot::getEntities();
+        $entities = \Rns\Notification\RnsBot::getEntities();
 
         $userSettings = [];
         foreach ($entities as $entity) {
@@ -36,10 +36,11 @@ class RnschatbotSettings extends \CBitrixComponent implements Controllerable
             $notice = isset($settings[$noticeCode]) && $settings[$noticeCode] == 'on';
             $onChangeDeadline = isset($settings[$onChangeDeadline]) && $settings[$onChangeDeadline] == 'on';
             $days = isset($settings[$daysCode]) && (int)$settings[$daysCode] ?
-                (int)$settings[$daysCode] : \Bitrix\Rnschatbot\RnsBot::getDefaultNoticeDays();
+                (int)$settings[$daysCode] : \Rns\Notification\RnsBot::getDefaultNoticeDays();
             $userSettings[$entity['ID']] = [
                 'NOTICE' => $notice,
                 'CHANGE_DEADLINE' => $onChangeDeadline,
+                'TODAY_DEADLINE' => $onChangeDeadline,
                 'DAYS' => $days
             ];
         }
@@ -47,21 +48,21 @@ class RnschatbotSettings extends \CBitrixComponent implements Controllerable
             'ENTITIES' => $userSettings
         ];
 
-        \Bitrix\Rnschatbot\RnsBot::saveUserSettings($USER->GetID(), $userSettings);
+        \Rns\Notification\RnsBot::saveUserSettings($USER->GetID(), $userSettings);
 
         return $userSettings;
     }
 
     public function executeComponent()
     {
-        if (!Loader::includeModule('rnschatbot')) {
+        if (!Loader::includeModule('rns.notification')) {
             echo GetMessage("ACCESS_DENIED");
             return false;
         }
         global $USER;
 
-        $userSettings = \Bitrix\Rnschatbot\RnsBot::getUserSettings($USER->GetID());
-        $entities = \Bitrix\Rnschatbot\RnsBot::getEntities();
+        $userSettings = \Rns\Notification\RnsBot::getUserSettings($USER->GetID());
+        $entities = \Rns\Notification\RnsBot::getEntities();
 
         $this->arResult['USER_SETTINGS'] = $userSettings;
         $this->arResult['ENTITIES'] = $entities;

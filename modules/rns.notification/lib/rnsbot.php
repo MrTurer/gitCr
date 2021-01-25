@@ -1,6 +1,6 @@
 <?php
 
-namespace Bitrix\Rnschatbot;
+namespace Rns\Notification;
 
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Highloadblock as HL;
@@ -9,8 +9,8 @@ use Bitrix\Main\EventManager;
 class RnsBot extends \Bitrix\ImBot\Bot\Base
 {
     const BOT_CODE = "rnsbot";
-    const MODULE_ID = "rnschatbot";
-    const AGENT_FUNCTION = "\Bitrix\Rnschatbot\RnsBot::noticeAllUsers();";
+    const MODULE_ID = "rns.notification";
+    const AGENT_FUNCTION = "\Rns\Notification\RnsBot::noticeAllUsers();";
     const TASKS_NOTICE_TIME = '09:00:00';
     const DEFAULT_DAYS_TO_NOTICE = 4;
     const HL_USER_SETTINGS_NAME = 'RnsBotUserSettings';
@@ -25,6 +25,15 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
 
         self::createUserSettingsHL();
 
+        return self::register();
+    }
+
+    public static function register()
+    {
+        if (self::getBotId()) {
+            return self::getBotId();
+        }
+
         $botId = \Bitrix\Im\Bot::register(array(
             'APP_ID' => "",
             'CODE' => self::BOT_CODE,
@@ -34,7 +43,7 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
             'METHOD_WELCOME_MESSAGE' => 'onChatStart',
             'METHOD_BOT_DELETE' => 'onBotDelete',
             'PROPERTIES' => array(
-                'NAME' => Loc::getMessage('RNSCHATBOT_RNSBOT_NAME')
+                'NAME' => Loc::getMessage('RNSNOTIFICATION_RNSBOT_NAME')
             )
         ));
         if ($botId) {
@@ -66,7 +75,7 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
                 "tasks",
                 "OnTaskUpdate",
                 self::MODULE_ID,
-                "Bitrix\Rnschatbot\RnsBot",
+                "Rns\Notification\RnsBot",
                 "noticeOnUpdateTasksAction"
             );
         }
@@ -92,7 +101,7 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
         HL\HighloadBlockLangTable::add(array(
             'ID' => $hlId,
             'LID' => 'ru',
-            'NAME' => Loc::getMessage('RNSCHATBOT_RNSBOT_HL_NAME')
+            'NAME' => Loc::getMessage('RNSNOTIFICATION_RNSBOT_HL_NAME')
         ));
         $UFObject = 'HLBLOCK_' . $hlId;
         $arCartFields = array(
@@ -148,6 +157,14 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
 
     public static function uninstall()
     {
+        return self::unregister();
+    }
+
+    public static function unregister()
+    {
+        if (!self::getBotId()) {
+            return true;
+        }
         $result = \Bitrix\Im\Bot::unRegister(array('BOT_ID' => self::getBotId()));
         if ($result) {
             self::setBotId(0);
@@ -160,7 +177,7 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
                 "tasks",
                 "OnTaskUpdate",
                 self::MODULE_ID,
-                "Bitrix\Rnschatbot\RnsBot",
+                "Rns\Notification\RnsBot",
                 "noticeOnUpdateTasksAction"
             );
         }
@@ -177,7 +194,7 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
         ),
             array(
                 'DIALOG_ID' => $dialogId,
-                'MESSAGE' => Loc::getMessage('RNSCHATBOT_RNSBOT_WELCOME_MESSAGE'),
+                'MESSAGE' => Loc::getMessage('RNSNOTIFICATION_RNSBOT_WELCOME_MESSAGE'),
                 'KEYBOARD' => $keyboard
             )
         );
@@ -190,7 +207,7 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
         $keyboard = new \Bitrix\Im\Bot\Keyboard(self::getBotId());
         $keyboard->addButton([
             "DISPLAY" => "LINE",
-            "TEXT" => Loc::getMessage('RNSCHATBOT_RNSBOT_SETTINGS_BUTTON_NAME'),
+            "TEXT" => Loc::getMessage('RNSNOTIFICATION_RNSBOT_SETTINGS_BUTTON_NAME'),
             "BG_COLOR" => "#29619b",
             "TEXT_COLOR" => "#fff",
             "BLOCK" => "Y",
@@ -232,53 +249,78 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
             return false;
         }
 
-        $tasks = '';
+        $message = '';
+        $tasksString = '';
+        $tasksTodayString = '';
         $settings = self::getUserSettings($userId);
 
         foreach ($settings['ENTITIES'] as $entityId => $entitySettings) {
             if ($entitySettings['NOTICE']) {
                 try {
                     $days = (int)$entitySettings['DAYS'];
-                    $toDate = date("d.m.Y H:i", strtotime("+$days day"));
-                    $fromDate = date("d.m.Y 23:59", strtotime("-1 day"));
-                    $arFilter = [
-                        '::LOGIC' => 'AND',
-                        'REAL_STATUS' => [\CTasks::STATE_NEW, \CTasks::STATE_PENDING, \CTasks::STATE_IN_PROGRESS],
-                        '<DEADLINE' => $toDate,
-                        '>DEADLINE' => $fromDate,
-                        'UF_TYPE_ENTITY' => $entityId,
-                        '::SUBFILTER-1' => [
-                            '::LOGIC' => 'OR',
-                            '::SUBFILTER-1' => [
-                                'CREATED_BY' => [$userId],
-                            ],
-                            '::SUBFILTER-2' => [
-                                'RESPONSIBLE_ID' => [$userId],
-                            ],
-                        ]
-                    ];
+                    $toDate = date("d.m.Y 23:59", strtotime("+$days day"));
+                    $fromDate = date("d.m.Y 00:00", strtotime("+$days day"));
+                    $arFilter = self::getTasksFilter($userId, $entityId, $fromDate, $toDate);;
 
                     list($arItems) = \CTaskItem::fetchList($userId, [], $arFilter);
                     foreach ($arItems as $item) {
                         $task = $item->getData(false);
-                        $tasks .= self::getTaskMessage($userId, $task);
+                        $tasksString .= self::getTaskMessage($userId, $task);
                     }
-
-
                 } catch (\Exception $e) {
-                    $tasks = 'error';
+                }
+            }
+            if ($entitySettings['TODAY_DEADLINE']) {
+                try {
+                    $toDate = date("d.m.Y H:i");
+                    $fromDate = date("d.m.Y 00:00");
+                    $arFilter = self::getTasksFilter($userId, $entityId, $fromDate, $toDate);
+
+                    list($arItems) = \CTaskItem::fetchList($userId, [], $arFilter);
+                    foreach ($arItems as $item) {
+                        $task = $item->getData(false);
+                        $tasksTodayString .= self::getTaskMessage($userId, $task);
+                    }
+                } catch (\Exception $e) {
                 }
             }
         }
 
-        if ($tasks) {
+        if ($tasksTodayString) {
+            $message .= 'Сегодня дедлайн:[br]' . $tasksTodayString . '[br]';
+        }
+        if ($tasksString) {
+            $message .= 'Приближается срок по задачам:[br]' . $tasksString;
+        }
+
+        if ($message) {
             $keyboard = self::getSettingsButton();
             \Bitrix\Im\Bot::addMessage(array('BOT_ID' => self::getBotId()), array(
                 'DIALOG_ID' => $userId,
-                'MESSAGE' => 'Приближается срок по задачам:[br]' . $tasks,
+                'MESSAGE' => $message,
                 'KEYBOARD' => $keyboard
             ));
         }
+    }
+
+    public static function getTasksFilter($userId, $entityId, $fromDate, $toDate)
+    {
+        return [
+            '::LOGIC' => 'AND',
+            'REAL_STATUS' => [\CTasks::STATE_NEW, \CTasks::STATE_PENDING, \CTasks::STATE_IN_PROGRESS],
+            '<DEADLINE' => $toDate,
+            '>DEADLINE' => $fromDate,
+            'UF_TYPE_ENTITY' => $entityId,
+            '::SUBFILTER-1' => [
+                '::LOGIC' => 'OR',
+                '::SUBFILTER-1' => [
+                    'CREATED_BY' => [$userId],
+                ],
+                '::SUBFILTER-2' => [
+                    'RESPONSIBLE_ID' => [$userId],
+                ],
+            ]
+        ];
     }
 
     public static function getTaskMessage($userId, array $task)
@@ -313,16 +355,22 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
     {
         $oldArFields = $arFields['META:PREV_FIELDS'];
 
+        $createdBy = $oldArFields['CREATED_BY'];
+        $responsibleId = isset($arFields['RESPONSIBLE_ID']) ? $arFields['RESPONSIBLE_ID'] : $oldArFields['RESPONSIBLE_ID'];
+        $changedBy = $arFields['CHANGED_BY'];
+
         if ($oldArFields['DEADLINE'] == $arFields['DEADLINE']) {
             return;
         }
 
-        if ($arFields['CREATED_BY'] != $arFields['CHANGED_BY']) {
-            self::noticeUpdateTask($arFields['CREATED_BY'], $arFields);
+        $arFields['TITLE'] = isset($arFields['TITLE']) ? $arFields['TITLE'] : $oldArFields['TITLE'];
+
+        if ($createdBy != $changedBy) {
+            self::noticeUpdateTask($createdBy, $arFields);
         }
 
-        if ($arFields['RESPONSIBLE_ID'] != $arFields['CHANGED_BY']) {
-            self::noticeUpdateTask($arFields['RESPONSIBLE_ID'], $arFields);
+        if ($responsibleId != $changedBy && $responsibleId != $createdBy) {
+            self::noticeUpdateTask($responsibleId, $arFields);
         }
     }
 
@@ -336,8 +384,8 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
 
     public static function onCommandLang($command, $lang = null)
     {
-        $title = Loc::getMessage('RNSCHATBOT_RNSBOT_COMMAND_' . mb_strtoupper($command) . '_TITLE', null, $lang);
-        $params = Loc::getMessage('RNSCHATBOT_RNSBOT_COMMAND_' . mb_strtoupper($command) . '_PARAMS', null, $lang);
+        $title = Loc::getMessage('RNSNOTIFICATION_RNSBOT_COMMAND_' . mb_strtoupper($command) . '_TITLE', null, $lang);
+        $params = Loc::getMessage('RNSNOTIFICATION_RNSBOT_COMMAND_' . mb_strtoupper($command) . '_PARAMS', null, $lang);
 
         $result = false;
         if ($title <> '') {
@@ -411,7 +459,7 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
             ],
             [
                 'DIALOG_ID' => $userId,
-                'MESSAGE' => Loc::getMessage('RNSCHATBOT_RNSBOT_MESSAGE_SAVE')
+                'MESSAGE' => Loc::getMessage('RNSNOTIFICATION_RNSBOT_MESSAGE_SAVE')
             ]
         );
 

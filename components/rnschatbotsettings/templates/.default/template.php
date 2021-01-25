@@ -8,6 +8,7 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
     <? foreach ($arResult['ENTITIES'] as $entity) {
         $isNotice = $arResult['USER_SETTINGS']['ENTITIES'][$entity['ID']]['NOTICE'];
         $onChangeDeadline = $arResult['USER_SETTINGS']['ENTITIES'][$entity['ID']]['CHANGE_DEADLINE'];
+        $todayDeadline = $arResult['USER_SETTINGS']['ENTITIES'][$entity['ID']]['TODAY_DEADLINE'];
         $days = $arResult['USER_SETTINGS']['ENTITIES'][$entity['ID']]['DAYS']; ?>
         <fieldset class="form-group">
             <legend><?= $entity['NAME'] ?>:</legend>
@@ -20,8 +21,12 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
                     <?= $days ? "value='{$days}'" : "" ?> > дней до дедлайна
             </label>
             <label>
-                Уведомлять при изменении срока <input type="checkbox" name="deadline<?= $entity['ID'] ?>" class="form-control"
+                Уведомлять при изменении срока <input type="checkbox" name="change<?= $entity['ID'] ?>" class="form-control"
                     <?= $onChangeDeadline ? 'checked' : '' ?> >
+            </label>
+            <label>
+                Сегодня дедлайн <input type="checkbox" name="deadline<?= $entity['ID'] ?>" class="form-control"
+                    <?= $todayDeadline ? 'checked' : '' ?> >
             </label>
         </fieldset>
     <? } ?>
