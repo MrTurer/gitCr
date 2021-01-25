@@ -3,6 +3,7 @@
 namespace RNS\Integrations\Processors;
 
 use CEventLog;
+use RNS\Integrations\Models\IntegrationOptions;
 use RNS\Integrations\Models\Mapping;
 use RNS\Integrations\Models\SystemExchangeType;
 
@@ -15,6 +16,9 @@ abstract class DataTransferBase
     protected $systemCode;
 
     protected $exchangeTypeCode;
+
+    /** @var IntegrationOptions */
+    protected $integrationOptions;
 
     protected $options;
 
@@ -39,6 +43,7 @@ abstract class DataTransferBase
         $this->exchangeTypeCode = $obj->getExchangeTypeCode();
         $this->options = $obj->getOptions();
         $this->mapping = $obj->getMapping();
+        $this->integrationOptions = new IntegrationOptions($this->systemCode);
 
         $this->execute();
 

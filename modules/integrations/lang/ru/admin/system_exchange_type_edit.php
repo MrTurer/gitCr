@@ -28,15 +28,9 @@ $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_DATABASE_USERNAME'] = 'Имя польз�
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_DATABASE_PASSWORD'] = 'Пароль';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_TEST_CONNECTION'] = 'Тест подключения';
 
-$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_PROJ_SOURCE_ELEM'] = 'Источник во внешней системе';
-$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_KEY_ATTR'] = 'Ключевое поле';
-$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_DISPLAY_ATTR'] = 'Поля для вывода';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_SRC_PRJ'] = 'Проект во внешней системе';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_DEST_PRJ'] = 'Проект в СППР';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_DEF_PRJ'] = 'Проект в СППР по умолчанию';
-$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_REF_ATTR'] = 'Поле для связи с проектом';
-
-$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_TASK_SOURCE_ELEM'] = 'Источник во внешней системе';
 
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_EXT_ENT_TYPE'] = 'Тип сущности во внешней системе';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_EXT_PROP'] = 'Свойство во внешней системе';
@@ -51,7 +45,6 @@ $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_ENT_DEF_STATUS'] = 'Статус су
 
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_ADD_MAP'] = 'Добавить сопоставление';
 
-$MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_USER_SOURCE_ELEM'] = 'Источник во внешней системе';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_INT_USER'] = 'Пользователь в СППР';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_EXT_USER'] = 'Пользователь во внешней системе';
 $MESS['INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_USER_DEF_EXT_EMAIL'] = 'E-mail при отсутствии исполнителя';

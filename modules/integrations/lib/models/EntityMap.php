@@ -4,70 +4,10 @@ namespace RNS\Integrations\Models;
 
 class EntityMap
 {
-    /** @var string|null */
-    private $srcElementName;
-    /** @var string|null */
-    private $keyAttrName;
-    /** @var string|null */
-    private $displayAttrName;
     /** @var int|null */
     private $defaultEntityId;
     /** @var EntityMapItem[] */
     private $items = [];
-
-    /**
-     * @return string
-     */
-    public function getSrcElementName(): ?string
-    {
-        return $this->srcElementName;
-    }
-
-    /**
-     * @param string|null $srcElementName
-     * @return EntityMap
-     */
-    public function setSrcElementName(?string $srcElementName): EntityMap
-    {
-        $this->srcElementName = $srcElementName;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getKeyAttrName(): ?string
-    {
-        return $this->keyAttrName;
-    }
-
-    /**
-     * @param string|null $keyAttrName
-     * @return EntityMap
-     */
-    public function setKeyAttrName(?string $keyAttrName): EntityMap
-    {
-        $this->keyAttrName = $keyAttrName;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getDisplayAttrName(): ?string
-    {
-        return $this->displayAttrName;
-    }
-
-    /**
-     * @param string|null $displayAttrName
-     * @return EntityMap
-     */
-    public function setDisplayAttrName(?string $displayAttrName): EntityMap
-    {
-        $this->displayAttrName = $displayAttrName;
-        return $this;
-    }
 
     /**
      * @return int|null

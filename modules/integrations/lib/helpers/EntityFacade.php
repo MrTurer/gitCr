@@ -8,6 +8,7 @@ use Bitrix\Tasks\Util\UserField;
 use CSocNetGroup;
 use CTasks;
 use CUser;
+use RNS\Integrations\Models\IntegrationOptions;
 use RNS\Integrations\Models\Mapping;
 use RNS\Integrations\Models\OptionsBase;
 
@@ -53,6 +54,7 @@ class EntityFacade
             'CHANGED_DATE',
             'START_DATE_PLAN',
             'END_DATE_PLAN',
+            'DEADLINE',
             'DATE_START',
             'CLOSED_DATE',
           ],
@@ -68,6 +70,7 @@ class EntityFacade
             'Дата изменения',
             'Планируемая дата начала',
             'Планируемая дата окончания',
+            'Дедлайн',
             'Дата начала',
             'Дата завершения',
           ]
@@ -141,25 +144,26 @@ class EntityFacade
         return $result;
     }
 
-    public static function getExternalProjects(string $echangeTypeCode, OptionsBase $options, Mapping $mapping)
+    public static function getExternalProjects(string $exchangeTypeCode, string $systemCode, OptionsBase $options, Mapping $mapping)
     {
-        $provider = self::getDataProvider($echangeTypeCode, $options, $mapping);
+        $provider = self::getDataProvider($exchangeTypeCode, $systemCode, $options, $mapping);
         return $provider->getProjects();
     }
 
-    public static function getExternalUsers(string $echangeTypeCode, OptionsBase $options, Mapping $mapping)
+    public static function getExternalUsers(string $echangeTypeCode, string $systemCode, OptionsBase $options, Mapping $mapping)
     {
-        $provider = self::getDataProvider($echangeTypeCode, $options, $mapping);
+        $provider = self::getDataProvider($echangeTypeCode, $systemCode, $options, $mapping);
         return $provider->getUsers();
     }
 
-    public static function getDataProvider(string $exchangeTypeCode, OptionsBase $options, Mapping $mapping)
+    public static function getDataProvider(string $exchangeTypeCode, string $systemCode, OptionsBase $options, Mapping $mapping)
     {
         $providerClassPath = $_SERVER['DOCUMENT_ROOT'] . '/local/modules/integrations/lib/processors/' . $exchangeTypeCode . '/' .
           $options->getType() . '/DataProvider.php';
         include_once($providerClassPath);
         $providerClass = "RNS\\Integrations\\Processors\\{$exchangeTypeCode}\\{$options->getType()}\\DataProvider";
-        $provider = new $providerClass($options, $mapping);
+        $integrationOptions = new IntegrationOptions($systemCode);
+        $provider = new $providerClass($systemCode, $integrationOptions, $options, $mapping);
         return $provider;
     }
 

@@ -101,7 +101,7 @@ if ($ID > 0) {
 
     $exchType = $obj->getExchangeTypeCode();
 
-    $externalProjects = EntityFacade::getExternalProjects($exchType, $obj->getOptions(), $obj->getMapping());
+    $externalProjects = EntityFacade::getExternalProjects($exchType, $systemCode, $obj->getOptions(), $obj->getMapping());
     foreach ($externalProjects as $id => $name) {
         if (!$mapping->getProjectMap()->getItemByExternalId($id)) {
             $mapping->getProjectMap()->addItem($id);
@@ -117,7 +117,7 @@ if ($ID > 0) {
       'REFERENCE_ID' => [],
       'REFERENCE' => []
     ];
-    $users = EntityFacade::getExternalUsers($exchType, $obj->getOptions(), $obj->getMapping());
+    $users = EntityFacade::getExternalUsers($exchType, $systemCode, $obj->getOptions(), $obj->getMapping());
     foreach ($users as $id => $name) {
         $externalUsers['REFERENCE_ID'][] = $id;
         $externalUsers['REFERENCE'][] = $name;
@@ -263,26 +263,6 @@ $tabControl->Begin();
     <!-- Экземпляры проектов -->
     <tr>
         <td class="adm-detail-content-cell-l">
-            <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_PROJ_SOURCE_ELEM') ?>
-        </td>
-        <td class="adm-detail-content-cell-r">
-            <?= InputType('text', 'mapping[projectMap][srcElementName]', $mapping->getProjectMap()->getSrcElementName(), false) ?>
-        </td>
-        <td class="adm-detail-content-cell-l">
-            <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_KEY_ATTR') ?>
-        </td>
-        <td class="adm-detail-content-cell-r">
-            <?= InputType('text', 'mapping[projectMap][keyAttrName]', $mapping->getProjectMap()->getKeyAttrName(), false) ?>
-        </td>
-    </tr>
-    <tr>
-        <td class="adm-detail-content-cell-l">
-            <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_DISPLAY_ATTR') ?>
-        </td>
-        <td class="adm-detail-content-cell-r">
-            <?= InputType('text', 'mapping[projectMap][displayAttrName]', $mapping->getProjectMap()->getDisplayAttrName(), false) ?>
-        </td>
-        <td class="adm-detail-content-cell-l">
             <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_DEF_PRJ') ?>
         </td>
         <td class="adm-detail-content-cell-r">
@@ -290,7 +270,7 @@ $tabControl->Begin();
         </td>
     </tr>
     <tr>
-        <td colspan="4">
+        <td colspan="2">
             <table class="adm-list-table">
                 <thead>
                 <tr class="adm-list-table-header">
@@ -332,12 +312,6 @@ $tabControl->Begin();
         <td class="adm-detail-content-cell-r">
             <?= SelectBoxFromArray("mapping[entityTypeMap][defaultTypeId]", $entityTypes, $mapping->getEntityPropertyMap()->getDefaultTypeId()) ?>
         </td>
-        <td class="adm-detail-content-cell-l">
-            <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_REF_ATTR') ?>
-        </td>
-        <td class="adm-detail-content-cell-r">
-            <?= InputType('text', 'mapping[entityTypeMap][refPropertyId]', $mapping->getEntityTypeMap()->getRefPropertyId(), false) ?>
-        </td>
     </tr>
     <tr>
         <td class="adm-detail-content-cell-r" colspan="4">
@@ -345,7 +319,7 @@ $tabControl->Begin();
         </td>
     </tr>
     <tr>
-        <td colspan="4">
+        <td colspan="2">
             <table class="adm-list-table">
                 <thead>
                 <tr class="adm-list-table-header">
@@ -477,20 +451,6 @@ $tabControl->Begin();
     <!-- Свойства сущности -->
     <tr>
         <td class="adm-detail-content-cell-l">
-            <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_TASK_SOURCE_ELEM') ?>
-        </td>
-        <td class="adm-detail-content-cell-r">
-            <?= InputType('text', 'mapping[entityPropertyMap][sourceElementName]', $mapping->getEntityPropertyMap()->getSourceElementName(), false) ?>
-        </td>
-        <td class="adm-detail-content-cell-l">
-            <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_KEY_ATTR') ?>
-        </td>
-        <td class="adm-detail-content-cell-r">
-            <?= InputType('text', 'mapping[entityPropertyMap][keyPropertyName]', $mapping->getEntityPropertyMap()->getKeyPropertyName(), false) ?>
-        </td>
-    </tr>
-    <tr>
-        <td class="adm-detail-content-cell-l">
             <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_ENT_DEF_TYPE') ?>
         </td>
         <td class="adm-detail-content-cell-r">
@@ -573,28 +533,6 @@ $tabControl->Begin();
     </tr>
     <?php $tabControl->BeginNextTab() ?>
     <!-- Пользователи -->
-    <tr>
-        <td class="adm-detail-content-cell-l">
-            <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_USER_SOURCE_ELEM') ?>
-        </td>
-        <td class="adm-detail-content-cell-r">
-            <?= InputType('text', 'mapping[userMap][srcElementName]', $mapping->getUserMap()->getSrcElementName(), false) ?>
-        </td>
-        <td class="adm-detail-content-cell-l">
-            <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_KEY_ATTR') ?>
-        </td>
-        <td class="adm-detail-content-cell-r">
-            <?= InputType('text', 'mapping[userMap][keyAttrName]', $mapping->getUserMap()->getKeyAttrName(), false) ?>
-        </td>
-    </tr>
-    <tr>
-        <td class="adm-detail-content-cell-l">
-            <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_DISPLAY_ATTR') ?>
-        </td>
-        <td class="adm-detail-content-cell-r">
-            <?= InputType('text', 'mapping[userMap][displayAttrName]', $mapping->getUserMap()->getDisplayAttrName(), false) ?>
-        </td>
-    </tr>
     <tr>
         <td>
             <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_USER_DEF_EXT_EMAIL') ?>

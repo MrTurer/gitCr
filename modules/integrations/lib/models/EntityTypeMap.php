@@ -6,8 +6,6 @@ class EntityTypeMap
 {
     /** @var int|null */
     private $defaultTypeId;
-    /** @var mixed */
-    private $refPropertyId;
     /** @var EntityTypeMapItem[] */
     private $items = [];
 
@@ -26,24 +24,6 @@ class EntityTypeMap
     public function setDefaultTypeId(?int $defaultTypeId): EntityTypeMap
     {
         $this->defaultTypeId = $defaultTypeId;
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getRefPropertyId()
-    {
-        return $this->refPropertyId;
-    }
-
-    /**
-     * @param mixed $refPropertyId
-     * @return EntityTypeMap
-     */
-    public function setRefPropertyId($refPropertyId)
-    {
-        $this->refPropertyId = $refPropertyId;
         return $this;
     }
 
