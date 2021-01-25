@@ -3,6 +3,7 @@
 namespace RNS\Integrations\Processors\database\pgsql;
 
 use RNS\Integrations\Helpers\EntityFacade;
+use RNS\Integrations\Models\IntegrationOptions;
 use RNS\Integrations\Models\Mapping;
 use RNS\Integrations\Models\OptionsBase;
 use RNS\Integrations\Processors\DataProviderBase;
@@ -11,9 +12,13 @@ class DataProvider extends DataProviderBase
 {
     private $conn;
 
-    public function __construct(OptionsBase $options, Mapping $mapping)
-    {
-        parent::__construct($options, $mapping);
+    public function __construct(
+        string $systemCode,
+        IntegrationOptions $integrationOptions,
+        OptionsBase $options,
+        Mapping $mapping
+    ) {
+        parent::__construct($systemCode, $integrationOptions, $options, $mapping);
     }
 
     public function isAvailable()
@@ -28,10 +33,9 @@ class DataProvider extends DataProviderBase
         }
         $this->connect();
 
-        $map = $this->mapping->getProjectMap();
-        $tableName = $map->getSrcElementName();
-        $keyField = $map->getKeyAttrName();
-        $displayField = $map->getDisplayAttrName();
+        $tableName = $this->integrationOptions->getProjectSource();
+        $keyField = $this->integrationOptions->getProjectKeyField();
+        $displayField = $this->integrationOptions->getProjectDisplayField();
 
         $displayField = explode(',', $displayField);
 
@@ -57,25 +61,24 @@ class DataProvider extends DataProviderBase
 
     /**
      * Возвращает массив сущностей для импорта, у которых еще не проставлен признак того, что она уже сымпортирована.
-     * @param string $systemCode
      * @return array
      */
-    public function getEntities(string $systemCode)
+    public function getEntities()
     {
         $result = [];
         if (!$this->isAvailable()) {
             return $result;
         }
 
-        $srcTableName = $this->mapping->getEntityPropertyMap()->getSourceElementName();
-        $prjTableName = $this->mapping->getProjectMap()->getSrcElementName();
-        $prjKeyFieldName = $this->mapping->getProjectMap()->getKeyAttrName();
-        $refFieldName = $this->mapping->getEntityTypeMap()->getRefPropertyId();
-        $isSavedFieldName = $this->moduleOptions['database']['isSavedFieldName'];
-        $createdFieldName = $this->moduleOptions['database'][$systemCode]['createdFieldName'];
-        $idFieldName = $this->moduleOptions['database'][$systemCode]['idFieldName'];
+        $srcTableName = $this->integrationOptions->getEntitySource();
+        $prjTableName = $this->integrationOptions->getProjectSource();
+        $prjKeyFieldName = $this->integrationOptions->getProjectKeyField();
+        $refFieldName = $this->integrationOptions->getEntityRefFieldName();
+        $isSavedFieldName = $this->integrationOptions->getIsSavedFieldName();
+        $createdFieldName = $this->integrationOptions->getCreatedFieldName();
+        $idFieldName = $this->integrationOptions->getEntityIdFieldName();
 
-        $fields = EntityFacade::getExternalEntityProperties($systemCode);
+        $fields = EntityFacade::getExternalEntityProperties($this->systemCode);
         $fieldNames = implode(', ', $fields['REFERENCE_ID']);
 
         $sql =
@@ -105,10 +108,9 @@ class DataProvider extends DataProviderBase
 
         $this->connect();
 
-        $map = $this->mapping->getUserMap();
-        $tableName = $map->getSrcElementName();
-        $keyField = $map->getKeyAttrName();
-        $displayField = $map->getDisplayAttrName();
+        $tableName = $this->integrationOptions->getUserSource();
+        $keyField = $this->integrationOptions->getUserSourceKeyField();
+        $displayField = $this->integrationOptions->getUserSourceDisplayField();
 
         $displayField = explode(',', $displayField);
 
@@ -132,17 +134,16 @@ class DataProvider extends DataProviderBase
         return $data;
     }
 
-    public function getEntityKeyById(string $systemCode, $id)
+    public function getEntityKeyById($id)
     {
         $result = false;
         if (!$this->isAvailable()) {
             return $result;
         }
 
-        $mapping = $this->mapping->getEntityPropertyMap();
-        $srcTableName = $mapping->getSourceElementName();
-        $keyFieldName = $mapping->getKeyPropertyName();
-        $idFieldName = $this->moduleOptions['database'][$systemCode]['idFieldName'];
+        $srcTableName = $this->integrationOptions->getEntitySource();
+        $keyFieldName = $this->integrationOptions->getEntityKeyField();
+        $idFieldName = $this->integrationOptions->getEntityIdFieldName();
 
         $this->connect();
 
@@ -154,7 +155,28 @@ class DataProvider extends DataProviderBase
             $result = $row[0];
         }
 
+        $this->disconnect();
+
         return $result;
+    }
+
+    public function setEntitySaved($id, bool $saved)
+    {
+        if (!$this->isAvailable()) {
+            return;
+        }
+
+        $isSavedField = $this->integrationOptions->getIsSavedFieldName();
+        $keyFieldName = $this->integrationOptions->getEntityKeyField();
+        $fieldName = $this->integrationOptions->getIsSavedFieldName();
+
+        $this->connect();
+
+        $sql = "update {$isSavedField} set {$fieldName} = {$saved} where {$keyFieldName} = {$id}";
+
+        pg_exec($this->conn, $sql);
+
+        $this->disconnect();
     }
 
     private function connect()

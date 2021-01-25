@@ -8,11 +8,6 @@ return [
   ],
   'database' => [
     'projectTableName' => 'b_sonet_group',
-    'taskTableName' => 'b_tasks',
-    'isSavedFieldName' => 'is_saved',
-    'jira' => [
-        'createdFieldName' => 'created',
-        'idFieldName' => 'issue_id'
-    ]
+    'taskTableName' => 'b_tasks'
   ]
 ];

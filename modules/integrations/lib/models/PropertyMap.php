@@ -4,52 +4,12 @@ namespace RNS\Integrations\Models;
 
 class PropertyMap
 {
-    /** @var string|null */
-    private $sourceElementName;
-    /** @var string|null */
-    private $keyPropertyName;
     /** @var mixed */
     private $defaultTypeId;
     /** @var mixed */
     private $defaultPropertyId;
     /** @var PropertyMapItem[] */
     private $items = [];
-
-    /**
-     * @return string|null
-     */
-    public function getSourceElementName(): ?string
-    {
-        return $this->sourceElementName;
-    }
-
-    /**
-     * @param string|null $sourceElementName
-     * @return PropertyMap
-     */
-    public function setSourceElementName(?string $sourceElementName): PropertyMap
-    {
-        $this->sourceElementName = $sourceElementName;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getKeyPropertyName(): ?string
-    {
-        return $this->keyPropertyName;
-    }
-
-    /**
-     * @param string|null $keyPropertyName
-     * @return PropertyMap
-     */
-    public function setKeyPropertyName(?string $keyPropertyName): PropertyMap
-    {
-        $this->keyPropertyName = $keyPropertyName;
-        return $this;
-    }
 
     /**
      * @return mixed

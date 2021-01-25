@@ -3,9 +3,10 @@
 namespace RNS\Integrations\Processors\Database;
 
 use Bitrix\Main\Loader;
-use Bitrix\Main\UserTable;
+use Bitrix\Tasks\Internals\Task\MemberTable;
 use Bitrix\Tasks\Item\Task;
 use CSocNetGroup;
+use CTaskMembers;
 use RNS\Integrations\Helpers\EntityFacade;
 use RNS\Integrations\Helpers\HLBlockHelper;
 use RNS\Integrations\Models\EntityTypeMapItem;
@@ -38,14 +39,14 @@ class Import extends DataTransferBase
             Loader::includeModule('tasks');
             Loader::includeModule('socialnetwork');
 
-            $provider = EntityFacade::getDataProvider($this->exchangeTypeCode, $this->options, $this->mapping);
+            $provider = EntityFacade::getDataProvider($this->exchangeTypeCode, $this->systemCode, $this->options, $this->mapping);
 
             $entities = $provider->getEntities($this->systemCode);
 
             $projectMap = $this->mapping->getProjectMap();
-            $refFieldName = $this->mapping->getEntityTypeMap()->getRefPropertyId();
+            $refFieldName = $this->integrationOptions->getEntityRefFieldName();
 
-            $keyFieldName = $this->mapping->getEntityPropertyMap()->getKeyPropertyName();
+            $keyFieldName = $this->integrationOptions->getEntityKeyField();
 
             $propMapItems = $this->mapping->getEntityPropertyMap()->getItems();
             $typeMap = $this->mapping->getEntityTypeMap();
@@ -71,6 +72,7 @@ class Import extends DataTransferBase
                 ]);
 
                 $data = [];
+                $data['UF_TASK_SOURCE'] = $sourceId;
 
                 /** @var EntityTypeMapItem $typeMapItem */
                 $typeMapItem = null;
@@ -145,6 +147,11 @@ class Import extends DataTransferBase
                                 $value = $parentTask->getId();
                             }
                         }
+                    } elseif ($destProp == 'DEADLINE') {
+                        if (!$value) {
+                            $value = new \DateTime();
+                            $value->add(new \DateInterval("P{$respSettings->getDefaultDeadlineDays()}D"));
+                        }
                     }
                     $data[$destProp] = $value;
                 }
@@ -152,12 +159,16 @@ class Import extends DataTransferBase
                 if (!$task) {
                     $task = new Task($data);
                 } else {
+                    $this->deleteTaskMembers($task->getId());
                     $task->setData($data);
                 }
 
                 $result = $task->save();
 
-                if (!$result->isSuccess()) {
+                if ($result->isSuccess()) {
+                    $provider->setEntitySaved($key, true);
+                } else {
+                    $provider->setEntitySaved($key, false);
                     foreach ($result->getErrors() as $error) {
                         $this->addError($error->getMessage());
                     }
@@ -168,6 +179,17 @@ class Import extends DataTransferBase
         } catch (\Exception $ex) {
             $this->addError($ex->getMessage());
             throw $ex;
+        }
+    }
+
+    private function deleteTaskMembers($taskId)
+    {
+        $list = MemberTable::getList(array(
+          'filter' => ['TASK_ID' => $taskId]
+        ));
+        while ($item = $list->fetch())
+        {
+            MemberTable::delete($item);
         }
     }
 }
