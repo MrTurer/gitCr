@@ -68,7 +68,7 @@ class Import extends DataTransferBase
 
                 $task = Task::findOne([
                     'select' => ['ID', 'TITLE'],
-                    'filter' => ['=UF_TASK_SOURCE' => $sourceId, '=UF_EXTERNAL_ID' => $key]
+                    'filter' => ['=UF_TASK_SOURCE' => $sourceId, '=UF_EXTERNAL_ID' => $key, '=ZOMBIE' => 'N']
                 ]);
 
                 $data = [];
