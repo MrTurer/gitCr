@@ -1,8 +1,8 @@
 <?
 
-class rnschatbot extends \CModule
+class rns_notification extends \CModule
 {
-    var $MODULE_ID = "rnschatbot";
+    var $MODULE_ID = "rns.notification";
     var $MODULE_VERSION;
     var $MODULE_VERSION_DATE;
     var $MODULE_NAME;
@@ -17,8 +17,8 @@ class rnschatbot extends \CModule
         $this->MODULE_VERSION = $arModuleVersion["VERSION"];
         $this->MODULE_VERSION_DATE = $arModuleVersion["VERSION_DATE"];
 
-        $this->MODULE_NAME = "Модуль чат-бота уведомлений";
-        $this->MODULE_DESCRIPTION = "Автоматическая рассылка уведомений в чате";
+        $this->MODULE_NAME = "Модуль уведомлений";
+        $this->MODULE_DESCRIPTION = "Автоматическая рассылка уведомлений пользователям";
         $this->PARTNER_NAME = 'RuNetSoft';
         $this->PARTNER_URI = 'http://www.rns-soft.ru';
     }
@@ -29,7 +29,7 @@ class rnschatbot extends \CModule
         if (!\Bitrix\Main\Loader::includeModule($this->MODULE_ID)) {
             return false;
         }
-        \Bitrix\Rnschatbot\RnsBot::install();
+        \Rns\Notification\RnsBot::install();
     }
 
     function DoUninstall()
@@ -37,7 +37,7 @@ class rnschatbot extends \CModule
         if (!\Bitrix\Main\Loader::includeModule($this->MODULE_ID)) {
             return false;
         }
-        \Bitrix\Rnschatbot\RnsBot::uninstall();
+        \Rns\Notification\RnsBot::uninstall();
         UnRegisterModule($this->MODULE_ID);
     }
 }
