@@ -5,6 +5,7 @@ namespace Rns\Notification;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Highloadblock as HL;
 use Bitrix\Main\EventManager;
+use Bitrix\Main\Config\Option;
 
 class RnsBot extends \Bitrix\ImBot\Bot\Base
 {
@@ -12,7 +13,6 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
     const MODULE_ID = "rns.notification";
     const AGENT_FUNCTION = "\Rns\Notification\RnsBot::noticeAllUsers();";
     const TASKS_NOTICE_TIME = '09:00:00';
-    const DEFAULT_DAYS_TO_NOTICE = 4;
     const HL_USER_SETTINGS_NAME = 'RnsBotUserSettings';
     const HL_ENTITIES_NAME = 'Entities';
     const HL_USER_SETTINGS_TABLE_NAME = 'rnsbot_user_settings';
@@ -43,7 +43,9 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
             'METHOD_WELCOME_MESSAGE' => 'onChatStart',
             'METHOD_BOT_DELETE' => 'onBotDelete',
             'PROPERTIES' => array(
-                'NAME' => Loc::getMessage('RNSNOTIFICATION_RNSBOT_NAME')
+                'NAME' => Option::get(self::MODULE_ID, 'RNSNOTIFICATION_OPT_CHATBOT_NAME'),
+                'COLOR' => Option::get(self::MODULE_ID, 'RNSNOTIFICATION_OPT_CHATBOT_COLOR'),
+                'PERSONAL_PHOTO' => Option::get(self::MODULE_ID, 'RNSNOTIFICATION_OPT_CHATBOT_ICON')
             )
         ));
         if ($botId) {
@@ -81,6 +83,28 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
         }
 
         return $botId;
+    }
+
+    public static function update()
+    {
+        if (!self::getBotId()) {
+            return false;
+        }
+
+        \Bitrix\Im\Bot::update(
+            [
+                'BOT_ID' => self::getBotId()
+            ],
+            [
+                'PROPERTIES' => [
+                    'NAME' => Option::get(self::MODULE_ID, 'RNSNOTIFICATION_OPT_CHATBOT_NAME'),
+                    'COLOR' => Option::get(self::MODULE_ID, 'RNSNOTIFICATION_OPT_CHATBOT_COLOR'),
+                    'PERSONAL_PHOTO' => Option::get(self::MODULE_ID, 'RNSNOTIFICATION_OPT_CHATBOT_ICON')
+                ]
+            ]
+        );
+
+        return true;
     }
 
     public static function createUserSettingsHL()
@@ -194,7 +218,7 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
         ),
             array(
                 'DIALOG_ID' => $dialogId,
-                'MESSAGE' => Loc::getMessage('RNSNOTIFICATION_RNSBOT_WELCOME_MESSAGE'),
+                'MESSAGE' => Option::get(self::MODULE_ID, 'RNSNOTIFICATION_OPT_CHATBOT_WELCOME_MESSAGE'),
                 'KEYBOARD' => $keyboard
             )
         );
@@ -248,69 +272,66 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
         if (!\Bitrix\Main\Loader::includeModule('tasks')) {
             return false;
         }
+        if (!\Bitrix\Main\Loader::includeModule('socialnetwork')) {
+            return false;
+        }
 
-        $message = '';
-        $tasksString = '';
-        $tasksTodayString = '';
+        $tasksArr = [];
+        $tasksTodayArr = [];
         $settings = self::getUserSettings($userId);
 
         foreach ($settings['ENTITIES'] as $entityId => $entitySettings) {
-            if ($entitySettings['NOTICE']) {
+            if ($entitySettings['NOTICE'] == 'Y') {
                 try {
                     $days = (int)$entitySettings['DAYS'];
                     $toDate = date("d.m.Y 23:59", strtotime("+$days day"));
                     $fromDate = date("d.m.Y 00:00", strtotime("+$days day"));
-                    $arFilter = self::getTasksFilter($userId, $entityId, $fromDate, $toDate);;
-
-                    list($arItems) = \CTaskItem::fetchList($userId, [], $arFilter);
-                    foreach ($arItems as $item) {
-                        $task = $item->getData(false);
-                        $tasksString .= self::getTaskMessage($userId, $task);
-                    }
-                } catch (\Exception $e) {
-                }
-            }
-            if ($entitySettings['TODAY_DEADLINE']) {
-                try {
-                    $toDate = date("d.m.Y H:i");
-                    $fromDate = date("d.m.Y 00:00");
                     $arFilter = self::getTasksFilter($userId, $entityId, $fromDate, $toDate);
+                    $template = Option::get(self::MODULE_ID, 'RNSNOTIFICATION_OPT_DAYS_DEADLINE_TEMPLATE_CONTENT');
 
                     list($arItems) = \CTaskItem::fetchList($userId, [], $arFilter);
                     foreach ($arItems as $item) {
                         $task = $item->getData(false);
-                        $tasksTodayString .= self::getTaskMessage($userId, $task);
+                        $tasksArr[$task['GROUP_ID']] .= self::getTaskMessage($userId, $task, $template);
+                    }
+                } catch (\Exception $e) {
+                }
+            }
+            if ($entitySettings['TODAY_DEADLINE'] == 'Y') {
+                try {
+                    $fromDate = date("d.m.Y H:i");
+                    $toDate = date("d.m.Y 23:59");
+                    $arFilter = self::getTasksFilter($userId, $entityId, $fromDate, $toDate);
+                    $template = Option::get(self::MODULE_ID, 'RNSNOTIFICATION_OPT_TODAY_DEADLINE_TEMPLATE_CONTENT');
+
+                    list($arItems) = \CTaskItem::fetchList($userId, [], $arFilter, [], ['*']);
+                    foreach ($arItems as $item) {
+                        $task = $item->getData(false);
+                        $tasksTodayArr[$task['GROUP_ID']] .= self::getTaskMessage($userId, $task, $template);
                     }
                 } catch (\Exception $e) {
                 }
             }
         }
 
-        if ($tasksTodayString) {
-            $message .= 'Сегодня дедлайн:[br]' . $tasksTodayString . '[br]';
-        }
-        if ($tasksString) {
-            $message .= 'Приближается срок по задачам:[br]' . $tasksString;
-        }
+        foreach ($tasksTodayArr as $groupId => $tasksTodayString) {
+            $titleTemplate = Option::get(self::MODULE_ID, 'RNSNOTIFICATION_OPT_TODAY_DEADLINE_TEMPLATE_TITLE');
+            self::sendTasksMessage($userId, $tasksTodayString, $groupId, $titleTemplate);
 
-        if ($message) {
-            $keyboard = self::getSettingsButton();
-            \Bitrix\Im\Bot::addMessage(array('BOT_ID' => self::getBotId()), array(
-                'DIALOG_ID' => $userId,
-                'MESSAGE' => $message,
-                'KEYBOARD' => $keyboard
-            ));
+        }
+        foreach ($tasksArr as $groupId => $tasksString) {
+            $titleTemplate = Option::get(self::MODULE_ID, 'RNSNOTIFICATION_OPT_DAYS_DEADLINE_TEMPLATE_TITLE');
+            self::sendTasksMessage($userId, $tasksString, $groupId, $titleTemplate);
         }
     }
 
     public static function getTasksFilter($userId, $entityId, $fromDate, $toDate)
     {
-        return [
+        $arFilter = [
             '::LOGIC' => 'AND',
             'REAL_STATUS' => [\CTasks::STATE_NEW, \CTasks::STATE_PENDING, \CTasks::STATE_IN_PROGRESS],
             '<DEADLINE' => $toDate,
             '>DEADLINE' => $fromDate,
-            'UF_TYPE_ENTITY' => $entityId,
             '::SUBFILTER-1' => [
                 '::LOGIC' => 'OR',
                 '::SUBFILTER-1' => [
@@ -321,9 +342,13 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
                 ],
             ]
         ];
+        if ($entityId) {
+            $arFilter['UF_TYPE_ENTITY'] = $entityId;
+        }
+        return $arFilter;
     }
 
-    public static function getTaskMessage($userId, array $task)
+    public static function getTaskMessage($userId, array $task, $template)
     {
         $pathToUserTask = \COption::GetOptionString("tasks", "paths_task_user_action", null, SITE_ID);
         $pathToUserTask = str_replace("#user_id#", $userId, $pathToUserTask);
@@ -336,16 +361,58 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
             ]
         );
 
-        return "[br][URL=$viewUrl]{$task['TITLE']}[/URL][br]Крайний срок: {$task["DEADLINE"]}[br]";
+        return str_replace(
+            [
+                '#url#',
+                '#title#',
+                '#deadline#'
+            ],
+            [
+                $viewUrl,
+                $task['TITLE'],
+                $task["DEADLINE"]
+            ],
+            $template
+        );
+    }
+
+    public static function sendTasksMessage($userId, $tasksMessage, $groupId, $title)
+    {
+        $groupUrl = '/';
+        $groupName = ' --- ';
+        if ($groupId) {
+            $group = \CSocNetGroup::GetByID($groupId);
+            $groupUrl = "/workgroups/group/$groupId/";
+            $groupName = $group['NAME'];
+        }
+        $title = str_replace(
+            [
+                '#url#',
+                '#title#'
+            ],
+            [
+                $groupUrl,
+                $groupName
+            ],
+            $title
+        );
+        $keyboard = self::getSettingsButton();
+        \Bitrix\Im\Bot::addMessage(array('BOT_ID' => self::getBotId()), array(
+            'DIALOG_ID' => $userId,
+            'MESSAGE' => $title . $tasksMessage,
+            'KEYBOARD' => $keyboard
+        ));
     }
 
     public static function noticeAllUsers()
     {
-        $settingsClass = self::getUserSettingsClass();
-        $allUserSettings = $settingsClass::getList();
+        $allUsers = \CUser::GetList(($by = "ID"), ($order = "ASC"), [
+            'ACTIVE' => 'Y',
+            'EXTERNAL_AUTH_ID' => false
+        ]);
 
-        while ($userSettings = $allUserSettings->fetch()) {
-            self::noticeAllTasksAction($userSettings['UF_USER_ID']);
+        while ($arUser = $allUsers->Fetch()) {
+            self::noticeAllTasksAction($arUser['ID']);
         }
 
         return self::AGENT_FUNCTION;
@@ -365,21 +432,29 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
 
         $arFields['TITLE'] = isset($arFields['TITLE']) ? $arFields['TITLE'] : $oldArFields['TITLE'];
 
+        $entityId = $oldArFields['UF_TYPE_ENTITY'];
+
         if ($createdBy != $changedBy) {
-            self::noticeUpdateTask($createdBy, $arFields);
+            $settings = self::getUserSettings($createdBy);
+            if ($settings['ENTITIES'][$entityId]['CHANGE_DEADLINE'] == 'Y' || $settings['ENTITIES'][0]['CHANGE_DEADLINE'] == 'Y') {
+                self::noticeUpdateTask($createdBy, $arFields);
+            }
         }
 
         if ($responsibleId != $changedBy && $responsibleId != $createdBy) {
-            self::noticeUpdateTask($responsibleId, $arFields);
+            $settings = self::getUserSettings($responsibleId);
+            if ($settings['ENTITIES'][$entityId]['CHANGE_DEADLINE'] == 'Y' || $settings['ENTITIES'][0]['CHANGE_DEADLINE'] == 'Y') {
+                self::noticeUpdateTask($responsibleId, $arFields);
+            }
         }
     }
 
     public static function noticeUpdateTask($userId, $task)
     {
-        \Bitrix\Im\Bot::addMessage(array('BOT_ID' => self::getBotId()), array(
-            'DIALOG_ID' => $userId,
-            'MESSAGE' => 'Был изменен срок по задаче:[br]' . self::getTaskMessage($userId, $task)
-        ));
+        $template = Option::get(self::MODULE_ID, 'RNSNOTIFICATION_OPT_CHANGE_DEADLINE_TEMPLATE_CONTENT');
+        $titleTemplate = Option::get(self::MODULE_ID, 'RNSNOTIFICATION_OPT_CHANGE_DEADLINE_TEMPLATE_TITLE');
+        $taskString = self::getTaskMessage($userId, $task, $template);
+        self::sendTasksMessage($userId, $taskString, 0, $titleTemplate);
     }
 
     public static function onCommandLang($command, $lang = null)
@@ -426,7 +501,16 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
         if ($userSettings = $userSettings->fetch()) {
             $userSettings = json_decode($userSettings['UF_SETTINGS'], true);
         } else {
-            $userSettings = [];
+            $userSettings = [
+                'ENTITIES' => [
+                    [
+                        'NOTICE' => Option::get(self::MODULE_ID, 'RNSNOTIFICATION_OPT_CHATBOT_NOTICE'),
+                        'DAYS' => Option::get(self::MODULE_ID, 'RNSNOTIFICATION_OPT_CHATBOT_DAYS'),
+                        'CHANGE_DEADLINE' => Option::get(self::MODULE_ID, 'RNSNOTIFICATION_OPT_CHATBOT_CHANGE'),
+                        'TODAY_DEADLINE' => Option::get(self::MODULE_ID, 'RNSNOTIFICATION_OPT_CHATBOT_TODAY_DEADLINE')
+                    ]
+                ]
+            ];
         }
 
         return $userSettings;
@@ -468,7 +552,7 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
 
     public static function getDefaultNoticeDays()
     {
-        return self::DEFAULT_DAYS_TO_NOTICE;
+        return Option::get(self::MODULE_ID, 'RNSNOTIFICATION_OPT_CHATBOT_DAYS');
     }
 
     public static function getEntities()

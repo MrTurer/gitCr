@@ -2,35 +2,47 @@
 if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
     die();
 }
+\Bitrix\Main\UI\Extension::load("ui.forms");
 ?>
 <form class="rnsbot-settings">
-    <h3>Настройки по типам задач</h3>
+    <h3>Настройка уведомлений чат-бота</h3>
     <? foreach ($arResult['ENTITIES'] as $entity) {
         $isNotice = $arResult['USER_SETTINGS']['ENTITIES'][$entity['ID']]['NOTICE'];
         $onChangeDeadline = $arResult['USER_SETTINGS']['ENTITIES'][$entity['ID']]['CHANGE_DEADLINE'];
         $todayDeadline = $arResult['USER_SETTINGS']['ENTITIES'][$entity['ID']]['TODAY_DEADLINE'];
         $days = $arResult['USER_SETTINGS']['ENTITIES'][$entity['ID']]['DAYS']; ?>
         <fieldset class="form-group">
-            <legend><?= $entity['NAME'] ?>:</legend>
-            <label>
-                Уведомлять <input type="checkbox" name="notice<?= $entity['ID'] ?>" class="form-control"
-                    <?= $isNotice ? 'checked' : '' ?> >
+            <legend>Тип сущности: <?= $entity['NAME'] ?></legend>
+            <label class="ui-ctl ui-ctl-checkbox ui-ctl-inline">
+                <input type="checkbox" name="notice<?= $entity['ID'] ?>" value="Y" class="ui-ctl-element"
+                    <?= $isNotice == 'Y' ? 'checked' : '' ?> >
             </label>
             <label>
-                За <input class="days" type="number" name="days<?= $entity['ID'] ?>" min="0" step="1"
-                    <?= $days ? "value='{$days}'" : "" ?> > дней до дедлайна
+                <div class="ui-ctl ui-ctl-inline">
+                    <span class="ui-ctl-label-text">За</span>
+                </div>
+                <div class="ui-ctl ui-ctl-textbox ui-ctl-inline ui-ctl-w25 ui-ctl-xs">
+                    <input class="days ui-ctl-element" type="number" name="days<?= $entity['ID'] ?>" min="0" step="1"
+                        <?= $days ? "value='{$days}'" : "" ?> >
+                </div>
+                <div class="ui-ctl ui-ctl-inline">
+                    <span class="ui-ctl-label-text">дней до дедлайна</span>
+                </div>
             </label>
-            <label>
-                Уведомлять при изменении срока <input type="checkbox" name="change<?= $entity['ID'] ?>" class="form-control"
-                    <?= $onChangeDeadline ? 'checked' : '' ?> >
+
+            <label class="ui-ctl ui-ctl-checkbox">
+                <input type="checkbox" class="ui-ctl-element"
+                       name="change<?= $entity['ID'] ?>" value="Y" <?= $onChangeDeadline == 'Y' ? 'checked' : '' ?> >
+                <div class="ui-ctl-label-text">При изменении срока</div>
             </label>
-            <label>
-                Сегодня дедлайн <input type="checkbox" name="deadline<?= $entity['ID'] ?>" class="form-control"
-                    <?= $todayDeadline ? 'checked' : '' ?> >
+            <label class="ui-ctl ui-ctl-checkbox">
+                <input type="checkbox" class="ui-ctl-element"
+                       name="deadline<?= $entity['ID'] ?>" value="Y" <?= $todayDeadline == 'Y' ? 'checked' : '' ?> >
+                <div class="ui-ctl-label-text">Сегодня дедлайн</div>
             </label>
         </fieldset>
     <? } ?>
-    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <button type="submit" class="ui-btn ui-btn-success">Сохранить</button>
 </form>
 
 <script>
@@ -59,22 +71,20 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
     });
 </script>
 
+
 <style>
     .rnsbot-settings {
         margin: 20px;
     }
-
     .rnsbot-settings fieldset {
         margin: 0 0 15px 0;
         border: #aaa solid 1px;
     }
 
-    .rnsbot-settings label {
-        margin: 10px 0;
-        display: block;
+    .rnsbot-settings .ui-ctl-checkbox {
+        margin: 0;
     }
-
-    .rnsbot-settings .days {
-        width: 50px;
+    .rnsbot-settings .ui-ctl-label-text {
+        padding: 0;
     }
 </style>

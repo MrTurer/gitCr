@@ -17,7 +17,7 @@ class rns_notification extends \CModule
         $this->MODULE_VERSION = $arModuleVersion["VERSION"];
         $this->MODULE_VERSION_DATE = $arModuleVersion["VERSION_DATE"];
 
-        $this->MODULE_NAME = "Модуль уведомлений";
+        $this->MODULE_NAME = "Уведомления";
         $this->MODULE_DESCRIPTION = "Автоматическая рассылка уведомлений пользователям";
         $this->PARTNER_NAME = 'RuNetSoft';
         $this->PARTNER_URI = 'http://www.rns-soft.ru';
