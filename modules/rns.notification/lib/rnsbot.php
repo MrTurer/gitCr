@@ -44,8 +44,7 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
             'METHOD_BOT_DELETE' => 'onBotDelete',
             'PROPERTIES' => array(
                 'NAME' => Option::get(self::MODULE_ID, 'RNSNOTIFICATION_OPT_CHATBOT_NAME'),
-                'COLOR' => Option::get(self::MODULE_ID, 'RNSNOTIFICATION_OPT_CHATBOT_COLOR'),
-                'PERSONAL_PHOTO' => Option::get(self::MODULE_ID, 'RNSNOTIFICATION_OPT_CHATBOT_ICON')
+                'COLOR' => Option::get(self::MODULE_ID, 'RNSNOTIFICATION_OPT_CHATBOT_COLOR')
             )
         ));
         if ($botId) {
@@ -154,6 +153,18 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
         }
     }
 
+    public static function deleteUserSettingsHL()
+    {
+        $settingsTable = HL\HighloadBlockTable::getList([
+            'filter' => [
+                'NAME' => self::HL_USER_SETTINGS_NAME
+            ]
+        ]);
+        if ($hldata = $settingsTable->fetch()) {
+            HL\HighloadBlockTable::delete($hldata['ID']);
+        }
+    }
+
     public static function getUserSettingsClass()
     {
         return self::getHLClass(self::HL_USER_SETTINGS_NAME);
@@ -181,6 +192,7 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
 
     public static function uninstall()
     {
+        self::deleteUserSettingsHL();
         return self::unregister();
     }
 
@@ -243,11 +255,11 @@ class RnsBot extends \Bitrix\ImBot\Bot\Base
 
     public static function getOpenSettingsFunction()
     {
-        return 'BX.SidePanel.Instance.open("rnschatbotsettings", {
+        return 'BX.SidePanel.Instance.open("rns:chatbotsettings", {
                     contentCallback: function (slider) {
                         return new Promise(function (resolve, reject) {
                             BX.ajax.runComponentAction(
-                                "rnschatbotsettings",
+                                "rns:chatbotsettings",
                                 "getForm",
                                 {
                                     mode: "class"

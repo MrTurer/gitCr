@@ -30,6 +30,13 @@ class rns_notification extends \CModule
             return false;
         }
         \Rns\Notification\RnsBot::install();
+
+        CopyDirFiles(
+            $_SERVER["DOCUMENT_ROOT"] . "/local/modules/{$this->MODULE_ID}/install/components",
+            $_SERVER["DOCUMENT_ROOT"] . "/bitrix/components",
+            true,
+            true
+        );
     }
 
     function DoUninstall()
@@ -38,6 +45,10 @@ class rns_notification extends \CModule
             return false;
         }
         \Rns\Notification\RnsBot::uninstall();
+        DeleteDirFiles(
+            $_SERVER["DOCUMENT_ROOT"] . "/local/modules/{$this->MODULE_ID}/install/components",
+            $_SERVER["DOCUMENT_ROOT"] . "/bitrix/components"
+        );
         UnRegisterModule($this->MODULE_ID);
     }
 }
