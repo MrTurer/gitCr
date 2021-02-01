@@ -9,7 +9,7 @@ use Bitrix\Main\Engine\Response\Component;
 use Bitrix\Main\Loader;
 use Rns\Notification\RnsBot;
 
-class RnschatbotSettings extends \CBitrixComponent implements Controllerable
+class ChatbotSettings extends \CBitrixComponent implements Controllerable
 {
     public function configureActions()
     {
@@ -18,7 +18,7 @@ class RnschatbotSettings extends \CBitrixComponent implements Controllerable
 
     public function getFormAction()
     {
-        return new Component('rnschatbotsettings');
+        return new Component('rns:chatbotsettings');
     }
 
     public function saveFormAction($settings)

@@ -171,6 +171,13 @@ if (check_bitrix_sessid() && (strlen($_POST['save']) > 0 || strlen($_POST['apply
             "del" => "Y",
             "MODULE_ID" => $module_id
         ];
+        CFile::ResizeImage(
+            $arFile,
+            [
+                "width" => 200,
+                "height" => 200
+            ]
+        );
         $fid = CFile::SaveFile($arFile, $module_id);
         Option::set($module_id, 'RNSNOTIFICATION_OPT_CHATBOT_ICON', $fid);
     }

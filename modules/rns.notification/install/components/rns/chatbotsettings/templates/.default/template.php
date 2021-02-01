@@ -54,7 +54,7 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
                 return obj;
             }, {});
             BX.ajax.runComponentAction(
-                "rnschatbotsettings",
+                "rns:chatbotsettings",
                 "saveForm",
                 {
                     mode: "class",
