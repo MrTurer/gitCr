@@ -19,7 +19,7 @@ $backUrl = 'industrial_office_entities_list.php?lang=' . LANGUAGE_ID;
 $arMessages = [];
 $hlDataClass = '';
 $bIsSuccess = false;
-$arFields = [];
+$arResult = [];
 $arFile = [];
 $strFormName = 'entity_edit_form';
 
@@ -66,19 +66,21 @@ if ($hldata = $rsData->fetch()) {
 				$row['ICON_CODE'] = $row['UF_ENTITY_ICON'];
 			}
 			
-			$arFields = $row;
+			$row['UF_BOUND_FIELDS'] = unserialize($row['UF_BOUND_FIELDS']);
+			
+			$arResult = $row;
 		} 
 	} else {
-		$arFields['UF_ACTIVE'] = 'Y';
+		$arResult['UF_ACTIVE'] = 'Y';
 	}
-
+	
 	if ((!empty($save) || !empty($apply)) && is_array($_POST)) {
-		$arFields = $_POST;
+		$arResult = $_POST;
 		
-		if ($arFields['UF_NAME'] == '') {
+		if ($arResult['UF_NAME'] == '') {
 			$arMessages[] = new CAdminMessage(Loc::getMessage("PMO_ERROR_EMPTY_NAME"));
 		}
-		if ($arFields['ICON_CODE'] == '' && (empty($_FILES) || !isset($_FILES['ICON_FILE']))) {
+		if ($arResult['ICON_CODE'] == '' && (empty($_FILES) || !isset($_FILES['ICON_FILE']))) {
 			$arMessages[] = new CAdminMessage(Loc::getMessage("PMO_ERROR_EMPTY_ICON"));
 		} elseif (!empty($_FILES) && isset($_FILES['ICON_FILE']) && $_FILES['ICON_FILE']['error'] == 0) {
 			$arFile = [
@@ -90,32 +92,36 @@ if ($hldata = $rsData->fetch()) {
 				"del" => "Y",
 				"MODULE_ID" => "highloadblock"
 			];
-		} elseif (intval($arFields['ICON_FILE_ID']) <= 0) {
+		} elseif (intval($arResult['ICON_FILE_ID']) <= 0) {
 			$arMessages[] = new CAdminMessage(Loc::getMessage("PMO_ERROR_EMPTY_ICON"));
 		}
 		
-		if ($arFields['UF_ENTITY_COLOR'] == '') {
+		if ($arResult['UF_ENTITY_COLOR'] == '') {
 			$arMessages[] = new CAdminMessage(Loc::getMessage("PMO_ERROR_EMPTY_COLOR"));
 		}
 		
-		if (!isset($arFields['UF_ACTIVE'])) {
-			$arFields['UF_ACTIVE'] = 'N';
+		if (!isset($arResult['UF_ACTIVE'])) {
+			$arResult['UF_ACTIVE'] = 'N';
 		}
-		if (!isset($arFields['UF_CONSIDER_TIME'])) {
-			$arFields['UF_CONSIDER_TIME'] = 'N';
+		if (!isset($arResult['UF_CONSIDER_TIME'])) {
+			$arResult['UF_CONSIDER_TIME'] = 'N';
 		}
-		if (!isset($arFields['UF_DECISION_REQUIRED'])) {
-			$arFields['UF_DECISION_REQUIRED'] = 'N';
+		if (!isset($arResult['UF_DECISION_REQUIRED'])) {
+			$arResult['UF_DECISION_REQUIRED'] = 'N';
+		}
+		if (!isset($arResult['UF_BOUND_FIELDS'])) {
+			$arResult['UF_BOUND_FIELDS'] = [];
 		}
 		
 		if (empty($arMessages)) {
 			$arElementFields = [
-				'UF_NAME' => $arFields['UF_NAME'],
-				'UF_ACTIVE' => $arFields['UF_ACTIVE'],
-				'UF_CODE' => $arFields['UF_CODE'],
-				'UF_CONSIDER_TIME' => $arFields['UF_CONSIDER_TIME'],
-				'UF_DECISION_REQUIRED' => $arFields['UF_DECISION_REQUIRED'],
-				'UF_ENTITY_COLOR' => $arFields['UF_ENTITY_COLOR'],
+				'UF_NAME' => $arResult['UF_NAME'],
+				'UF_ACTIVE' => ($arResult['UF_ACTIVE'] == 'Y'),
+				'UF_CODE' => $arResult['UF_CODE'],
+				'UF_CONSIDER_TIME' => ($arResult['UF_CONSIDER_TIME'] == 'Y'),
+				'UF_DECISION_REQUIRED' => ($arResult['UF_DECISION_REQUIRED'] == 'Y'),
+				'UF_ENTITY_COLOR' => $arResult['UF_ENTITY_COLOR'],
+				'UF_BOUND_FIELDS' => serialize($arResult['UF_BOUND_FIELDS']),
 			];
 			
 			if (!empty($arFile)) {
@@ -123,12 +129,11 @@ if ($hldata = $rsData->fetch()) {
 				
 				if (intval($fid)>0) $arElementFields["UF_ENTITY_ICON"] = intval($fid); 
 				else $arElementFields["UF_ENTITY_ICON"] = "null";
-			} elseif (empty($arFile) && intval($arFields['ICON_FILE_ID']) > 0) {
-				$arElementFields['UF_ENTITY_ICON'] = $arFields['ICON_FILE_ID'];
-			} elseif (empty($arFile) && intval($arFields['ICON_FILE_ID']) <= 0) {
-				$arElementFields['UF_ENTITY_ICON'] = $arFields['ICON_CODE'];
+			} elseif (empty($arFile) && intval($arResult['ICON_FILE_ID']) > 0) {
+				$arElementFields['UF_ENTITY_ICON'] = $arResult['ICON_FILE_ID'];
+			} elseif (empty($arFile) && intval($arResult['ICON_FILE_ID']) <= 0) {
+				$arElementFields['UF_ENTITY_ICON'] = $arResult['ICON_CODE'];
 			}
-			
 			if ($ID <= 0) {
 				$obResult = $strEntityDataClass::add($arElementFields);
 			} else {
@@ -137,7 +142,6 @@ if ($hldata = $rsData->fetch()) {
 			
 			if ($obResult->isSuccess()) {
 				$ID = $obResult->getId();
-				$bIsSuccess = true;
 			} else {
 				$arMessages[] = new CAdminMessage(Loc::getMessage("PMO_ERROR_EDIT"));
 			}
@@ -149,14 +153,30 @@ if ($hldata = $rsData->fetch()) {
 			LocalRedirect($_SERVER['PHP_SELF'] . '?ID=' . $ID . '&lang=' . LANGUAGE_ID.'&SUCCESS=true');
 		}
 	}
+	
+	$rsUserFields = \Bitrix\Main\UserFieldTable::getList([
+		'order' => ['ENTITY_ID'=>'ASC','SORT'=>'ASC'],
+		'filter' => ['ENTITY_ID' => 'TASKS_TASK'],
+		'select' => ['ID']
+	]);
+	while ($arUserField = $rsUserFields->Fetch()) {
+		$arUserField = CUserTypeEntity::GetByID($arUserField['ID']);
+		
+		$arResult['UF_BOUND_FIELDS'][$arUserField['FIELD_NAME']]['NAME'] = $arUserField['EDIT_FORM_LABEL']["ru"];
+	}
 }
 
 $tabs = [
-  ['DIV' => 'tab-1', 'TAB' => Loc::getMessage('PMO_ENTITY_EDIT_GENERAL')],
+	['DIV' => 'tab-1', 'TAB' => Loc::getMessage('PMO_ENTITY_EDIT_TAB_GENERAL')],
+	['DIV' => 'tab-2', 'TAB' => Loc::getMessage('PMO_ENTITY_EDIT_TAB_FIELDS')],
 ];
 $tabControl = new CAdminTabControl("tabControl", $tabs);
 
-$APPLICATION->SetTitle(Loc::getMessage('PMO_ENTITY_EDIT_TITLE'));
+if ($arResult['UF_NAME'] != '') {
+	$APPLICATION->SetTitle(Loc::getMessage('PMO_ENTITY_EDIT_TITLE').$arResult['UF_NAME']);
+} else {
+	$APPLICATION->SetTitle(Loc::getMessage('PMO_ENTITY_EDIT_NEW_TITLE'));
+}
 require_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_admin_after.php';
 
 $aMenu = [
@@ -187,58 +207,81 @@ if(!empty($arMessages)) {
 	name="<?= $strFormName?>"
 	enctype = 'multipart/form-data'>
 	
-    <?=bitrix_sessid_post()?>
-    <? $tabControl->Begin(); ?>
-    <? $tabControl->BeginNextTab(); ?>
+    <?= bitrix_sessid_post()?>
+    <?
+	$tabControl->Begin();
+	$tabControl->BeginNextTab();
+	?>
     <tr>
         <td><?= Loc::getMessage('PMO_ENTITY_FIELD_NAME') ?></td>
         <td>
-            <?= InputType('text', 'UF_NAME', $arFields['UF_NAME'], false) ?>
+            <?= InputType('text', 'UF_NAME', $arResult['UF_NAME'], false) ?>
         </td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('PMO_ENTITY_FIELD_ACTIVE') ?></td>
         <td>
-			<?= InputType('checkbox', 'UF_ACTIVE', 'Y', [$arFields['UF_ACTIVE']]) ?>
+			<?= InputType('checkbox', 'UF_ACTIVE', 'Y', [$arResult['UF_ACTIVE']]) ?>
         </td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('PMO_ENTITY_FIELD_CODE') ?></td>
         <td>
-            <?= InputType('text', 'UF_CODE', $arFields['UF_CODE'], false) ?>
+            <?= InputType('text', 'UF_CODE', $arResult['UF_CODE'], false) ?>
         </td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('PMO_ENTITY_FIELD_USE_TIME') ?></td>
         <td>
-            <?= InputType('checkbox', 'UF_CONSIDER_TIME', 'Y', [$arFields['UF_CONSIDER_TIME']]) ?>
+            <?= InputType('checkbox', 'UF_CONSIDER_TIME', 'Y', [$arResult['UF_CONSIDER_TIME']]) ?>
         </td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('PMO_ENTITY_FIELD_RESOLUTION') ?></td>
         <td>
-            <?= InputType('checkbox', 'UF_DECISION_REQUIRED', 'Y', [$arFields['UF_DECISION_REQUIRED']]) ?>
+            <?= InputType('checkbox', 'UF_DECISION_REQUIRED', 'Y', [$arResult['UF_DECISION_REQUIRED']]) ?>
         </td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('PMO_ENTITY_FIELD_ICON') ?></td>
         <td>
-            <?= InputType('hidden', 'ICON_FILE_ID', $arFields['ICON_FILE_ID'], false) ?>
-            <?= InputType('file', 'ICON_FILE', $arFields['ICON_FILE']['ORIGINAL_NAME'], false, true) ?>
+            <?= InputType('hidden', 'ICON_FILE_ID', $arResult['ICON_FILE_ID'], false) ?>
+            <?= InputType('file', 'ICON_FILE', $arResult['ICON_FILE']['ORIGINAL_NAME'], false, true) ?>
         </td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('PMO_ENTITY_FIELD_ICON_CODE') ?></td>
         <td>
-            <?= InputType('text', 'ICON_CODE', $arFields['ICON_CODE'], false) ?>
+            <?= InputType('text', 'ICON_CODE', $arResult['ICON_CODE'], false) ?>
         </td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('PMO_ENTITY_FIELD_COLOR') ?></td>
         <td>
-            <?= InputType('text', 'UF_ENTITY_COLOR', $arFields['UF_ENTITY_COLOR'], false) ?>
+            <?= InputType('text', 'UF_ENTITY_COLOR', $arResult['UF_ENTITY_COLOR'], false) ?>
         </td>
     </tr>
+    <?
+	$tabControl->BeginNextTab();
+	?>
+	<tr colspan="2">
+		<td align="center">
+			<table class="internal" id="table_ENTITY_FIELDS">
+				<tr class="heading">
+					<td><?echo GetMessage("PMO_ENTITY_TABLE_COL_NAME_FIELD");?></td>
+					<td><?echo GetMessage("PMO_ENTITY_TABLE_COL_SHOW");?></td>
+				</tr>
+				<?foreach($arResult['UF_BOUND_FIELDS'] as $strFieldName => $arField) {?>
+					<tr id="tr_ENTITY_FIELDS_<?echo $strFieldName?>">
+							<td style="text-align: left;"><?echo ($arField['NAME'] != '') ? $arField['NAME'] : $strFieldName?></td>
+							<td style="text-align:center"><?
+								echo '<input type="checkbox" value="Y" '.' name="UF_BOUND_FIELDS['.$strFieldName.'][CHECKED]" '.((isset($arField['CHECKED']) && $arField['CHECKED'] == "Y") ? 'checked="checked"': '').'>';
+							?></td>
+					</tr>
+				<?}?>
+			</table>
+		</td>
+	</tr>
 </form>
 
 <?

@@ -5,6 +5,7 @@ use Bitrix\Main\Localization\Loc,
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_admin_before.php';
 require_once($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/main/admin_tools.php');
+
 /** @global CMain $APPLICATION */
 /** @global CDatabase $DB */
 /** @global CUserTypeManager $USER_FIELD_MANAGER */
@@ -18,6 +19,7 @@ Loc::loadMessages(__FILE__);
 $entityId = 'PMO_ENTITIES_LIST';
 $tableId = 'pmo_entities_list';
 $sort = new CAdminSorting($tableId, 'id', 'asc');
+
 /** @var CAdminList $lAdmin */
 $lAdmin = new CAdminList($tableId, $sort);
 
