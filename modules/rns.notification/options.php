@@ -119,6 +119,9 @@ $options['days_deadline'] = [
         Loc::getMessage('RNSNOTIFICATION_OPT_ENTITY_TEMPLATE'),
         '',
         ['textarea', 5, 50]
+    ],
+    [
+        'help_template' => true
     ]
 ];
 $options['today_deadline'] = [
@@ -133,6 +136,9 @@ $options['today_deadline'] = [
         Loc::getMessage('RNSNOTIFICATION_OPT_ENTITY_TEMPLATE'),
         '',
         ['textarea', 5, 50]
+    ],
+    [
+        'help_template' => true
     ]
 ];
 $options['change_deadline'] = [
@@ -147,6 +153,9 @@ $options['change_deadline'] = [
         Loc::getMessage('RNSNOTIFICATION_OPT_ENTITY_TEMPLATE'),
         '',
         ['textarea', 5, 50]
+    ],
+    [
+        'help_template' => true
     ]
 ];
 
@@ -213,6 +222,69 @@ if (check_bitrix_sessid() && (strlen($_POST['save']) > 0 || strlen($_POST['apply
                             <?= InputType('file', $option[0], $val, false); ?>
                             <?= CFile::ShowImage($val, 30, 30, "border=0", "", true) ?>
                         </td>
+                    </tr>
+                    <?
+                } elseif ($option['help_template'] == 'true') {
+                    ?>
+                    <tr>
+                        <td><h4>Специальные теги в заголовке:</h4></td>
+                    </tr>
+                    <tr>
+                        <td>'#url#' – гиперссылка на проект</td>
+                    </tr>
+                    <tr>
+                        <td>'#title# - название проекта</td>
+                    </tr>
+                    <tr>
+                        <td><h4>Специальные теги в шаблоне задачи:</h4></td>
+                    </tr>
+                    <tr>
+                        <td>'#url#' – гиперссылка на задачу</td>
+                    </tr>
+                    <tr>
+                        <td>'#title# - название задачи</td>
+                    </tr>
+                    <tr>
+                        <td>'#deadline#' - крайний срок в задаче</td>
+                    </tr>
+                    <tr>
+                        <td><h4>Общие теги:</h4></td>
+                    </tr>
+                    <tr>
+                        <td>[B]полужирный[/B] текст	- <b>полужирный</b> текст</td>
+                    </tr>
+                    <tr>
+                        <td>[U]подчеркнутый[/U] текст - <u>подчеркнутый</u> текст</td>
+                    </tr>
+                    <tr>
+                        <td>[I]наклонный[/I] текст - <i>наклонный</i> текст</td>
+                    </tr>
+                    <tr>
+                        <td>[S]перечеркнутый[/S] текст - <s>перечеркнутый</s> текст</td>
+                    </tr>
+                    <tr>
+                        <td>[BR] - перенос на новую строку</td>
+                    </tr>
+                    <tr>
+                        <td>#BR# - перенос на новую строку</td>
+                    </tr>
+                    <tr>
+                        <td>\n - перенос на новую строку</td>
+                    </tr>
+                    <tr>
+                        <td>[USER=5]Марта[/USER] - ссылка на пользователя</td>
+                    </tr>
+                    <tr>
+                        <td>[CALL=84012334455]позвонить[/CALL] - кнопка для осуществления звонка через Битрикс24</td>
+                    </tr>
+                    <tr>
+                        <td>[CHAT=12]ссылка на чат[/CHAT] - ссылка на чат</td>
+                    </tr>
+                    <tr>
+                        <td>[send=текст]название кнопки[/send] - мгновенная отправка текста боту</td>
+                    </tr>
+                    <tr>
+                        <td>[put=/search] Введите строку поиска[/put] - если необходимо, чтобы пользователь что-то дописал к команде</td>
                     </tr>
                     <?
                 } else {
