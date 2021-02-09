@@ -4,9 +4,7 @@ namespace RNS\Integrations\Helpers;
 
 use Bitrix\Main\UserFieldLangTable;
 use Bitrix\Main\UserFieldTable;
-use Bitrix\Tasks\Util\UserField;
 use CSocNetGroup;
-use CTasks;
 use CUser;
 use RNS\Integrations\Models\IntegrationOptions;
 use RNS\Integrations\Models\Mapping;
@@ -44,7 +42,6 @@ class EntityFacade
         $fixedFields = [
           'REFERENCE_ID' => [
             'TITLE',
-            'GROUP_ID',
             'PARENT_ID',
             'PRIORITY',
             'CREATED_BY',
@@ -60,7 +57,6 @@ class EntityFacade
           ],
           'REFERENCE' => [
             'Название задачи',
-            'Идентификатор проекта',
             'Идентификатор родительской задачи',
             'Приоритет задачи',
             'Автор',

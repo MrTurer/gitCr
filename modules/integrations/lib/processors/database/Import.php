@@ -114,13 +114,14 @@ class Import extends DataTransferBase
                         if (!empty($dictItem)) {
                             $value = $dictItem[0]['ID'];
                         }
-                    } elseif ($destProp == 'GROUP_ID') {
-                        $projectItem = $projectMap->getItemByExternalId($entity[$refFieldName]);
-                        if ($projectItem) {
-                            $project = CSocNetGroup::GetById($projectItem->getInternalEntityId());
-                            $value = $project['ID'];
+                    } elseif ($destProp == 'UF_RNS_PROJECTS_ID') {
+                        $projectItems = $projectMap->getItemsByExternalId($entity[$refFieldName]);
+                        if (!empty($projectItems)) {
+                            $value = array_map(function($item) {
+                                return $item->getInternalEntityId();
+                            }, $projectItems);
                         } else {
-                            $value = $projectMap->getDefaultEntityId();
+                            $value = [$projectMap->getDefaultEntityId()];
                         }
                     } elseif ($destProp == 'RESPONSIBLE_ID') {
                         $userMapItem = $userMap->getItemByExternalId($value);

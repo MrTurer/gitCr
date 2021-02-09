@@ -5,9 +5,29 @@ namespace RNS\Integrations\Models;
 class EntityTypeMapItem
 {
     /** @var mixed */
+    private $externalProjectId;
+    /** @var mixed */
     private $externalTypeId;
     /** @var mixed */
     private $internalTypeId;
+
+    /**
+     * @return mixed
+     */
+    public function getExternalProjectId()
+    {
+        return $this->externalProjectId;
+    }
+
+    /**
+     * @param mixed $externalProjectId
+     * @return EntityTypeMapItem
+     */
+    public function setExternalProjectId($externalProjectId)
+    {
+        $this->externalProjectId = $externalProjectId;
+        return $this;
+    }
 
     /**
      * @return mixed

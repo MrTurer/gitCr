@@ -45,14 +45,19 @@ class EntityMap
         return $this;
     }
 
-    public function getItemByExternalId(string $id)
+    /**
+     * @param string $id
+     * @return EntityMapItem[]
+     */
+    public function getItemsByExternalId(string $id): array
     {
+        $result = [];
         foreach ($this->items as $item) {
             if ($item->getExternalEntityId() == $id) {
-                return $item;
+                $result[] = $item;
             }
         }
-        return null;
+        return $result;
     }
 
     public function addItem($externalEntityId, $internalEntityId = null)
