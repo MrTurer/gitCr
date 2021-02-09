@@ -509,7 +509,7 @@ $tabControl->Begin();
                             <?= SelectBoxFromArray("mapping[entityStatusMap][items][{$i}][externalProjectId]", $externalProjects, $mapItem->getExternalProjectId(), $noneSelected, 'onchange="refillSelects(\'entityStatusMap\', \'externalProjectId\', ' . $i . ')"') ?>
                         </td>
                         <td class="adm-list-table-cell">
-                            <?= SelectBoxFromArray("mapping[entityStatusMap][items][{$i}][externalTypeId]", $externalEntityTypes, $mapItem->getExternalTypeId(), $noneSelected, 'onchange="refillSelects(\'entityStatusMap\', \'externalTypeId\', ' . $i . ')"') ?>
+                            <?= SelectBoxFromArray("mapping[entityStatusMap][items][{$i}][externalTypeId]", $externalEntityTypes, $mapItem->getExternalTypeId(), $noneSelected) ?>
                         </td>
                         <td class="adm-list-table-cell">
                             <?= SelectBoxFromArray("mapping[entityStatusMap][items][{$i}][externalStatusId]", $externalEntityStatuses, $mapItem->getExternalStatusId(), $noneSelected) ?>
@@ -539,20 +539,6 @@ $tabControl->Begin();
     </tr>
     <?php $tabControl->BeginNextTab() ?>
     <!-- Свойства сущности -->
-    <tr>
-        <td class="adm-detail-content-cell-l">
-            <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_ENT_DEF_TYPE') ?>
-        </td>
-        <td class="adm-detail-content-cell-r">
-            <?= SelectBoxFromArray("mapping[entityPropertyMap][defaultTypeId]", $entityTypes, $mapping->getEntityPropertyMap()->getDefaultTypeId()) ?>
-        </td>
-        <td class="adm-detail-content-cell-l">
-            <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_ENT_DEF_PROP') ?>
-        </td>
-        <td class="adm-detail-content-cell-r">
-            <?= SelectBoxFromArray("mapping[entityPropertyMap][defaultPropertyId]", $entityProps, $mapping->getEntityPropertyMap()->getDefaultPropertyId()) ?>
-        </td>
-    </tr>
     <tr>
         <td class="adm-detail-content-cell-r" colspan="4">
             <input type="button" @click="entityPropertyMapAddItem" value="<?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_ADD_MAP') ?>">
@@ -773,7 +759,6 @@ $tabControl->End();
 
     function entityStatusMapEntityTypeChange(idx) {
       updateStatusList(idx);
-      refillSelects('entityStatusMap', 'internalTypeId', idx);
     }
 
     function updateAllStatusLists() {
@@ -863,13 +848,6 @@ $tabControl->End();
             case 'externalProjectId':
               options = <?= json_encode($externalProjects, JSON_UNESCAPED_UNICODE)?>;
               break;
-            case 'externalTypeId':
-              options = <?= json_encode($externalEntityTypes, JSON_UNESCAPED_UNICODE)?>;
-              scopeProperty = 'externalProjectId';
-              break;
-            case 'internalTypeId':
-              options = <?= json_encode($entityTypes, JSON_UNESCAPED_UNICODE)?>;
-              scopeProperty = 'externalProjectId';
           }
           break;
         case 'entityPropertyMap':
@@ -977,15 +955,13 @@ $tabControl->End();
             return `<select name="mapping[entityStatusMap][items][${item.idx}][externalProjectId]" id="mapping[entityStatusMap][items][${item.idx}][externalProjectId]" class="typeselect">${options}</select>`;
           },
           entityStatusMapGetExtEntityTypeSelect(item) {
-            var options = getOptionsHtml('entityStatusMap', 'externalTypeId', item.idx);
-            return `<select name="mapping[entityStatusMap][items][${item.idx}][externalTypeId]" id="mapping[entityStatusMap][items][${item.idx}][externalTypeId]" class="typeselect">${options}</select>`;
+            return `<select name="mapping[entityStatusMap][items][${item.idx}][externalTypeId]" id="mapping[entityStatusMap][items][${item.idx}][externalTypeId]" class="typeselect"><?= implode('', $externalEntityTypeOptions)?></select>`;
           },
           entityStatusMapGetExtEntityStatusSelect(item) {
             return `<select name="mapping[entityStatusMap][items][${item.idx}][externalStatusId]" class="typeselect"><?= implode('', $externalEntityStatusOptions)?></select>`;
           },
           entityStatusMapGetIntEntityTypeSelect(item) {
-            var options = getOptionsHtml('entityStatusMap', 'internalTypeId', item.idx);
-            return `<select id="mapping[entityStatusMap][items][${item.idx}][internalTypeId]" name="mapping[entityStatusMap][items][${item.idx}][internalTypeId]" class="typeselect" onchange="entityStatusMapEntityTypeChange(${item.idx})">${options}</select>`;
+            return `<select id="mapping[entityStatusMap][items][${item.idx}][internalTypeId]" name="mapping[entityStatusMap][items][${item.idx}][internalTypeId]" class="typeselect" onchange="entityStatusMapEntityTypeChange(${item.idx})"><?= implode('', $entityTypeOptions)?></select>`;
           },
           entityStatusMapGetIntEntityStatusSelect(item) {
             return `<select id="mapping_entityStatusMap_items_${item.idx}_internalStatusId" name="mapping[entityStatusMap][items][${item.idx}][internalStatusId]" class="typeselect"></select>`;
