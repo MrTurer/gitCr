@@ -5,6 +5,8 @@ namespace RNS\Integrations\Models;
 class EntityStatusMapItem
 {
     /** @var mixed */
+    private $externalProjectId;
+    /** @var mixed */
     private $externalTypeId;
     /** @var mixed */
     private $externalStatusId;
@@ -12,6 +14,24 @@ class EntityStatusMapItem
     private $internalTypeId;
     /** @var mixed */
     private $internalStatusId;
+
+    /**
+     * @return mixed
+     */
+    public function getExternalProjectId()
+    {
+        return $this->externalProjectId;
+    }
+
+    /**
+     * @param mixed $externalProjectId
+     * @return EntityStatusMapItem
+     */
+    public function setExternalProjectId($externalProjectId)
+    {
+        $this->externalProjectId = $externalProjectId;
+        return $this;
+    }
 
     /**
      * @return mixed

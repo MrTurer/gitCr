@@ -5,9 +5,29 @@ namespace RNS\Integrations\Models;
 class EntityTypeMap
 {
     /** @var int|null */
+    private $defaultProjectId;
+    /** @var int|null */
     private $defaultTypeId;
     /** @var EntityTypeMapItem[] */
     private $items = [];
+
+    /**
+     * @return int|null
+     */
+    public function getDefaultProjectId(): ?int
+    {
+        return $this->defaultProjectId;
+    }
+
+    /**
+     * @param int|null $defaultProjectId
+     * @return EntityTypeMap
+     */
+    public function setDefaultProjectId(?int $defaultProjectId): EntityTypeMap
+    {
+        $this->defaultProjectId = $defaultProjectId;
+        return $this;
+    }
 
     /**
      * @return int|null
@@ -47,15 +67,24 @@ class EntityTypeMap
 
     /**
      * @param mixed $id
+     * @param mixed $projectId
      * @return EntityTypeMapItem|null
      */
-    public function getItemByExternalTypeId($id)
+    public function getItemByExternalTypeId($id, $projectId = null)
     {
         foreach ($this->items as $item) {
-            if ($item->getExternalTypeId() == $id) {
+            if ($item->getExternalTypeId() == $id && (!$projectId || $projectId == $item->getExternalProjectId())) {
                 return $item;
             }
         }
         return null;
+    }
+
+    public function addItem($projectId, $typeId)
+    {
+        $item = new EntityTypeMapItem();
+        $item->setExternalProjectId($projectId);
+        $item->setExternalTypeId($typeId);
+        $this->items[] = $item;
     }
 }

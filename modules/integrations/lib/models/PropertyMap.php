@@ -64,4 +64,22 @@ class PropertyMap
         $this->items = $items;
         return $this;
     }
+
+    public function getItemByExternalPropertyId($typeId, $propertyId)
+    {
+        foreach ($this->items as $item) {
+            if ($item->getExternalTypeId() == $typeId && $item->getExternalPropertyId() == $propertyId) {
+                return $item;
+            }
+        }
+        return null;
+    }
+
+    public function addItem($typeId, $propertyId)
+    {
+        $item = new PropertyMapItem();
+        $item->setExternalTypeId($typeId);
+        $item->setExternalPropertyId($propertyId);
+        $this->items[] = $item;
+    }
 }

@@ -179,7 +179,7 @@ class SystemExchangeType
         global $USER;
 
         if (!empty($fields['mapping'])) {
-            $mappings = ['entityTypeMap', 'entityStatusMap', 'entityPropertyMap', 'userMap'];
+            $mappings = ['projectMap', 'entityTypeMap', 'entityStatusMap', 'entityPropertyMap', 'userMap'];
             foreach ($mappings as $mapping) {
                 if (empty($fields['mapping'][$mapping]) || empty($fields['mapping'][$mapping]['items'])) {
                     continue;
