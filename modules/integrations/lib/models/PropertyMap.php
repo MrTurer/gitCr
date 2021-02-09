@@ -65,19 +65,21 @@ class PropertyMap
         return $this;
     }
 
-    public function getItemByExternalPropertyId($typeId, $propertyId)
+    public function getItemByExternalPropertyId($projectId, $typeId, $propertyId)
     {
         foreach ($this->items as $item) {
-            if ($item->getExternalTypeId() == $typeId && $item->getExternalPropertyId() == $propertyId) {
+            if ($item->getExternalProjectId() == $projectId && $item->getExternalTypeId() == $typeId &&
+              $item->getExternalPropertyId() == $propertyId) {
                 return $item;
             }
         }
         return null;
     }
 
-    public function addItem($typeId, $propertyId)
+    public function addItem($projectId, $typeId, $propertyId)
     {
         $item = new PropertyMapItem();
+        $item->setExternalProjectId($projectId);
         $item->setExternalTypeId($typeId);
         $item->setExternalPropertyId($propertyId);
         $this->items[] = $item;
