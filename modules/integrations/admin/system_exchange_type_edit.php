@@ -87,15 +87,8 @@ if ($ID > 0) {
         $entityTypeOptions[] = '<option value="'. $id . '">' . $entityTypes['REFERENCE'][$i] . '</option>';
     }
     $externalEntityTypeOptions = [];
-    $propertyMapping = $mapping->getEntityPropertyMap();
     foreach ($externalEntityTypes['REFERENCE_ID'] as $i => $id) {
         $externalEntityTypeOptions[] = '<option value="'. $id . '">' . $externalEntityTypes['REFERENCE'][$i] . '</option>';
-
-        foreach ($externalEntityProps['REFERENCE_ID'] as $propId) {
-            if (!$propertyMapping->getItemByExternalPropertyId($id, $propId)) {
-                $propertyMapping->addItem($id, $propId);
-            }
-        }
     }
 
     $externalEntityStatusOptions = [];
@@ -124,6 +117,7 @@ if ($ID > 0) {
     $projectMapping = $mapping->getProjectMap();
     $entityTypeMapping = $mapping->getEntityTypeMap();
     $entityStatusMapping = $mapping->getEntityStatusMap();
+    $propertyMapping = $mapping->getEntityPropertyMap();
     foreach ($externalProjectList as $id => $name) {
         $externalProjectOptions[] = '<option value="'. $id . '">' . $name . '</option>';
 
@@ -140,6 +134,11 @@ if ($ID > 0) {
             foreach ($externalEntityStatuses['REFERENCE_ID'] as $statusId) {
                 if (!$entityStatusMapping->getItemByExternalStatusId($statusId, $typeId, $id)) {
                     $entityStatusMapping->addItem($id, $typeId, $statusId);
+                }
+            }
+            foreach ($externalEntityProps['REFERENCE_ID'] as $propId) {
+                if (!$propertyMapping->getItemByExternalPropertyId($id, $typeId, $propId)) {
+                    $propertyMapping->addItem($id, $typeId, $propId);
                 }
             }
         }
@@ -566,6 +565,11 @@ $tabControl->Begin();
                 <tr class="adm-list-table-header">
                     <td class="adm-list-table-cell">
                         <div class="adm-list-table-cell-inner">
+                            <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_SRC_PRJ') ?>
+                        </div>
+                    </td>
+                    <td class="adm-list-table-cell">
+                        <div class="adm-list-table-cell-inner">
                             <?= Loc::getMessage('INTEGRATIONS_SYS_EXCH_TYPE_EDIT_MAP_EXT_ENT_TYPE') ?>
                         </div>
                     </td>
@@ -595,6 +599,9 @@ $tabControl->Begin();
                 <?php foreach ($mapping->getEntityPropertyMap()->getItems() as $i => $mapItem): ?>
                     <tr>
                         <td class="adm-list-table-cell">
+                            <?= SelectBoxFromArray("mapping[entityPropertyMap][items][{$i}][externalProjectId]", $externalProjects, $mapItem->getExternalProjectId(), $noneSelected) ?>
+                        </td>
+                        <td class="adm-list-table-cell">
                             <?= SelectBoxFromArray("mapping[entityPropertyMap][items][{$i}][externalTypeId]", $externalEntityTypes, $mapItem->getExternalTypeId(), $noneSelected) ?>
                         </td>
                         <td class="adm-list-table-cell">
@@ -612,6 +619,7 @@ $tabControl->Begin();
                     </tr>
                 <?php endforeach; ?>
                 <tr v-for="item in entityPropertyMap.items">
+                    <td class="adm-list-table-cell" v-html="entityPropertyMapGetExtProjectSelect(item)"></td>
                     <td class="adm-list-table-cell" v-html="entityPropertyMapGetExtEntityTypeSelect(item)"></td>
                     <td class="adm-list-table-cell" v-html="entityPropertyMapGetExtEntityPropSelect(item)"></td>
                     <td class="adm-list-table-cell" v-html="entityPropertyMapGetIntEntityTypeSelect(item)"></td>
@@ -785,15 +793,32 @@ $tabControl->End();
     function optionUsed(value, mapping, property, excludeIndex, scopeProperty) {
       var currVal = null;
       if (scopeProperty) {
-        var elScopeCurrent = BX('mapping[' + mapping + '][items][' + excludeIndex + '][' + scopeProperty + ']');
-        if (elScopeCurrent) currVal = elScopeCurrent.value;
+        if (Array.isArray(scopeProperty)) {
+          currVal = [];
+          scopeProperty.forEach(function(item) {
+            var elScopeCurrent = BX(`mapping[${mapping}][items][${excludeIndex}][${item}]`);
+            if (elScopeCurrent) currVal.push({prop: item, val: elScopeCurrent.value});
+          });
+        } else {
+          var elScopeCurrent = BX(`mapping[${mapping}][items][${excludeIndex}][${scopeProperty}]`);
+          if (elScopeCurrent) currVal = elScopeCurrent.value;
+        }
       }
       for (var i = 0;; i++) {
-        var el = BX('mapping[' + mapping + '][items][' + i + '][' + property + ']');
+        var el = BX(`mapping[${mapping}][items][${i}][${property}]`);
         if (!el) break;
         if (scopeProperty) {
-          var elScope = BX('mapping[' + mapping + '][items][' + i + '][' + scopeProperty + ']');
-          if (elScope.value !== currVal) continue;
+          if (currVal && Array.isArray(currVal)) {
+            var scoped = true;
+            currVal.forEach(function(item) {
+              var elScope = BX(`mapping[${mapping}][items][${i}][${item.prop}]`);
+              if (elScope.value !== item.val) scoped = false;
+            });
+            if (!scoped) continue;
+          } else {
+            var elScope = BX(`mapping[${mapping}][items][${i}][${scopeProperty}]`);
+            if (elScope.value !== currVal) continue;
+          }
         }
         if (i !== excludeIndex && el.value === value) return true;
       }
@@ -849,7 +874,7 @@ $tabControl->End();
           break;
         case 'entityPropertyMap':
           options = <?= json_encode($entityProps, JSON_UNESCAPED_UNICODE)?>;
-          scopeProperty = 'externalTypeId';
+          scopeProperty = ['externalProjectId', 'externalTypeId'];
           break;
 
       }
@@ -972,8 +997,11 @@ $tabControl->End();
             });
             this.entityPropertyMap.lastIndex++;
           },
+          entityPropertyMapGetExtProjectSelect(item) {
+            return `<select name="mapping[entityPropertyMap][items][${item.idx}][externalProjectId]" id="mapping[entityStatusMap][items][${item.idx}][externalProjectId]" class="typeselect"><?= implode('', $externalProjectOptions)?></select>`;
+          },
           entityPropertyMapGetExtEntityTypeSelect(item) {
-            return `<select name="mapping[entityPropertyMap][items][${item.idx}][externalTypeId]" class="typeselect"><?= implode('', $externalEntityTypeOptions)?></select>`;
+            return `<select name="mapping[entityPropertyMap][items][${item.idx}][externalTypeId]" id="mapping[entityPropertyMap][items][${item.idx}][externalTypeId]" class="typeselect"><?= implode('', $externalEntityTypeOptions)?></select>`;
           },
           entityPropertyMapGetExtEntityPropSelect(item) {
             return `<select name="mapping[entityPropertyMap][items][${item.idx}][externalPropertyId]" class="typeselect"><?= implode('', $externalEntityPropertyOptions)?></select>`;
@@ -983,7 +1011,7 @@ $tabControl->End();
           },
           entityPropertyMapGetIntEntityPropSelect(item) {
             var options = getOptionsHtml('entityPropertyMap', 'internalPropertyId', item.idx);
-            return `<select name="mapping[entityPropertyMap][items][${item.idx}][internalPropertyId]" id="mapping[entityPropertyMap][items][${item.idx}][internalPropertyId]" class="typeselect">${options}</select>`;
+            return `<select name="mapping[entityPropertyMap][items][${item.idx}][internalPropertyId]" id="mapping[entityPropertyMap][items][${item.idx}][internalPropertyId]" class="typeselect" onchange="refillSelects('entityPropertyMap', 'internalPropertyId', ${item.idx}})">${options}</select>`;
           },
 
           userMapAddItem() {

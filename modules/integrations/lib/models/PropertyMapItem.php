@@ -5,6 +5,8 @@ namespace RNS\Integrations\Models;
 class PropertyMapItem
 {
     /** @var mixed */
+    private $externalProjectId;
+    /** @var mixed */
     private $externalTypeId;
     /** @var mixed */
     private $externalPropertyId;
@@ -12,6 +14,24 @@ class PropertyMapItem
     private $internalTypeId;
     /** @var mixed */
     private $internalPropertyId;
+
+    /**
+     * @return mixed
+     */
+    public function getExternalProjectId()
+    {
+        return $this->externalProjectId;
+    }
+
+    /**
+     * @param mixed $externalProjectId
+     * @return PropertyMapItem
+     */
+    public function setExternalProjectId($externalProjectId)
+    {
+        $this->externalProjectId = $externalProjectId;
+        return $this;
+    }
 
     /**
      * @return mixed
