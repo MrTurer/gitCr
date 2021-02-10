@@ -69,7 +69,7 @@ BX.ready(function () {
               },
             },
           }),
-          new BX.PopupWindowButton({
+          /*new BX.PopupWindowButton({
             text: "Добавить группу", // текст кнопки
             id: "add-group-btn", // идентификатор
             className: "ui-btn ui-btn-primary", // доп. классы
@@ -79,7 +79,7 @@ BX.ready(function () {
                 setTimeout(getNewHintPopup().show(), 2000);
               },
             },
-          }),
+          }),*/
         ],
         events: {
           onPopupClose: function (popupWindow) {
