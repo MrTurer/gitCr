@@ -1,0 +1,66 @@
+#new-hint-popup .popup-window-content {
+  background-color: #ffffff;
+  padding: 10px;
+}
+
+.new-hint-form-label-container {
+  display: block;
+  margin-bottom: 5px;
+}
+.new-hint-form-label-container.with-top-margin {
+  margin-top: 20px;
+}
+
+.new-hint-form-label {
+  color: #a3a9b1;
+}
+.new-hint-form-label.error {
+  color: red;
+}
+
+.new-hint-bottom-label span.asterix {
+  color: red;
+  font-size: 20px;
+  line-height: 10px;
+}
+.new-hint-bottom-label span.text {
+  color: #a3a9b1;
+  font-size: 12px;
+}
+
+.hint-form-row-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: stretch;
+  align-items: flex-start;
+  width: 100%;
+  height: auto;
+  margin-top: 20px;
+}
+
+.hint-form-block-50 {
+  display: inline-block;
+  width: 50%;
+  height: auto;
+}
+.hint-form-block-50.left {
+  padding-right: 10px;
+}
+.hint-form-block-50.right {
+  padding-left: 10px;
+}
+
+#new-hint-popup .element-not-binded {
+  display: block;
+}
+#new-hint-popup .element-binded {
+  display: none;
+}
+#new-hint-popup.bind-success .element-not-binded {
+  display: none;
+}
+#new-hint-popup.bind-success .element-binded {
+  display: block;
+}
+
+/*# sourceMappingURL=hint-style.css.map */
