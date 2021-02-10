@@ -22,8 +22,8 @@ BX.ready(function () {
       //
       // Отрисовка подсказок
       //
-      //renderHints();
-      renderHintsOld();
+      renderHints();
+      //renderHintsOld();
     })
   });
 });
