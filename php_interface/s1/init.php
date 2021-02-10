@@ -8,28 +8,28 @@ use Bitrix\Main\Page\Asset;
 
 $arJsConfig = array(
     'dropDownMenu' => array(
-        'js'=> '/local/js/dropDownMenu.js?v=20210209',
+        'js'=> '/local/js/dropDownMenu.js',
     ),
     'newHintPopup' => array(
-        'js'=> '/local/js/newHintPopup.js?v=20210209',
+        'js'=> '/local/js/newHintPopup.js',
     ),
     'hintElementInfo' => array(
-        'js'=> '/local/js/hintElementInfo.js?v=20210209',
+        'js'=> '/local/js/hintElementInfo.js',
     ),
     'hintsListPopup' => array(
-        'js'=> '/local/js/hintsListPopup.js?v=20210209',
+        'js'=> '/local/js/hintsListPopup.js',
     ),
     'clearFields' => array(
-        'js'=> '/local/js/clearFields.js?v=20210209',
+        'js'=> '/local/js/clearFields.js',
     ),
     'hintItems' => array(
-        'js'=> '/local/js/hintItems.js?v=20210209',
+        'js'=> '/local/js/hintItems.js',
     ),
     //'renderHints' => array(
-    //    'js'=> '/local/js/renderHints.js?v=20210209',
+    //    'js'=> '/local/js/renderHints.js',
     //),
     'renderHintsOld' => array(
-        'js'=> '/local/js/renderHintsOld.js?v=20210209',
+        'js'=> '/local/js/renderHintsOld.js',
     )
 );
 
@@ -49,7 +49,7 @@ CUtil::InitJSCore(array('renderHintsOld'));
 CJSCore::Init(array('ajax', 'popup', 'jquery'));
 
 AddEventHandler('main', 'onProlog', function(){
-    Asset::getInstance()->addJs("/local/js/newHint.js?v=20210209");
-    Asset::getInstance()->addCss("/local/styles/style.css?v=20210209");
-    Asset::getInstance()->addCss("/local/styles/hint-style.css?v=20210209");
+    Asset::getInstance()->addJs("/local/js/newHint.js");
+    Asset::getInstance()->addCss("/local/styles/style.css");
+    Asset::getInstance()->addCss("/local/styles/hint-style.css");
 }, 99999999);
