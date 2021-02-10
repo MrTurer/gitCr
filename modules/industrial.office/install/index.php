@@ -109,6 +109,7 @@ class industrial_office extends CModule
 	public function InstallFiles()
 	{
 		CopyDirFiles(__DIR__ . '/admin/', $_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin', true, true);
+		CopyDirFiles(__DIR__ . '/templates/', $_SERVER['DOCUMENT_ROOT'] . '/local/templates/.default/components/bitrix', true, true);
 		return true;
 	}
 
@@ -120,6 +121,7 @@ class industrial_office extends CModule
 	public function UnInstallFiles()
 	{
 		DeleteDirFiles(__DIR__ . '/admin/', $_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin/');
+		DeleteDirFiles(__DIR__ . '/templates/', $_SERVER['DOCUMENT_ROOT'] . '/local/templates/.default/components/bitrix');
 		return true;
 	}
 }

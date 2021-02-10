@@ -11,4 +11,8 @@ $MESS['PMO_STATUSES_LIST_FIELD_NEXT_STATUS'] = 'Следующий статус'
 $MESS['PMO_STATUSES_LIST_FIELD_NEXT_STATUS_BUTTON_NAME'] = 'Название кнопки перехода в следующий статус';
 $MESS['PMO_STATUSES_LIST_FIELD_PRESENCE_INCOMP_CHILD'] = 'Наличие незавершенных сущностей, дочерних';
 $MESS['PMO_STATUSES_LIST_FIELD_LACK_LINKED_ENTITIES'] = 'Отсутствие привязанных сущностей';
+$MESS['PMO_STATUSES_LIST_FIELD_DATE_CREATE'] = 'Дата создания';
+$MESS['PMO_STATUSES_LIST_FIELD_CREATED_BY'] = 'Кто создал';
+$MESS['PMO_STATUSES_LIST_FIELD_DATE_CHANGE'] = 'Дата изменения';
+$MESS['PMO_STATUSES_LIST_FIELD_MODIFIED_BY'] = 'Кем изменена';
 ?>

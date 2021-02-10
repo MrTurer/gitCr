@@ -39,7 +39,8 @@ $USER_FIELD_MANAGER->AdminListAddHeaders($entityId, $headers);
 $list->AddHeaders($headers);
 
 $rsData = \Bitrix\Highloadblock\HighloadBlockTable::getList(['filter' => ['NAME' => 'Entities']]);
-if ($hldata = $rsData->fetch()) {
+$hldata = $rsData->fetch();
+if ($hldata) {
 	$hlentity = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($hldata);
 	$strEntityDataClass = $hlentity->getDataClass();
 	

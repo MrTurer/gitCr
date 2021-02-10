@@ -8,6 +8,7 @@ $MESS['PMO_ENTITY_FIELD_ENG_NAME'] = 'Английское название';
 $MESS['PMO_ENTITY_FIELD_ENTITY_TYPE_BIND'] = 'Привязка к типу сущности';
 $MESS['PMO_ENTITY_FIELD_NEXT_STATUS'] = 'Следующий статус';
 $MESS['PMO_ENTITY_FIELD_NEXT_STATUS_BUTTON_NAME'] = 'Название кнопки перехода в следующий статус';
+$MESS['PMO_ENTITY_FIELD_STATUS_COLOR'] = 'Цвет';
 $MESS['PMO_ENTITY_FIELD_PRESENCE_INCOMP_CHILD'] = 'Наличие незавершенных сущностей, дочерних';
 $MESS['PMO_ENTITY_FIELD_LACK_LINKED_ENTITIES'] = 'Отсутствие привязанных сущностей';
 $MESS['PMO_ERROR_EMPTY_CODE'] = 'Не заполнено обязательное поле "Символьный код"';
