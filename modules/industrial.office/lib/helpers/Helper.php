@@ -16,7 +16,8 @@ class Helper {
 
 		$arEntityCode = '';
 		$rsData = HighloadBlockTable::getList(['filter' => ['NAME' => 'Entities']]);
-		if ($hldata = $rsData->fetch()) {
+		$hldata = $rsData->fetch();
+		if ($hldata) {
 			$hlentity = HighloadBlockTable::compileEntity($hldata);
 			$strEntityDataClass = $hlentity->getDataClass();
 			
@@ -34,7 +35,8 @@ class Helper {
 
 		if ($arEntityCode != '') {
 			$rsData = HighloadBlockTable::getList(['filter' => ['NAME' => 'StatusEntity']]);
-			if ($hldata = $rsData->fetch()) {
+			$hldata = $rsData->fetch();
+			if ($hldata) {
 				$hlentity = HighloadBlockTable::compileEntity($hldata);
 				$strEntityDataClass = $hlentity->getDataClass();
 				
@@ -56,6 +58,8 @@ class Helper {
 					$arReturn['ALL_CUSTOM_STATUSES'][$ar_res['UF_CODE']]['ID'] = $ar_res['ID'];
 					$arReturn['ALL_CUSTOM_STATUSES'][$ar_res['UF_CODE']]['NAME'] = $ar_res['UF_RUS_NAME'];
 					$arReturn['ALL_CUSTOM_STATUSES'][$ar_res['UF_CODE']]['FINAL_STATUS'] = false;
+					$arReturn['ALL_CUSTOM_STATUSES'][$ar_res['UF_CODE']]['UF_NEXT_STATUS'] = $ar_res['UF_NEXT_STATUS'];
+					$arReturn['ALL_CUSTOM_STATUSES'][$ar_res['UF_CODE']]['UF_NEXT_STATUS_BUTTON_NAME'] = $ar_res['UF_NEXT_STATUS_BUTTON_NAME'];
 					
 					if ($ar_res['UF_NEXT_STATUS'] == '') {
 						$arReturn['ALL_CUSTOM_STATUSES'][$ar_res['UF_CODE']]['FINAL_STATUS'] = true;
@@ -74,7 +78,8 @@ class Helper {
 		}
 
 		$rsData = HighloadBlockTable::getList(['filter' => ['NAME' => 'Entities']]);
-		if ($hldata = $rsData->fetch()) {
+		$hldata = $rsData->fetch();
+		if ($hldata) {
 			$hlentity = HighloadBlockTable::compileEntity($hldata);
 			$strEntityDataClass = $hlentity->getDataClass();
 			
@@ -99,7 +104,8 @@ class Helper {
 		}
 		
 		$rsData = HighloadBlockTable::getList(['filter' => ['NAME' => 'Entities']]);
-		if ($hldata = $rsData->fetch()) {
+		$hldata = $rsData->fetch();
+		if ($hldata) {
 			$hlentity = HighloadBlockTable::compileEntity($hldata);
 			$strEntityDataClass = $hlentity->getDataClass();
 			

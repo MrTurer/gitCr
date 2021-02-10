@@ -24,7 +24,8 @@ $arFile = [];
 $strFormName = 'entity_edit_form';
 
 $rsData = \Bitrix\Highloadblock\HighloadBlockTable::getList(['filter' => ['NAME' => 'Entities']]);
-if ($hldata = $rsData->fetch()) {
+$hldata = $rsData->fetch();
+if ($hldata) {
 	$hlentity = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($hldata);
 	$strEntityDataClass = $hlentity->getDataClass();
 	
@@ -80,9 +81,12 @@ if ($hldata = $rsData->fetch()) {
 		if ($arResult['UF_NAME'] == '') {
 			$arMessages[] = new CAdminMessage(Loc::getMessage("PMO_ERROR_EMPTY_NAME"));
 		}
-		if ($arResult['ICON_CODE'] == '' && (empty($_FILES) || !isset($_FILES['ICON_FILE']))) {
-			$arMessages[] = new CAdminMessage(Loc::getMessage("PMO_ERROR_EMPTY_ICON"));
-		} elseif (!empty($_FILES) && isset($_FILES['ICON_FILE']) && $_FILES['ICON_FILE']['error'] == 0) {
+		
+		if ($arResult['UF_CODE'] == '') {
+			$arMessages[] = new CAdminMessage(Loc::getMessage("PMO_ERROR_EMPTY_CODE"));
+		}
+		
+		if (!empty($_FILES) && isset($_FILES['ICON_FILE']) && $_FILES['ICON_FILE']['error'] == 0) {
 			$arFile = [
 				"name" => $_FILES['ICON_FILE']['name'],
 				"size" => $_FILES['ICON_FILE']['size'],
@@ -92,8 +96,6 @@ if ($hldata = $rsData->fetch()) {
 				"del" => "Y",
 				"MODULE_ID" => "highloadblock"
 			];
-		} elseif (intval($arResult['ICON_FILE_ID']) <= 0) {
-			$arMessages[] = new CAdminMessage(Loc::getMessage("PMO_ERROR_EMPTY_ICON"));
 		}
 		
 		if ($arResult['UF_ENTITY_COLOR'] == '') {
@@ -114,17 +116,30 @@ if ($hldata = $rsData->fetch()) {
 		}
 		
 		if (empty($arMessages)) {
+			global $USER, $DB;
+			
 			$arElementFields = [
 				'UF_NAME' => $arResult['UF_NAME'],
 				'UF_ACTIVE' => ($arResult['UF_ACTIVE'] == 'Y'),
-				'UF_CODE' => $arResult['UF_CODE'],
+				'UF_CODE' => strtoupper($arResult['UF_CODE']),
 				'UF_CONSIDER_TIME' => ($arResult['UF_CONSIDER_TIME'] == 'Y'),
 				'UF_DECISION_REQUIRED' => ($arResult['UF_DECISION_REQUIRED'] == 'Y'),
 				'UF_ENTITY_COLOR' => $arResult['UF_ENTITY_COLOR'],
 				'UF_BOUND_FIELDS' => serialize($arResult['UF_BOUND_FIELDS']),
+				'UF_DATE_CHANGE' => date($DB->DateFormatToPHP(CSite::GetDateFormat("FULL")), time()),
+				'UF_MODIFIED_BY' => $USER->GetID(),
 			];
 			
 			if (!empty($arFile)) {
+				CAllFile::ResizeImage(
+					$arFile,
+					[
+						"width" => 100,
+						"height" => 100
+					],
+					BX_RESIZE_IMAGE_PROPORTIONAL
+				);
+				
 				$fid = CFile::SaveFile($arFile, "pmo");
 				
 				if (intval($fid)>0) $arElementFields["UF_ENTITY_ICON"] = intval($fid); 
@@ -134,7 +149,11 @@ if ($hldata = $rsData->fetch()) {
 			} elseif (empty($arFile) && intval($arResult['ICON_FILE_ID']) <= 0) {
 				$arElementFields['UF_ENTITY_ICON'] = $arResult['ICON_CODE'];
 			}
+			
 			if ($ID <= 0) {
+				$arElementFields['UF_DATE_CREATE'] = date($DB->DateFormatToPHP(CSite::GetDateFormat("FULL")), time());
+				$arElementFields['UF_CREATED_BY'] = $USER->GetID();
+				
 				$obResult = $strEntityDataClass::add($arElementFields);
 			} else {
 				$obResult = $strEntityDataClass::update($ID, $arElementFields);
@@ -143,6 +162,7 @@ if ($hldata = $rsData->fetch()) {
 			if ($obResult->isSuccess()) {
 				$ID = $obResult->getId();
 			} else {
+				/* $arMessages[] = $obResult->getErrorMessages(); */
 				$arMessages[] = new CAdminMessage(Loc::getMessage("PMO_ERROR_EDIT"));
 			}
 		}
@@ -200,6 +220,8 @@ if(!empty($arMessages)) {
 } elseif ($SUCCESS == 'true') {
 	CAdminMessage::ShowMessage(["MESSAGE" => Loc::getMessage("PMO_SUCCESS_EDIT"), "TYPE" => "OK"]);
 }
+
+\CJSCore::init("color_picker");
 ?>
 
 <form method="POST"
@@ -213,7 +235,7 @@ if(!empty($arMessages)) {
 	$tabControl->BeginNextTab();
 	?>
     <tr>
-        <td><?= Loc::getMessage('PMO_ENTITY_FIELD_NAME') ?></td>
+        <td><?= Loc::getMessage('PMO_ENTITY_FIELD_NAME') ?> *</td>
         <td>
             <?= InputType('text', 'UF_NAME', $arResult['UF_NAME'], false) ?>
         </td>
@@ -225,9 +247,14 @@ if(!empty($arMessages)) {
         </td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('PMO_ENTITY_FIELD_CODE') ?></td>
+        <td><?= Loc::getMessage('PMO_ENTITY_FIELD_CODE') ?> <?= (strlen($arResult['UF_CODE']) <= 0) ? "*" : ""?></td>
         <td>
-            <?= InputType('text', 'UF_CODE', $arResult['UF_CODE'], false) ?>
+			<?if (strlen($arResult['UF_CODE']) <= 0) {?>
+				<?= InputType('text', 'UF_CODE', "", false) ?>
+			<?} else {?>
+				<?= InputType('hidden', 'UF_CODE', $arResult['UF_CODE'], false) ?>
+				<span><?= $arResult['UF_CODE']?></span>
+			<?}?>
         </td>
     </tr>
     <tr>
@@ -245,8 +272,13 @@ if(!empty($arMessages)) {
     <tr>
         <td><?= Loc::getMessage('PMO_ENTITY_FIELD_ICON') ?></td>
         <td>
-            <?= InputType('hidden', 'ICON_FILE_ID', $arResult['ICON_FILE_ID'], false) ?>
-            <?= InputType('file', 'ICON_FILE', $arResult['ICON_FILE']['ORIGINAL_NAME'], false, true) ?>
+			<?if ($arResult['ICON_FILE_ID'] > 0) {?>
+				<?= InputType('hidden', 'ICON_FILE_ID', $arResult['ICON_FILE_ID'], false) ?>
+				<div style="display: table;"><?= CFile::ShowImage($arResult['ICON_FILE_ID'], 0, 0, "style='max-width: 50px; max-height: 50px; width: auto; margin-right: 10px;'") ?><span style="display:table-cell; vertical-align: middle;"><?= $arResult['ICON_FILE']['ORIGINAL_NAME']?></span></div>
+				<br/>
+			<?}?>
+			
+			<?= InputType('file', 'ICON_FILE', "", false, true) ?>
         </td>
     </tr>
     <tr>
@@ -256,7 +288,7 @@ if(!empty($arMessages)) {
         </td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('PMO_ENTITY_FIELD_COLOR') ?></td>
+        <td><?= Loc::getMessage('PMO_ENTITY_FIELD_COLOR') ?> *</td>
         <td>
             <?= InputType('text', 'UF_ENTITY_COLOR', $arResult['UF_ENTITY_COLOR'], false) ?>
         </td>
@@ -274,7 +306,7 @@ if(!empty($arMessages)) {
 				<?foreach($arResult['UF_BOUND_FIELDS'] as $strFieldName => $arField) {?>
 					<tr id="tr_ENTITY_FIELDS_<?echo $strFieldName?>">
 							<td style="text-align: left;"><?echo ($arField['NAME'] != '') ? $arField['NAME'] : $strFieldName?></td>
-							<td style="text-align:center"><?
+							<td style="text-align: center"><?
 								echo '<input type="checkbox" value="Y" '.' name="UF_BOUND_FIELDS['.$strFieldName.'][CHECKED]" '.((isset($arField['CHECKED']) && $arField['CHECKED'] == "Y") ? 'checked="checked"': '').'>';
 							?></td>
 					</tr>
@@ -283,6 +315,41 @@ if(!empty($arMessages)) {
 		</td>
 	</tr>
 </form>
+
+<script>
+(function() {
+    "use strict";
+	
+    var picker = new BX.ColorPicker({
+        bindElement: null,
+        defaultColor: "#000000",
+		selectedColor: "<?= $arResult['UF_ENTITY_COLOR']?>",
+        popupOptions: {
+            offsetTop: 10,
+            offsetLeft: 10,
+            angle: true,
+        }
+    });
+	
+    BX.bind(BX("UF_ENTITY_COLOR"), "click", onButtonClick);
+	
+    function onButtonClick(event) {
+        var target = event.target;
+		
+        picker.open({
+            selectedColor: BX.type.isNotEmptyString(target.value) ? target.value : null,
+            bindElement: target,
+            onColorSelected: onColorSelected.bind(target)
+        });
+    }
+    
+    function onColorSelected(color, picker) {
+        this.value = color;
+		
+		picker.close();
+    }
+})();
+</script>
 
 <?
 $tabControl->Buttons([

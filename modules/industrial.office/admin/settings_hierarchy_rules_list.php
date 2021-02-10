@@ -21,7 +21,8 @@ $strFormName = 'entity_edit_form';
 $bSuccess = false;
 
 $rsData = \Bitrix\Highloadblock\HighloadBlockTable::getList(['filter' => ['NAME' => 'Entities']]);
-if ($hldata = $rsData->fetch()) {
+$hldata = $rsData->fetch();
+if ($hldata) {
 	$hlentity = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($hldata);
 	$strEntityDataClass = $hlentity->getDataClass();
 	
@@ -56,6 +57,10 @@ if ($hldata = $rsData->fetch()) {
 		}
 		
 		$arResult['ENTITIES'][$dr['ID']] = $dr;
+		$arResult['JS_ENTITIES'][$dr['ID']] = [
+			'NAME'	=> $dr['UF_NAME'],
+			'VALUE'	=> $dr['ID']
+		];
 	}
 	unset($rsData, $hldata, $hlentity, $res, $dr, $strEntityDataClass);
 }
@@ -96,16 +101,15 @@ if(!empty($arMessages)) {
 				</tr>
 				<?foreach($arResult['ENTITIES'] as $strEntityID => $arEntity) {?>
 					<tr id="tr_ENTITY_<?= $strEntityID?>">
-						<td style="text-align: left;"><?
-						/* if (is_array($arEntity['UF_ENTITY_ICON']) && !empty($arEntity['UF_ENTITY_ICON'])) {
-							?><img scr="<?= $arEntity['UF_ENTITY_ICON']['SRC']?>" style="max-width: 20px; max-height: 20px;"/><?
+						<td style="text-align: left;"><div style="display: table"><?
+						if (is_array($arEntity['UF_ENTITY_ICON']) && !empty($arEntity['UF_ENTITY_ICON'])) {
+							?><?= CFile::ShowImage($arEntity['UF_ENTITY_ICON']['ID'], 0, 0, "style='min-width: 25px; max-height: 25px; width: auto; margin-right: 10px;'") ?><?
 						} elseif ($arEntity['UF_ENTITY_ICON']) {
 							echo $arEntity['UF_ENTITY_ICON']." ";
-						} */
-
-						echo $arEntity['UF_NAME'];
-						?></td>
-						<td style="text-align:center">
+						}
+						
+						?><span style="display:table-cell; vertical-align: middle;"><?= $arEntity['UF_NAME']?></span></div></td>
+						<td style="text-align: middle;">
 							<select name="NESTED_ENTITY_TYPES[<?= $strEntityID?>][]" multiple size="5">
 								<?
 								foreach($arResult['ENTITIES'] as $strNestedEntityID => $arNestedEntity) {?>
@@ -124,6 +128,5 @@ $tabControl->Buttons([
 	"btnApply" => false
 ]);
 $tabControl->End();
-
-require_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/epilog_admin.php';
 ?>
+<?require_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/epilog_admin.php';?>

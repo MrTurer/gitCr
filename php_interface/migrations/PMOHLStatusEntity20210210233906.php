@@ -3,9 +3,9 @@
 namespace Sprint\Migration;
 
 
-class HLEntities31122020201231142307 extends Version
+class PMOHLStatusEntity20210210233906 extends Version
 {
-    protected $description = "Модуль \"Производственный офис\" от 311220. HL \"Сущности\"";
+    protected $description = "Модуль \"Производственный офис\". HL \"Статусы сущности\".";
 
     protected $moduleVersion = "3.22.2";
 

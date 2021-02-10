@@ -21,7 +21,8 @@ $bIsSuccess = false;
 $arResult = [];
 
 $rsData = \Bitrix\Highloadblock\HighloadBlockTable::getList(['filter' => ['NAME' => 'StatusEntity']]);
-if ($hldata = $rsData->fetch()) {
+$hldata = $rsData->fetch();
+if ($hldata) {
 	$hlentity = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($hldata);
 	$strEntityDataClass = $hlentity->getDataClass();
 	
@@ -71,6 +72,14 @@ if ($hldata = $rsData->fetch()) {
 			$arResult['FIELDS']['UF_CODE'] = strtoupper($arResult['FIELDS']['UF_CODE']);
 		}
 		
+		if ($arResult['FIELDS']['UF_RUS_NAME'] == '') {
+			$arMessages[] = new CAdminMessage(Loc::getMessage("PMO_ERROR_EMPTY_RUS_NAME"));
+		}
+		
+		if ($arResult['FIELDS']['UF_STATUS_COLOR'] == '') {
+			$arMessages[] = new CAdminMessage(Loc::getMessage("PMO_ERROR_EMPTY_RUS_NAME"));
+		}
+		
 		if (!is_array($arResult['FIELDS']['UF_PRESENCE_INCOMP_CHILD'])) {
 			$arResult['FIELDS']['UF_PRESENCE_INCOMP_CHILD'] = [$arResult['FIELDS']['UF_PRESENCE_INCOMP_CHILD']];
 		}
@@ -94,19 +103,27 @@ if ($hldata = $rsData->fetch()) {
 		}
 		
 		if (empty($arMessages)) {
+			global $USER, $DB;
+			
 			$arElementFields = [
 				'UF_ACTIVE' => $arResult['FIELDS']['UF_ACTIVE'],
-				'UF_CODE' => $arResult['FIELDS']['UF_CODE'],
+				'UF_CODE' => strtoupper($arResult['FIELDS']['UF_CODE']),
 				'UF_RUS_NAME' => $arResult['FIELDS']['UF_RUS_NAME'],
 				'UF_ENG_NAME' => $arResult['FIELDS']['UF_ENG_NAME'],
 				'UF_ENTITY_TYPE_BIND' => $ENTITY_CODE,
 				'UF_NEXT_STATUS' => serialize($arResult['FIELDS']['UF_NEXT_STATUS']),
 				'UF_NEXT_STATUS_BUTTON_NAME' => serialize($arResult['FIELDS']['UF_NEXT_STATUS_BUTTON_NAME']),
+				'UF_STATUS_COLOR' => $arResult['FIELDS']['UF_STATUS_COLOR'],
 				'UF_PRESENCE_INCOMP_CHILD' => $arResult['FIELDS']['UF_PRESENCE_INCOMP_CHILD'],
 				'UF_LACK_LINKED_ENTITIES' => $arResult['FIELDS']['UF_LACK_LINKED_ENTITIES'],
+				'UF_DATE_CHANGE' => date($DB->DateFormatToPHP(CSite::GetDateFormat("FULL")), time()),
+				'UF_MODIFIED_BY' => $USER->GetID(),
 			];
-						
+			
 			if ($STATUS_ID <= 0) {
+				$arElementFields['UF_DATE_CREATE'] = date($DB->DateFormatToPHP(CSite::GetDateFormat("FULL")), time());
+				$arElementFields['UF_CREATED_BY'] = $USER->GetID();
+				
 				$obResult = $strEntityDataClass::add($arElementFields);
 			} else {
 				$obResult = $strEntityDataClass::update($STATUS_ID, $arElementFields);
@@ -119,7 +136,7 @@ if ($hldata = $rsData->fetch()) {
 			}
 		}
 		
-		if (!empty($save)) {
+		if (!empty($save) && empty($arMessages)) {
 			LocalRedirect($backUrl);
 		} elseif(empty($arMessages)) {
 			LocalRedirect($_SERVER['PHP_SELF'] . '?ENTITY_CODE='.$ENTITY_CODE.'&STATUS_ID=' . $obResult->getId() . '&lang=' . LANGUAGE_ID.'&SUCCESS=true');
@@ -127,7 +144,8 @@ if ($hldata = $rsData->fetch()) {
 	}
 	
 	$rsData = \Bitrix\Highloadblock\HighloadBlockTable::getList(['filter' => ['NAME' => 'Entities']]);
-	if ($hldata = $rsData->fetch()) {
+	$hldata = $rsData->fetch();
+	if ($hldata) {
 		$hlentity = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($hldata);
 		$strEntityDataClass2 = $hlentity->getDataClass();
 		
@@ -157,6 +175,8 @@ if(!empty($arMessages)) {
 } elseif ($SUCCESS == 'true') {
 	CAdminMessage::ShowMessage(["MESSAGE" => Loc::getMessage("PMO_SUCCESS_EDIT"), "TYPE" => "OK"]);
 }
+
+\CJSCore::init("color_picker");
 ?>
 
 <form method="POST" action="<? echo $APPLICATION->GetCurPage() ?>?lang=<?=LANG?>&ENTITY_CODE=<?=$ENTITY_CODE?>&STATUS_ID=<?=$STATUS_ID?>" name="form1">
@@ -176,13 +196,18 @@ if(!empty($arMessages)) {
         </td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('PMO_ENTITY_FIELD_CODE') ?></td>
+        <td><?= Loc::getMessage('PMO_ENTITY_FIELD_CODE') ?>  <?= (strlen($arResult['FIELDS']['UF_CODE']) <= 0) ? "*" : ""?></td>
         <td>
-            <?= InputType('text', 'UF_CODE', $arResult['FIELDS']['UF_CODE'], false) ?>
+			<?if (strlen($arResult['FIELDS']['UF_CODE']) <= 0) {?>
+				<?= InputType('text', 'UF_CODE', "", false) ?>
+			<?} else {?>
+				<?= InputType('hidden', 'UF_CODE', $arResult['FIELDS']['UF_CODE'], false) ?>
+				<span><?= $arResult['FIELDS']['UF_CODE']?></span>
+			<?}?>
         </td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('PMO_ENTITY_FIELD_RUS_NAME') ?></td>
+        <td><?= Loc::getMessage('PMO_ENTITY_FIELD_RUS_NAME') ?> *</td>
         <td>
             <?= InputType('text', 'UF_RUS_NAME', $arResult['FIELDS']['UF_RUS_NAME'], false) ?>
         </td>
@@ -214,6 +239,12 @@ if(!empty($arMessages)) {
         </td>
     </tr>
     <tr>
+        <td><?= Loc::getMessage('PMO_ENTITY_FIELD_STATUS_COLOR') ?> *</td>
+        <td>
+            <?= InputType('text', 'UF_STATUS_COLOR', $arResult['FIELDS']['UF_STATUS_COLOR'], false) ?>
+        </td>
+    </tr>
+    <tr>
         <td><?= Loc::getMessage('PMO_ENTITY_FIELD_PRESENCE_INCOMP_CHILD') ?></td>
         <td>
             <?= SelectBoxMFromArray('UF_PRESENCE_INCOMP_CHILD[]', $arResult['ENTITIES_FOR_SELECT'], $arResult['FIELDS']['UF_PRESENCE_INCOMP_CHILD'], "", false, 5)?>
@@ -226,6 +257,41 @@ if(!empty($arMessages)) {
         </td>
     </tr>
 </form>
+
+<script>
+(function() {
+    "use strict";
+	
+    var picker = new BX.ColorPicker({
+        bindElement: null,
+        defaultColor: "#000000",
+		selectedColor: "<?= $arResult['FIELDS']['UF_STATUS_COLOR']?>",
+        popupOptions: {
+            offsetTop: 10,
+            offsetLeft: 10,
+            angle: true,
+        }
+    });
+	
+    BX.bind(BX("UF_STATUS_COLOR"), "click", onButtonClick);
+	
+    function onButtonClick(event) {
+        var target = event.target;
+		
+        picker.open({
+            selectedColor: BX.type.isNotEmptyString(target.value) ? target.value : null,
+            bindElement: target,
+            onColorSelected: onColorSelected.bind(target)
+        });
+    }
+    
+    function onColorSelected(color, picker) {
+        this.value = color;
+		
+		picker.close();
+    }
+})();
+</script>
 
 <?
 $tabControl->Buttons([

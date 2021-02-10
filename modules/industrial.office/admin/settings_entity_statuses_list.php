@@ -74,6 +74,30 @@ $headers = [
         'content' => Loc::getMessage("PMO_STATUSES_LIST_FIELD_LACK_LINKED_ENTITIES"),
         'default' => false,
     ],
+    [
+        'id' => 'UF_DATE_CREATE',
+        'content' => Loc::getMessage("PMO_STATUSES_LIST_FIELD_DATE_CREATE"),
+        'default' => false,
+        'sort' => 'uf_date_create'
+    ],
+    [
+        'id' => 'UF_CREATED_BY',
+        'content' => Loc::getMessage("PMO_STATUSES_LIST_FIELD_CREATED_BY"),
+        'default' => false,
+        'sort' => 'uf_created_by'
+    ],
+    [
+        'id' => 'UF_DATE_CHANGE',
+        'content' => Loc::getMessage("PMO_STATUSES_LIST_FIELD_DATE_CHANGE"),
+        'default' => true,
+        'sort' => 'uf_date_change'
+    ],
+    [
+        'id' => 'UF_MODIFIED_BY',
+        'content' => Loc::getMessage("PMO_STATUSES_LIST_FIELD_MODIFIED_BY"),
+        'default' => true,
+        'sort' => 'uf_modified_by'
+    ],
 ];
 
 $USER_FIELD_MANAGER->AdminListAddHeaders($entityId, $headers);
@@ -83,7 +107,8 @@ $arEntity = [];
 $arResult = [];
 
 $rsData = \Bitrix\Highloadblock\HighloadBlockTable::getList(['filter' => ['NAME' => 'Entities']]);
-if ($hldata = $rsData->fetch() && strlen($ENTITY_CODE) > 0) {
+$hldata = $rsData->fetch();
+if ($hldata && strlen($ENTITY_CODE) > 0) {
 	$hlentity = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($hldata);
 	$strEntityDataClass = $hlentity->getDataClass();
 	
@@ -102,6 +127,7 @@ if ($hldata = $rsData->fetch() && strlen($ENTITY_CODE) > 0) {
 	$rsData = \Bitrix\Highloadblock\HighloadBlockTable::getList(['filter' => ['NAME' => 'StatusEntity']]);
 	$hldata = $rsData->fetch();
 	if ($hldata && !empty($arEntity)) {
+		$arUsersCache = [];
 		$hlentity = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($hldata);
 		$strEntityDataClass = $hlentity->getDataClass();
 		
@@ -121,7 +147,8 @@ if ($hldata = $rsData->fetch() && strlen($ENTITY_CODE) > 0) {
 			$htmlLink = 'industrial_office_settings_entity_status_edit.php?lang='.LANGUAGE_ID.'&ENTITY_CODE='.urlencode($arEntity['UF_CODE']).'&STATUS_ID='.urlencode($dr['ID']);
 			$row->AddViewField("NAME_RUS", '<a href="'.htmlspecialcharsbx($htmlLink).'">'.htmlspecialcharsEx($dr['UF_RUS_NAME']).'</a>');
 			$row->AddViewField("NAME_ENG", '<a href="'.htmlspecialcharsbx($htmlLink).'">'.htmlspecialcharsEx($dr['UF_ENG_NAME']).'</a>');
-			
+			unset($htmlLink);
+
 			$row->AddViewField('UF_ENTITY_TYPE_BIND', htmlspecialcharsEx($arResult['ENTITIES'][$dr['UF_ENTITY_TYPE_BIND']]));
 			$dr['UF_NEXT_STATUS'] = unserialize($dr['UF_NEXT_STATUS']);
 			$row->AddViewField('UF_NEXT_STATUS', htmlspecialcharsEx(implode(' / ', $dr['UF_NEXT_STATUS'])));
@@ -144,6 +171,32 @@ if ($hldata = $rsData->fetch() && strlen($ENTITY_CODE) > 0) {
 				}
 			}
 			$row->AddViewField('UF_LACK_LINKED_ENTITIES', htmlspecialcharsEx(implode(' / ', $arTmp)));
+			$row->AddViewField("UF_DATE_CREATE", $dr['UF_DATE_CREATE']);
+		
+			if(!array_key_exists($dr['UF_CREATED_BY'], $arUsersCache)) {
+				$rsUser = CUser::GetByID($dr['UF_CREATED_BY']);
+				$arUsersCache[$dr['UF_CREATED_BY']] = $rsUser->Fetch();
+			}
+			
+			if($arUser = $arUsersCache[$dr['UF_CREATED_BY']]) {
+				$htmlLink = 'user_edit.php?lang='.LANGUAGE_ID.'&ID='.$dr['UF_CREATED_BY'];
+				$row->AddViewField("UF_CREATED_BY", '[<a href="'.htmlspecialcharsbx($htmlLink).'">'.$dr['UF_CREATED_BY']."</a>]&nbsp;".htmlspecialcharsEx("(".$arUser["LOGIN"].") ".$arUser["NAME"]." ".$arUser["LAST_NAME"]));
+				unset($htmlLink);
+			}
+			
+			$row->AddViewField("UF_DATE_CHANGE", $dr['UF_DATE_CHANGE']);
+			
+			if(!array_key_exists($dr['UF_MODIFIED_BY'], $arUsersCache)) {
+				$rsUser = CUser::GetByID($dr['UF_MODIFIED_BY']);
+				$arUsersCache[$dr['UF_MODIFIED_BY']] = $rsUser->Fetch();
+			}
+			
+			if($arUser = $arUsersCache[$dr['UF_MODIFIED_BY']]) {
+				$htmlLink = 'user_edit.php?lang='.LANGUAGE_ID.'&ID='.$dr['UF_MODIFIED_BY'];
+				$row->AddViewField("UF_MODIFIED_BY", '[<a href="'.htmlspecialcharsbx($htmlLink).'">'.$dr['UF_MODIFIED_BY']."</a>]&nbsp;".htmlspecialcharsEx("(".$arUser["LOGIN"].") ".$arUser["NAME"]." ".$arUser["LAST_NAME"]));
+				unset($htmlLink);
+			}
+
 		}
 	}
 	

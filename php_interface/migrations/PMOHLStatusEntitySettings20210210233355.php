@@ -3,9 +3,9 @@
 namespace Sprint\Migration;
 
 
-class HLStatusEntitySettings31122020210115144729 extends Version
+class PMOHLStatusEntitySettings20210210233355 extends Version
 {
-    protected $description = "Модуль \"Производственный офис\" от 311220. HL \"Статусы сущности\". Настройки HL";
+    protected $description = "Модуль \"Производственный офис\". HL \"Статусы сущности\". Настройки HL.";
 
     protected $moduleVersion = "3.22.2";
 
@@ -356,6 +356,52 @@ class HLStatusEntitySettings31122020210115144729 extends Version
   ),
 ));
         $helper->Hlblock()->saveField($hlblockId, array (
+  'FIELD_NAME' => 'UF_STATUS_COLOR',
+  'USER_TYPE_ID' => 'string',
+  'XML_ID' => 'UF_STATUS_COLOR',
+  'SORT' => '650',
+  'MULTIPLE' => 'N',
+  'MANDATORY' => 'N',
+  'SHOW_FILTER' => 'N',
+  'SHOW_IN_LIST' => 'Y',
+  'EDIT_IN_LIST' => 'Y',
+  'IS_SEARCHABLE' => 'N',
+  'SETTINGS' => 
+  array (
+    'SIZE' => 20,
+    'ROWS' => 1,
+    'REGEXP' => '',
+    'MIN_LENGTH' => 0,
+    'MAX_LENGTH' => 0,
+    'DEFAULT_VALUE' => '',
+  ),
+  'EDIT_FORM_LABEL' => 
+  array (
+    'en' => 'Color',
+    'ru' => 'Цвет',
+  ),
+  'LIST_COLUMN_LABEL' => 
+  array (
+    'en' => 'Color',
+    'ru' => 'Цвет',
+  ),
+  'LIST_FILTER_LABEL' => 
+  array (
+    'en' => 'Color',
+    'ru' => 'Цвет',
+  ),
+  'ERROR_MESSAGE' => 
+  array (
+    'en' => '',
+    'ru' => '',
+  ),
+  'HELP_MESSAGE' => 
+  array (
+    'en' => '',
+    'ru' => '',
+  ),
+));
+        $helper->Hlblock()->saveField($hlblockId, array (
   'FIELD_NAME' => 'UF_PRESENCE_INCOMP_CHILD',
   'USER_TYPE_ID' => 'string',
   'XML_ID' => 'UF_PRESENCE_INCOMP_CHILD',
@@ -435,6 +481,180 @@ class HLStatusEntitySettings31122020210115144729 extends Version
   array (
     'en' => 'The lack of linked entities',
     'ru' => 'Отсутствие привязанных сущностей',
+  ),
+  'ERROR_MESSAGE' => 
+  array (
+    'en' => '',
+    'ru' => '',
+  ),
+  'HELP_MESSAGE' => 
+  array (
+    'en' => '',
+    'ru' => '',
+  ),
+));
+        $helper->Hlblock()->saveField($hlblockId, array (
+  'FIELD_NAME' => 'UF_DATE_CREATE',
+  'USER_TYPE_ID' => 'datetime',
+  'XML_ID' => 'UF_DATE_CREATE',
+  'SORT' => '900',
+  'MULTIPLE' => 'N',
+  'MANDATORY' => 'N',
+  'SHOW_FILTER' => 'I',
+  'SHOW_IN_LIST' => 'Y',
+  'EDIT_IN_LIST' => 'Y',
+  'IS_SEARCHABLE' => 'N',
+  'SETTINGS' => 
+  array (
+    'DEFAULT_VALUE' => 
+    array (
+      'TYPE' => 'NOW',
+      'VALUE' => '',
+    ),
+    'USE_SECOND' => 'Y',
+    'USE_TIMEZONE' => 'N',
+  ),
+  'EDIT_FORM_LABEL' => 
+  array (
+    'en' => 'Date create',
+    'ru' => 'Дата создания',
+  ),
+  'LIST_COLUMN_LABEL' => 
+  array (
+    'en' => 'Date create',
+    'ru' => 'Дата создания',
+  ),
+  'LIST_FILTER_LABEL' => 
+  array (
+    'en' => 'Date create',
+    'ru' => 'Дата создания',
+  ),
+  'ERROR_MESSAGE' => 
+  array (
+    'en' => '',
+    'ru' => '',
+  ),
+  'HELP_MESSAGE' => 
+  array (
+    'en' => '',
+    'ru' => '',
+  ),
+));
+        $helper->Hlblock()->saveField($hlblockId, array (
+  'FIELD_NAME' => 'UF_DATE_CHANGE',
+  'USER_TYPE_ID' => 'datetime',
+  'XML_ID' => 'UF_DATE_CHANGE',
+  'SORT' => '1000',
+  'MULTIPLE' => 'N',
+  'MANDATORY' => 'N',
+  'SHOW_FILTER' => 'I',
+  'SHOW_IN_LIST' => 'Y',
+  'EDIT_IN_LIST' => 'Y',
+  'IS_SEARCHABLE' => 'N',
+  'SETTINGS' => 
+  array (
+    'DEFAULT_VALUE' => 
+    array (
+      'TYPE' => 'NOW',
+      'VALUE' => '',
+    ),
+    'USE_SECOND' => 'Y',
+    'USE_TIMEZONE' => 'N',
+  ),
+  'EDIT_FORM_LABEL' => 
+  array (
+    'en' => 'Date of change',
+    'ru' => 'Дата изменения',
+  ),
+  'LIST_COLUMN_LABEL' => 
+  array (
+    'en' => 'Date of change',
+    'ru' => 'Дата изменения',
+  ),
+  'LIST_FILTER_LABEL' => 
+  array (
+    'en' => 'Date of change',
+    'ru' => 'Дата изменения',
+  ),
+  'ERROR_MESSAGE' => 
+  array (
+    'en' => '',
+    'ru' => '',
+  ),
+  'HELP_MESSAGE' => 
+  array (
+    'en' => '',
+    'ru' => '',
+  ),
+));
+        $helper->Hlblock()->saveField($hlblockId, array (
+  'FIELD_NAME' => 'UF_CREATED_BY',
+  'USER_TYPE_ID' => 'employee',
+  'XML_ID' => 'UF_CREATED_BY',
+  'SORT' => '1100',
+  'MULTIPLE' => 'N',
+  'MANDATORY' => 'N',
+  'SHOW_FILTER' => 'I',
+  'SHOW_IN_LIST' => 'Y',
+  'EDIT_IN_LIST' => 'Y',
+  'IS_SEARCHABLE' => 'N',
+  'SETTINGS' => 
+  array (
+  ),
+  'EDIT_FORM_LABEL' => 
+  array (
+    'en' => 'Created by',
+    'ru' => 'Кем создана',
+  ),
+  'LIST_COLUMN_LABEL' => 
+  array (
+    'en' => 'Created by',
+    'ru' => 'Кем создана',
+  ),
+  'LIST_FILTER_LABEL' => 
+  array (
+    'en' => 'Created by',
+    'ru' => 'Кем создана',
+  ),
+  'ERROR_MESSAGE' => 
+  array (
+    'en' => '',
+    'ru' => '',
+  ),
+  'HELP_MESSAGE' => 
+  array (
+    'en' => '',
+    'ru' => '',
+  ),
+));
+        $helper->Hlblock()->saveField($hlblockId, array (
+  'FIELD_NAME' => 'UF_MODIFIED_BY',
+  'USER_TYPE_ID' => 'employee',
+  'XML_ID' => 'UF_MODIFIED_BY',
+  'SORT' => '1200',
+  'MULTIPLE' => 'N',
+  'MANDATORY' => 'N',
+  'SHOW_FILTER' => 'I',
+  'SHOW_IN_LIST' => 'Y',
+  'EDIT_IN_LIST' => 'Y',
+  'IS_SEARCHABLE' => 'N',
+  'SETTINGS' => 
+  array (
+  ),
+  'EDIT_FORM_LABEL' => 
+  array (
+    'en' => 'Modified by',
+    'ru' => 'Кем изменена',
+  ),
+  'LIST_COLUMN_LABEL' => 
+  array (
+    'en' => 'Modified by',
+    'ru' => 'Кем изменена',
+  ),
+  'LIST_FILTER_LABEL' => 
+  array (
+    'en' => 'Modified by',
+    'ru' => 'Кем изменена',
   ),
   'ERROR_MESSAGE' => 
   array (

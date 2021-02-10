@@ -31,10 +31,34 @@ $headers = [
         'sort' => 'id'
     ],
     [
-        'id' => 'NAME',
+        'id' => 'UF_NAME',
         'content' => Loc::getMessage("PMO_ENTITIES_LIST_FIELD_NAME"),
         'default' => true,
-        'sort' => 'name'
+        'sort' => 'uf_name'
+    ],
+    [
+        'id' => 'UF_DATE_CREATE',
+        'content' => Loc::getMessage("PMO_ENTITIES_LIST_FIELD_DATE_CREATE"),
+        'default' => true,
+        'sort' => 'uf_date_create'
+    ],
+    [
+        'id' => 'UF_CREATED_BY',
+        'content' => Loc::getMessage("PMO_ENTITIES_LIST_FIELD_CREATED_BY"),
+        'default' => true,
+        'sort' => 'uf_created_by'
+    ],
+    [
+        'id' => 'UF_DATE_CHANGE',
+        'content' => Loc::getMessage("PMO_ENTITIES_LIST_FIELD_DATE_CHANGE"),
+        'default' => true,
+        'sort' => 'uf_date_change'
+    ],
+    [
+        'id' => 'UF_MODIFIED_BY',
+        'content' => Loc::getMessage("PMO_ENTITIES_LIST_FIELD_MODIFIED_BY"),
+        'default' => true,
+        'sort' => 'uf_modified_by'
     ],
 ];
 
@@ -42,7 +66,8 @@ $USER_FIELD_MANAGER->AdminListAddHeaders($entityId, $headers);
 $lAdmin->AddHeaders($headers);
 
 $rsData = \Bitrix\Highloadblock\HighloadBlockTable::getList(['filter' => ['NAME' => 'Entities']]);
-if ($hldata = $rsData->fetch()) {
+$hldata = $rsData->fetch();
+if ($hldata) {
 	$hlentity = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($hldata);
 	$strEntityDataClass = $hlentity->getDataClass();
 	
@@ -76,6 +101,14 @@ if ($hldata = $rsData->fetch()) {
 							
 							if ($obResult->isSuccess()) {
 								$bIsSuccess = true;
+								
+								/* CEventLog::Add(array(
+									"SEVERITY" => "SECURITY",
+									"AUDIT_TYPE_ID" => "MY_OWN_TYPE",
+									"MODULE_ID" => "main",
+									"ITEM_ID" => 123,
+									"DESCRIPTION" => "Какое-то описание",
+								)); */
 							} else {
 								$DB->Rollback();
 								$lAdmin->AddGroupError(Loc::getMessage("PMO_ENTITIES_LIST_ELEM_DELETE_ERROR"), $ID);
@@ -83,7 +116,7 @@ if ($hldata = $rsData->fetch()) {
 							
 							$DB->Commit();
 						} else {
-							$lAdmin->AddGroupError(Loc::getMessage("PMO_ENTITIES_LIST_ELEM_NOT_EMPTY", array('#COUNT#' => $totalCount)), $ID);
+							$lAdmin->AddGroupError(Loc::getMessage("PMO_ENTITIES_LIST_ELEM_NOT_EMPTY", ['#COUNT#' => $totalCount]), $ID);
 						}
 					}
 					break;
@@ -91,8 +124,9 @@ if ($hldata = $rsData->fetch()) {
 		}
 	}
 	
+	$arUsersCache = [];
 	$res = $strEntityDataClass::getList([
-		'select' => ['ID', 'UF_NAME'],
+		'select' => ['*'],
 		'order' => [strtoupper($sort->getField()) => $sort->getOrder()]
 	]);
 	while ($dr = $res->fetch()) {
@@ -102,7 +136,34 @@ if ($hldata = $rsData->fetch()) {
 		
 		// параметр NAME будет отображаться ссылкой
 		$htmlLink = 'industrial_office_entities_edit.php?lang='.LANGUAGE_ID.'&ID='.urlencode($dr['ID']);
-		$row->AddViewField("NAME", '<a href="'.htmlspecialcharsbx($htmlLink).'">'.htmlspecialcharsEx($dr['UF_NAME']).'</a>');
+		$row->AddViewField("UF_NAME", '<a href="'.htmlspecialcharsbx($htmlLink).'">'.htmlspecialcharsEx($dr['UF_NAME']).'</a>');
+		unset($htmlLink);
+		
+		$row->AddViewField("UF_DATE_CREATE", $dr['UF_DATE_CREATE']);
+		
+		if(!array_key_exists($dr['UF_CREATED_BY'], $arUsersCache)) {
+			$rsUser = CUser::GetByID($dr['UF_CREATED_BY']);
+			$arUsersCache[$dr['UF_CREATED_BY']] = $rsUser->Fetch();
+		}
+		
+		if($arUser = $arUsersCache[$dr['UF_CREATED_BY']]) {
+			$htmlLink = 'user_edit.php?lang='.LANGUAGE_ID.'&ID='.$dr['UF_CREATED_BY'];
+			$row->AddViewField("UF_CREATED_BY", '[<a href="'.htmlspecialcharsbx($htmlLink).'">'.$dr['UF_CREATED_BY']."</a>]&nbsp;".htmlspecialcharsEx("(".$arUser["LOGIN"].") ".$arUser["NAME"]." ".$arUser["LAST_NAME"]));
+			unset($htmlLink);
+		}
+		
+		$row->AddViewField("UF_DATE_CHANGE", $dr['UF_DATE_CHANGE']);
+		
+		if(!array_key_exists($dr['UF_MODIFIED_BY'], $arUsersCache)) {
+			$rsUser = CUser::GetByID($dr['UF_MODIFIED_BY']);
+			$arUsersCache[$dr['UF_MODIFIED_BY']] = $rsUser->Fetch();
+		}
+		
+		if($arUser = $arUsersCache[$dr['UF_MODIFIED_BY']]) {
+			$htmlLink = 'user_edit.php?lang='.LANGUAGE_ID.'&ID='.$dr['UF_MODIFIED_BY'];
+			$row->AddViewField("UF_MODIFIED_BY", '[<a href="'.htmlspecialcharsbx($htmlLink).'">'.$dr['UF_MODIFIED_BY']."</a>]&nbsp;".htmlspecialcharsEx("(".$arUser["LOGIN"].") ".$arUser["NAME"]." ".$arUser["LAST_NAME"]));
+			unset($htmlLink);
+		}
 		
 		$arActions = [];
 
