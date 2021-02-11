@@ -1,4 +1,6 @@
-#new-hint-popup .popup-window-content {
+#new-hint-popup .popup-window-content,
+#popup-hints-list .popup-window-content,
+#new-group-popup .popup-window-content {
   background-color: #ffffff;
   padding: 10px;
 }
@@ -56,20 +58,18 @@
   }
 }
 
-#new-hint-popup {
-  .element-not-binded {
-    display: block;
-  }
-  .element-binded {
-    display: none;
-  }
+//#eef2f4
 
-  &.bind-success {
-    .element-not-binded {
-      display: none;
-    }
-    .element-binded {
-      display: block;
-    }
+.hints-table {
+  width: 100%;
+  text-align: left;
+  td, th {
+    padding: 5px;
   }
+}
+
+.last-column {
+  text-align: right;
+
+  white-space: nowrap;
 }

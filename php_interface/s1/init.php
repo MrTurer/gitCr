@@ -7,45 +7,37 @@ use Bitrix\Main\Page\Asset;
 \Bitrix\Main\UI\Extension::load("ui.tour");
 
 $arJsConfig = array(
-    'dropDownMenu' => array(
-        'js'=> '/local/js/dropDownMenu.js',
+    'hintStorage' => array(
+        'js' => '/local/js/hint-storage.js',
+    ),
+    'rnsHintsEdit' => array(
+        'js'=> '/local/js/rns.hints.edit.js',
     ),
     'newHintPopup' => array(
         'js'=> '/local/js/newHintPopup.js',
     ),
-    'hintElementInfo' => array(
-        'js'=> '/local/js/hintElementInfo.js',
+    'newGroupPopup' => array(
+        'js'=> '/local/js/newGroupPopup.js',
     ),
     'hintsListPopup' => array(
         'js'=> '/local/js/hintsListPopup.js',
     ),
-    'clearFields' => array(
-        'js'=> '/local/js/clearFields.js',
-    ),
-    'hintItems' => array(
-        'js'=> '/local/js/hintItems.js',
-    ),
-    'renderHints' => array(
-        'js'=> '/local/js/renderHints.js',
-    ),
-    //'renderHintsOld' => array(
-    //    'js'=> '/local/js/renderHintsOld.js',
-    //)
 );
 
 foreach ($arJsConfig as $ext => $arExt) {
     \CJSCore::RegisterExt($ext, $arExt);
 }
 
-//CUtil::InitJSCore(array('renderHintsOld'));
 
 CJSCore::Init(array('ajax', 'popup', 'jquery',
-'dropDownMenu', 'newHintPopup', 'hintElementInfo',
-'hintsListPopup', 'clearFields', 'hintItems', 'renderHints'));
+'hintStorage',
+'rnsHintsEdit',
+'newHintPopup',
+'newGroupPopup',
+'hintsListPopup'));
 
 AddEventHandler('main', 'onProlog', function(){
-    Asset::getInstance()->addJs("/local/js/newHint.js");
-    Asset::getInstance()->addCss("/local/styles/style.css");
+    Asset::getInstance()->addJs("/local/js/rns.hints.view.js");
     Asset::getInstance()->addCss("/local/styles/hint-style.css");
 }, 99999999);
 
