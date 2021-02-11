@@ -77,7 +77,7 @@ if ($hldata) {
 		}
 		
 		if ($arResult['FIELDS']['UF_STATUS_COLOR'] == '') {
-			$arMessages[] = new CAdminMessage(Loc::getMessage("PMO_ERROR_EMPTY_RUS_NAME"));
+			$arMessages[] = new CAdminMessage(Loc::getMessage("PMO_ERROR_EMPTY_STATUS_COLOR"));
 		}
 		
 		if (!is_array($arResult['FIELDS']['UF_PRESENCE_INCOMP_CHILD'])) {

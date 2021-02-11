@@ -103,7 +103,7 @@ if(!empty($arMessages)) {
 					<tr id="tr_ENTITY_<?= $strEntityID?>">
 						<td style="text-align: left;"><div style="display: table"><?
 						if (is_array($arEntity['UF_ENTITY_ICON']) && !empty($arEntity['UF_ENTITY_ICON'])) {
-							?><?= CFile::ShowImage($arEntity['UF_ENTITY_ICON']['ID'], 0, 0, "style='min-width: 25px; max-height: 25px; width: auto; margin-right: 10px;'") ?><?
+							?><?= CFile::ShowImage($arEntity['UF_ENTITY_ICON']['ID'], 0, 0, "style='min-width: 25px; max-height: 25px; width: auto; height: auto; margin-right: 10px;'") ?><?
 						} elseif ($arEntity['UF_ENTITY_ICON']) {
 							echo $arEntity['UF_ENTITY_ICON']." ";
 						}
