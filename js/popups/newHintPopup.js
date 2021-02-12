@@ -18,7 +18,7 @@ BX.ready(function () {
     const hintDescriptionFieldLabel = 'Описание';
     const hintSerialFieldLabel = 'Сортировка';
     const hintBindLabel = 'Привязать к элементу';
-    const hintBindButtonText = 'Привязать элемент';
+    let hintBindButtonText = 'Привязать элемент';
     const hintBindButtonSuccessText = 'Элемент привязан';
     const hintBindButtonFailText = '';
     const hintBindAboutText = 'кликните на кнопку привязать элемент, а затем кликните правой кнопкой мыши по нужному элементу';
@@ -104,6 +104,7 @@ BX.ready(function () {
       }
 
       if( !bindElement ) {
+        error = true;
         bindButton.classList.remove('ui-btn-secondary');
         bindButton.classList.remove('ui-btn-success');
         bindButton.classList.add('ui-btn-danger');
@@ -181,6 +182,7 @@ BX.ready(function () {
         hintDescriptionFieldValue = hintFromStorage.DETAIL_TEXT;
         hintSerialFieldValue = hintFromStorage.SORT;
         hintElementSelector = hintFromStorage.HINT_ELEMENT;
+        hintBindButtonText = 'Изменить элемент';
       }
     }
 
