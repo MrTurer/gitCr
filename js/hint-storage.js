@@ -26,7 +26,6 @@
   }
 }
 */
-console.log(JSON.parse(localStorage.getItem('hints-info-per-page')));
 
 function getHintFromStorage(hintId, groupId){
   let items = JSON.parse(localStorage.getItem('hints-info-per-page'));
@@ -63,6 +62,7 @@ function getGroupFromStorage(groupId){
 }
 
 function saveHintToStorage(hint) {
+  console.log(hint);
   let items = JSON.parse(localStorage.getItem('hints-info-per-page')) || [];
 
   if( hint.GROUP_ID ) {
@@ -115,7 +115,7 @@ function getHintsInGroupListFromStorage(groupId) {
   if( items ){
     let filteredGroup = items.filter(item => item.ID === groupId);
     if( filteredGroup ){
-      return filteredGroup[0].HINTS;
+      return filteredGroup[0].HINTS ? filteredGroup[0].HINTS.sort((a, b) => a.SORT - b.SORT) : [];
     }
   }
 

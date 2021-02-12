@@ -123,11 +123,10 @@ BX.ready(function () {
                   },
                   events: {
                     click: function () {
-                      console.log('item.ID', item.ID);
                       if( item.TYPE === 'group' ){
-                        setTimeout(getNewGroupPopup(item.ID).show(), 2000);
+                        setTimeout(getNewGroupPopup(item.ID).show(), 1000);
                       } else {
-                        setTimeout(getNewHintPopup(item.ID, groupId).show(), 2000);
+                        setTimeout(getNewHintPopup(item.ID, groupId).show(), 1000);
                       }
                     },
                   },
@@ -263,7 +262,7 @@ BX.ready(function () {
             events: {
               click: function () {
                 hintsListPopup.destroy();
-                setTimeout(getNewHintPopup(null, groupId).show(), 2000);
+                setTimeout(getNewHintPopup(null, groupId).show(), 1000);
               },
             },
           }),
@@ -276,7 +275,7 @@ BX.ready(function () {
             events: {
               click: function () {
                 hintsListPopup.destroy();
-                setTimeout(getNewGroupPopup().show(), 2000);
+                setTimeout(getNewGroupPopup().show(), 1000);
               },
             },
           })
@@ -288,7 +287,7 @@ BX.ready(function () {
             events: {
               click: function () {
                 hintsListPopup.destroy();
-                setTimeout(getHintsListPopup().show(), 2000);
+                setTimeout(getHintsListPopup().show(), 1000);
               },
             },
           }),

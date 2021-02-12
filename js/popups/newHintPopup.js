@@ -128,6 +128,8 @@ BX.ready(function () {
         DETAIL_TEXT: hintDescription.value,
         HINT_ELEMENT: hintElementSelector,
       })
+
+      return true;
     }
 
     const closeHintPopup = () => {
@@ -154,16 +156,17 @@ BX.ready(function () {
       }
     }
 
-    const onSaveButtonPress = () => {
-      saveNewHint();
-      closeHintPopup();
+    const onSaveHintButtonPress = () => {
+      if( saveNewHint() ){
+        closeHintPopup();
+      }
     }
 
-    const onApplyButtonPress = () => {
+    const onApplyHintButtonPress = () => {
       saveNewHint();
     }
 
-    const onCancelButtonPress = () => {
+    const onCancelHintButtonPress = () => {
       closeHintPopup();
     }
 
@@ -183,6 +186,8 @@ BX.ready(function () {
         hintSerialFieldValue = hintFromStorage.SORT;
         hintElementSelector = hintFromStorage.HINT_ELEMENT;
         hintBindButtonText = 'Изменить элемент';
+        bindElement = document.getElementById(hintElementSelector) ||
+          document.body.querySelector("." + hintElementSelector.split(' ').join('.'))
       }
     }
 
@@ -407,7 +412,7 @@ BX.ready(function () {
             id: "id-save-btn",
             className: "ui-btn ui-btn-success",
             events: {
-              click: onSaveButtonPress,
+              click: onSaveHintButtonPress,
             },
           }),
           new BX.PopupWindowButton({
@@ -415,7 +420,7 @@ BX.ready(function () {
             id: "id-apply-btn",
             className: "ui-btn ui-btn-light-border",
             events: {
-              click: onApplyButtonPress,
+              click: onApplyHintButtonPress,
             },
           }),
           new BX.PopupWindowButton({
@@ -423,12 +428,12 @@ BX.ready(function () {
             id: "id-cancel-btn",
             className: "ui-btn ui-btn-link",
             events: {
-              click: onCancelButtonPress,
+              click: onCancelHintButtonPress,
             },
           }),
         ],
         events: {
-          onPopupClose: onCancelButtonPress,
+          onPopupClose: onCancelHintButtonPress,
         },
       }
     );

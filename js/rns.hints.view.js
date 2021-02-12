@@ -48,7 +48,8 @@ BX.ready(function () {
                 : document.querySelector(`.${item.HINT_ELEMENT.split('.').join('-')}`);
 
             BX.UI.Tour.Manager.add({
-              id: 'hintTour',
+              id: 'id-single-hint-tour-' + item.ID,
+              simpleMode: true,
               steps: [{
                 target: hintElement,
                 id: item.HINT_ELEMENT.split('.').join('-'),
@@ -57,12 +58,16 @@ BX.ready(function () {
                 link: "",
                 rounded: false,
                 title: item.NAME,
-                position: null,
+                position: 'right',
               }]
             });
           }
         }
       });
     }
+
+    setTimeout(() => {
+      document.querySelector('body').classList.remove('ui-tour-body-overflow');
+    });
   });
 });
