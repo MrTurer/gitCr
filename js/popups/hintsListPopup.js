@@ -78,10 +78,10 @@ BX.ready(function () {
               children: [
                 BX.create({
                   tag: "button",
-                  title: hideButtonText,
                   props: {
                     className: 'ui-btn ui-btn-danger ui-btn-icon-pause',
                     id: `header-hint-hide-toggle-${index}`,
+                    title: hideButtonText,
                   },
                   events: {
                     click: function () {
@@ -117,9 +117,9 @@ BX.ready(function () {
                 }),
                 BX.create({
                   tag: "button",
-                  title: editButtonText,
                   props: {
                     className: "ui-btn ui-btn-secondary ui-btn-icon-edit",
+                    title: editButtonText,
                   },
                   events: {
                     click: function () {
@@ -134,9 +134,9 @@ BX.ready(function () {
                 }),
                 BX.create({
                   tag: "button",
-                  title: deleteButtonText,
                   props: {
                     className: "ui-btn ui-btn-secondary ui-btn-icon-remove",
+                    title: deleteButtonText,
                   },
                   events: {
                     click: () => {
