@@ -1,4 +1,6 @@
-#new-hint-popup .popup-window-content {
+#new-hint-popup .popup-window-content,
+#popup-hints-list .popup-window-content,
+#new-group-popup .popup-window-content {
   background-color: #ffffff;
   padding: 10px;
 }
@@ -50,17 +52,17 @@
   padding-left: 10px;
 }
 
-#new-hint-popup .element-not-binded {
-  display: block;
+.hints-table {
+  width: 100%;
+  text-align: left;
 }
-#new-hint-popup .element-binded {
-  display: none;
+.hints-table td, .hints-table th {
+  padding: 5px;
 }
-#new-hint-popup.bind-success .element-not-binded {
-  display: none;
-}
-#new-hint-popup.bind-success .element-binded {
-  display: block;
+
+.last-column {
+  text-align: right;
+  white-space: nowrap;
 }
 
 /*# sourceMappingURL=hint-style.css.map */

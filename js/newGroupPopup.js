@@ -3,35 +3,170 @@
  */
 let getNewGroupPopup;
 BX.ready(function () {
-  getNewGroupPopup = (currentGroupItem) => {
+  getNewGroupPopup = (editGroupId) => {
+    const currentPageUrl = window.location.href.split('?')[0];
+
+    let hintGroupId = parseInt(Math.random() * 100000).toString();
+    let hintGroupNameFieldValue = ""
+    let hintGroupSerialFieldValue = 500;
+    let groupHints = [];
+    const groupWindowTitle = 'Окно создания группы автоподсказок';
+    const hintGroupNameFieldLabel = 'Название группы';
+    const hintGroupSerialFieldLabel = 'Сортировка';
+    const saveBtnText = 'Сохранить';
+    const applyBtnText = 'Применить';
+    const cancelBtnText = 'Отмена';
+
+    const saveNewGroup = () => {
+      const groupName = document.getElementById('id-hint-group-name');
+      const groupSerial = document.getElementById('id-hint-group-serial');
+
+      //
+      // validation
+      //
+      let error = false;
+      if( groupName.value === '' ) {
+        groupName.parentElement.classList.add('ui-ctl-danger');
+        error = true;
+      } else {
+        groupName.parentElement.classList.remove('ui-ctl-danger');
+      }
+
+      if( groupSerial.value === '' ) {
+        groupSerial.parentElement.classList.add('ui-ctl-danger');
+        error = true;
+      } else {
+        groupSerial.parentElement.classList.remove('ui-ctl-danger');
+      }
+
+      if( error ){
+        return false;
+      }
+
+      saveGroupToStorage({
+        ID: hintGroupId,
+        TYPE: 'group',
+        CURRENT_PAGE_URL: currentPageUrl,
+        CREATED_BY: "UNKNOWN",
+        DATE_EDIT: new Date(),
+        DATE_CREATE: new Date(),
+        SORT: groupSerial.value,
+        ACTIVE: true,
+        NAME: groupName.value,
+        HINTS: groupHints,
+      })
+    }
+
+    const closeGroupPopup = () => {
+      const groupName = document.getElementById('id-hint-group-name');
+      const groupSerial = document.getElementById('id-hint-group-serial');
+
+      //
+      // clear fields
+      //
+      groupName.value = '';
+      groupSerial.value = 500;
+
+      newGroupPopup.destroy();
+      setTimeout(() => getHintsListPopup().show(), 300);
+    }
+
+    const onSaveGroupButtonPress = () => {
+      saveNewGroup();
+      closeGroupPopup();
+    }
+
+    const onApplyGroupHintButtonPress = () => {
+      saveNewGroup();
+    }
+
+    const onCancelGroupButtonPress = () => {
+      closeGroupPopup();
+    }
+
+    //
+    // if edit
+    //
+    if( typeof editGroupId !== 'undefined' && editGroupId !== null ){
+      hintGroupId = editGroupId;
+      let groupFromStorage = getGroup(hintGroupId);
+      if( groupFromStorage !== null ){
+        hintGroupNameFieldValue = groupFromStorage.NAME;
+        hintGroupSerialFieldValue = groupFromStorage.SORT;
+        groupHints = groupFromStorage.HINTS;
+      }
+    }
+
     const newGroupPopup = BX.PopupWindowManager.create(
-      "popup-message",
+      "new-group-popup",
       BX("element"),
       {
+        //
+        // ширина окна
+        //
+        width: 500,
+        min_width: 500,
+        //
+        // высота окна
+        //
+        height: 400,
+        min_height: 400,
+        //
+        // z-index
+        //
+        zIndex: 100,
+        closeIcon: {
+          opacity: 0.5,
+        },
+        closeByEsc: true,
+        darkMode: false,
+        autoHide: true,
+        draggable: true,
+        resizable: false,
+        lightShadow: true,
+        angle: false,
+        overlay: {
+          backgroundColor: "black",
+          opacity: 500,
+        },
+        titleBar: groupWindowTitle,
         content: BX.create({
           tag: "div",
-          props: {className: "formFieldsContainer"},
+          props: {
+            className: "form-container"
+          },
           children: [
             BX.create({
               tag: "div",
               props: {
-                className: "form-group form-group-new-hints-group",
+                className: "new-hint-form-label-container",
               },
               children: [
                 BX.create({
                   tag: "label",
-                  props: {for: "groupName"},
-                  text: "Название группы",
+                  props: {
+                    for: "id-hint-group-name",
+                    className: "new-hint-form-label"
+                  },
+                  text: hintGroupNameFieldLabel,
                 }),
+              ],
+            }),
+            BX.create({
+              tag: "div",
+              props: {
+                className: "ui-ctl ui-ctl-textbox ui-ctl-w100",
+              },
+              children: [
                 BX.create({
                   tag: "input",
                   props: {
-                    id: "groupName",
+                    id: "id-hint-group-name",
                     type: "text",
-                    className: "form-control",
-                    placeholder: "Название группы",
-                    name: "Название группы",
-                    value: currentGroupItem ? currentGroupItem.NAME : "",
+                    className: "ui-ctl-element",
+                    placeholder: hintGroupNameFieldLabel,
+                    name: "hintName",
+                    value: hintGroupNameFieldValue,
                   },
                 }),
               ],
@@ -39,288 +174,71 @@ BX.ready(function () {
             BX.create({
               tag: "div",
               props: {
-                className: "form-group form-group-new-hint",
+                className: "new-hint-form-label-container with-top-margin",
               },
               children: [
                 BX.create({
                   tag: "label",
-                  props: {for: "reviewText"},
-                  text: "Описание автоподсказки",
-                }),
-                BX.create({
-                  tag: "textarea",
                   props: {
-                    id: "reviewText",
-                    name: "reviewText",
-                    rows: 3,
-                    className: "form-control",
-                    value: currentHintItem ? currentHintItem.DETAIL_TEXT : "",
+                    for: "id-hint-group-serial",
+                    className: "new-hint-form-label"
                   },
+                  text: hintGroupSerialFieldLabel,
                 }),
               ],
             }),
             BX.create({
               tag: "div",
               props: {
-                className: "form-group  form-group-new-hint",
+                className: "ui-ctl ui-ctl-textbox ui-ctl-w100",
               },
               children: [
-                BX.create({
-                  tag: "label",
-                  props: {for: "new-hint-number"},
-                  text: "Какой по счёту подсказка будет выведена на экран?",
-                }),
-
                 BX.create({
                   tag: "input",
                   props: {
                     type: "number",
-                    id: "new-hint-number",
-                    name: "new-hint-number",
-                    rows: 3,
-                    className: "new-hint-number",
-                    value: currentHintItem
-                      ? currentHintItem.HINT_NUMBER
-                      : "100",
+                    id: "id-hint-group-serial",
+                    name: "hintSerial",
+                    className: "ui-ctl-element",
+                    value: hintGroupSerialFieldValue,
                   },
                 }),
               ],
             }),
-            BX.create({
-              tag: "button",
-              text: "Привязать элемент",
-              events: {
-                click: function () {
-                  const overlay = document.getElementById(
-                    "popup-window-overlay-popup-message"
-                  );
-                  const newHintPopupWrapper = document.getElementById(
-                    "popup-message"
-                  );
-                  overlay.style.display = "none";
-                  newHintPopupWrapper.style.display = "none";
-                  const chooseItemListener = (e) => {
-                    $(function () {
-                      e.preventDefault();
-                      const popup = BX.PopupWindowManager.create(
-                        "popup-message1",
-                        BX("element"),
-                        {
-                          width: 400, // ширина окна
-                          height: 100, // высота окна
-                          zIndex: 100, // z-index
-                          closeIcon: {
-                            // объект со стилями для иконки закрытия, при null - иконки не будет
-                            opacity: 1,
-                          },
-                          titleBar: "Элемент привязан, закройте и сохраните",
-                          closeByEsc: true, // закрытие окна по esc
-                          darkMode: false, // окно будет светлым или темным
-                          autoHide: false, // закрытие при клике вне окна
-                          draggable: true, // можно двигать или нет
-                          resizable: true, // можно ресайзить
-                          min_height: 100, // минимальная высота окна
-                          min_width: 100, // минимальная ширина окна
-                          lightShadow: true, // использовать светлую тень у окна
-                          angle: false, // появится уголок
-                          overlay: {
-                            // объект со стилями фона
-                            backgroundColor: "black",
-                            opacity: 500,
-                          },
-
-                          events: {
-                            onPopupShow: function () {
-                              const bgGray = document.getElementById(
-                                "popup-window-content-popup-message1"
-                              );
-                              bgGray.style.backgroundColor = "transparent";
-                            },
-                            onPopupClose: function (popupWindow) {
-                              overlay.style.display = "block";
-                              newHintPopupWrapper.style.display = "block";
-                              document.removeEventListener(
-                                "contextmenu",
-                                chooseItemListener
-                              );
-                              popupWindow.destroy();
-                            },
-                          },
-                        }
-                      );
-                      popup.show();
-                      getHintElementInfo(true, e);
-                      return false;
-                    });
-                  };
-                  document.addEventListener(
-                    "contextmenu",
-                    chooseItemListener
-                  );
-                },
-              },
-              props: {
-                id: "button-bind-element",
-                type: "button",
-                className: "form-button-bind-element",
-              },
-            }),
-            BX.create({
-              tag: "p",
-              text:
-                "* кликните на кнопку привязать элемент," +
-                "а затем кликните правой кнопкой мыши по нужному элементу",
-              props: {
-                className: "bind-button-label",
-              },
-            }),
-            BX.create({
-              tag: "input",
-              props: {
-                type: "text",
-                className: "invisible-field",
-              },
-            }),
           ],
         }),
-        width: 500, // ширина окна
-        height: 500, // высота окна
-        zIndex: 100, // z-index
-        closeIcon: {
-          // объект со стилями для иконки закрытия, при null - иконки не будет
-          opacity: 0.5,
-        },
-        titleBar: "Окно создания автоподсказки",
-        closeByEsc: true, // закрытие окна по esc
-        darkMode: false, // окно будет светлым или темным
-        autoHide: true, // закрытие при клике вне окна
-        draggable: true, // можно двигать или нет
-        resizable: true, // можно ресайзить
-        min_height: 500, // минимальная высота окна
-        min_width: 500, // минимальная ширина окна
-        lightShadow: true, // использовать светлую тень у окна
-        angle: false, // появится уголок
-        overlay: {
-          // объект со стилями фона
-          backgroundColor: "black",
-          opacity: 500,
-        },
         buttons: [
           new BX.PopupWindowButton({
-            text: "Сохранить", // текст кнопки
-            id: "save-btn", // идентификатор
-            className: "ui-btn ui-btn-success", // доп. классы
+            text: saveBtnText,
+            id: "id-save-btn",
+            className: "ui-btn ui-btn-success",
             events: {
-              click: function () {
-                const newHintInputName = document
-                    .getElementById("popup-message")
-                    .querySelector("input"),
-                  newHintTextArea = document
-                    .getElementById("popup-message")
-                    .querySelector("textarea"),
-                  newHintNumberInput = document
-                    .getElementById("popup-message")
-                    .querySelector('input[type="number"]'),
-                  hintInfoPerPage = {
-                    CURRENT_PAGE_URL: currentPageUrl,
-                    NAME: newHintInputName.value,
-                    DETAIL_TEXT: newHintTextArea.value,
-                    HINT_NUMBER: newHintNumberInput.value,
-                    HINT_ELEMENT: hintSelector,
-                    CREATED_BY: "UNKNOWN",
-                    DATE_EDIT: new Date(),
-                    DATE_CREATE: new Date(),
-                    SORT: "unset",
-                    ACTION: "add",
-                    ACTIVE: true,
-                  };
-                if (currentHintItem) {
-                  hintsPerPage = hintsPerPage.filter(
-                    (item) => item.NAME !== currentHintItem.NAME
-                  );
-                }
-                hintsPerPage.push(hintInfoPerPage);
-                if (!isEdit) {
-                  hintsPerPage.forEach((hint, i) => {
-                    const el3 = () => {
-                      let el = document.querySelector(
-                        `.${hint.HINT_ELEMENT}`
-                      );
-                      if (el === null) {
-                        el = document.getElementById(`${hint.HINT_ELEMENT}`);
-                      }
-                      if (el === null) {
-                        hint.HINT_ELEMENT = hint.HINT_ELEMENT.split(' ').join('.');
-                        el = document.querySelector(
-                          `.${hint.HINT_ELEMENT}`
-                        );
-                      }
-                      if (el === null) {
-                        hintsPerPage.splice(i, 1);
-                        alert("Ошибка формирования подсказки");
-                      }
-                    };
-                    el3();
-                  });
-                  if (isEdit) isEdit = false;
-                }
-
-                localStorage.setItem(
-                  "hints-info-per-page",
-                  JSON.stringify(hintsPerPage)
-                );
-                clearFields(
-                  newHintInputName,
-                  newHintTextArea,
-                  newHintNumberInput
-                );
-                newHintPopup.close();
-                setTimeout(() => getHintsListPopup().show(), 300);
-              },
+              click: onSaveGroupButtonPress,
             },
           }),
           new BX.PopupWindowButton({
-            text: "Отмена",
-            id: "copy-btn",
-            className: "ui-btn ui-btn-primary",
+            text: applyBtnText,
+            id: "id-apply-btn",
+            className: "ui-btn ui-btn-light-border",
             events: {
-              click: function () {
-                const newHintInput = document
-                    .getElementById("popup-message")
-                    .querySelector("input"),
-                  newHintTextArea = document
-                    .getElementById("popup-message")
-                    .querySelector("textarea"),
-                  newHintNumberInput = document
-                    .getElementById("popup-message")
-                    .querySelector('input[type="number"]');
-                clearFields(
-                  newHintInput,
-                  newHintTextArea,
-                  newHintNumberInput
-                );
-              },
+              click: onApplyGroupHintButtonPress,
+            },
+          }),
+          new BX.PopupWindowButton({
+            text: cancelBtnText,
+            id: "id-cancel-btn",
+            className: "ui-btn ui-btn-link",
+            events: {
+              click: onCancelGroupButtonPress,
             },
           }),
         ],
         events: {
-          onPopupClose: function (popupWindow) {
-            const newHintInput = document
-                .getElementById("popup-message")
-                .querySelector("input"),
-              newHintTextArea = document
-                .getElementById("popup-message")
-                .querySelector("textarea"),
-              newHintNumberInput = document
-                .getElementById("popup-message")
-                .querySelector('input[type="number"]');
-            clearFields(newHintInput, newHintTextArea, newHintNumberInput);
-
-            popupWindow.destroy();
-          },
+          onPopupClose: onCancelGroupButtonPress,
         },
       }
     );
+
     return newGroupPopup;
   };
 });
