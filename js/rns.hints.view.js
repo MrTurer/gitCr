@@ -2,7 +2,7 @@ BX.ready(function () {
   BX.bind(document, "readystatechange", function () {
     const currentPageUrl = window.location.href.split('?')[0];
 
-    let hintsPerPage = getHintsGeneralList();
+    let hintsPerPage = getHintsGeneralListFromStorage();
 
     if (
       hintsPerPage !== null &&
@@ -57,7 +57,7 @@ BX.ready(function () {
                 link: "",
                 rounded: false,
                 title: item.NAME,
-                position: null
+                position: null,
               }]
             });
           }

@@ -28,7 +28,7 @@
 */
 console.log(JSON.parse(localStorage.getItem('hints-info-per-page')));
 
-function getHint(hintId, groupId){
+function getHintFromStorage(hintId, groupId){
   let items = JSON.parse(localStorage.getItem('hints-info-per-page'));
 
   if( items ){
@@ -48,7 +48,7 @@ function getHint(hintId, groupId){
   return null;
 }
 
-function getGroup(groupId){
+function getGroupFromStorage(groupId){
   let items = JSON.parse(localStorage.getItem('hints-info-per-page'));
 
   if( items ){
@@ -60,20 +60,6 @@ function getGroup(groupId){
   }
 
   return null;
-}
-
-function saveGroupToStorage(group) {
-  let items = JSON.parse(localStorage.getItem('hints-info-per-page')) || [];
-
-  if( items ){
-    items = items.filter(
-      item => item.ID !== group.ID
-    );
-  }
-
-  items.push(group);
-
-  localStorage.setItem('hints-info-per-page', JSON.stringify(items));
 }
 
 function saveHintToStorage(hint) {
@@ -105,12 +91,26 @@ function saveHintToStorage(hint) {
   localStorage.setItem('hints-info-per-page', JSON.stringify(items));
 }
 
-function getHintsGeneralList() {
+function saveGroupToStorage(group) {
+  let items = JSON.parse(localStorage.getItem('hints-info-per-page')) || [];
+
+  if( items ){
+    items = items.filter(
+      item => item.ID !== group.ID
+    );
+  }
+
+  items.push(group);
+
+  localStorage.setItem('hints-info-per-page', JSON.stringify(items));
+}
+
+function getHintsGeneralListFromStorage() {
   let items = JSON.parse(localStorage.getItem("hints-info-per-page"));
   return items ? items.sort((a, b) => a.SORT - b.SORT) : [];
 }
 
-function getHintsInGroupList(groupId) {
+function getHintsInGroupListFromStorage(groupId) {
   let items = JSON.parse(localStorage.getItem("hints-info-per-page"));
   if( items ){
     let filteredGroup = items.filter(item => item.ID === groupId);
@@ -122,10 +122,20 @@ function getHintsInGroupList(groupId) {
   return [];
 }
 
-function deleteGroupOrSingleHint(groupId) {
+function deleteHintFromStorage(hintId) {
+  let filteredHints = JSON.parse(localStorage.getItem('hints-info-per-page')).filter(
+    item => item.ID !== hintId.ID
+  );
+
+  localStorage.setItem('hints-info-per-page', JSON.stringify(filteredHints));
+}
+
+function deleteGroupFromStorage(groupId) {
   let filteredHints = JSON.parse(localStorage.getItem('hints-info-per-page')).filter(
     item => item.ID !== groupId.ID
   );
 
   localStorage.setItem('hints-info-per-page', JSON.stringify(filteredHints));
 }
+
+

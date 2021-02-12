@@ -14,13 +14,13 @@ $arJsConfig = array(
         'js'=> '/local/js/rns.hints.edit.js',
     ),
     'newHintPopup' => array(
-        'js'=> '/local/js/newHintPopup.js',
+        'js'=> '/local/js/popups/newHintPopup.js',
     ),
     'newGroupPopup' => array(
-        'js'=> '/local/js/newGroupPopup.js',
+        'js'=> '/local/js/popups/newGroupPopup.js',
     ),
     'hintsListPopup' => array(
-        'js'=> '/local/js/hintsListPopup.js',
+        'js'=> '/local/js/popups/hintsListPopup.js',
     ),
 );
 

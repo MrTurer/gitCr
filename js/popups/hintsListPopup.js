@@ -5,7 +5,12 @@ let getHintsListPopup;
 BX.ready(function () {
   getHintsListPopup = (groupId) => {
     let hintsListPopup = null;
-    const hintsListWindowTitle = 'Список автоподсказок';
+
+    let hintsListWindowTitle = 'Список автоподсказок';
+    if( typeof groupId !== 'undefined' && groupId !== null ){
+      let group = getGroupFromStorage(groupId);
+      hintsListWindowTitle = 'Группа "' + group.NAME + '"';
+    }
     const hintsListItemName = 'Название подсказки';
     const hintsListItemType = 'Тип';
     const hintsListItemTypeHint = 'Одиночная';
@@ -21,8 +26,8 @@ BX.ready(function () {
 
     const getHintItems = () => {
       let hintsItemsList = typeof groupId === 'undefined'
-        ? getHintsGeneralList()
-        : getHintsInGroupList(groupId);
+        ? getHintsGeneralListFromStorage()
+        : getHintsInGroupListFromStorage(groupId);
 
       return hintsItemsList.map((item, index) =>
         BX.create({
@@ -135,7 +140,12 @@ BX.ready(function () {
                   },
                   events: {
                     click: () => {
-                      deleteGroupOrSingleHint(item.ID);
+                      if( item.TYPE === 'group' ){
+                        deleteGroupFromStorage(item.ID);
+                      } else {
+                        deleteHintFromStorage(item.ID);
+                      }
+
                       BX.remove(BX('id-list-item-' + item.ID));
                     },
                   },
@@ -151,7 +161,7 @@ BX.ready(function () {
       hintsListPopup.destroy();
       setTimeout(() => {
         getHintsListPopup(groupId).show();
-      }, 300)
+      }, 500)
     }
 
     hintsListPopup = BX.PopupWindowManager.create(
@@ -257,7 +267,7 @@ BX.ready(function () {
               },
             },
           }),
-          typeof groupId === 'undefined'
+          typeof groupId === 'undefined' || groupId === null
           ?
           new BX.PopupWindowButton({
             text: addHintGroupButtonText,
