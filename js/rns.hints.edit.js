@@ -28,10 +28,7 @@ BX.ready(function () {
         },
         html: '<span class="menu-popup-item-text">' + "Автоподсказки" + "</span>",
         events: {
-          click: function () {
-            const popup = getHintsListPopup();
-            popup.show();
-          },
+          click: () => getHintsListPopup().show(),
         },
       });
       //

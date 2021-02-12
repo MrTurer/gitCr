@@ -68,7 +68,7 @@ BX.ready(function () {
       groupSerial.value = 500;
 
       newGroupPopup.destroy();
-      setTimeout(() => getHintsListPopup().show(), 300);
+      setTimeout(() => getHintsListPopup().show(), 500);
     }
 
     const onSaveGroupButtonPress = () => {
@@ -89,7 +89,7 @@ BX.ready(function () {
     //
     if( typeof editGroupId !== 'undefined' && editGroupId !== null ){
       hintGroupId = editGroupId;
-      let groupFromStorage = getGroup(hintGroupId);
+      let groupFromStorage = getGroupFromStorage(hintGroupId);
       if( groupFromStorage !== null ){
         hintGroupNameFieldValue = groupFromStorage.NAME;
         hintGroupSerialFieldValue = groupFromStorage.SORT;

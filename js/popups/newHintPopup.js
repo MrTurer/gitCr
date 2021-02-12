@@ -14,10 +14,10 @@ BX.ready(function () {
     let hintGroupId = null;
     let hintElementSelector = '';
     const hintWindowTitle = 'Окно создания автоподсказки';
-    const hintNameFieldLabel = 'Название автоподсказки';
-    const hintDescriptionFieldLabel = 'Описание автоподсказки';
-    const hintSerialFieldLabel = 'Какой по счёту подсказка будет выведена на экран?';
-    const hintBindLabel = 'Привязать автоподсказку к элементу';
+    const hintNameFieldLabel = 'Название';
+    const hintDescriptionFieldLabel = 'Описание';
+    const hintSerialFieldLabel = 'Сортировка';
+    const hintBindLabel = 'Привязать к элементу';
     const hintBindButtonText = 'Привязать элемент';
     const hintBindButtonSuccessText = 'Элемент привязан';
     const hintBindButtonFailText = '';
@@ -146,7 +146,11 @@ BX.ready(function () {
       bindButton.classList.add('ui-btn-secondary');
 
       newHintPopup.destroy();
-      setTimeout(() => getHintsListPopup().show(), 300);
+      if( typeof groupId !== 'undefined' && groupId !== null ){
+        setTimeout(() => getHintsListPopup(groupId).show(), 500);
+      } else {
+        setTimeout(() => getHintsListPopup().show(), 500);
+      }
     }
 
     const onSaveButtonPress = () => {
@@ -171,7 +175,7 @@ BX.ready(function () {
 
     if( typeof editHintId !== 'undefined' && editHintId !== null ){
       hintId = editHintId;
-      let hintFromStorage = getHint(hintId, groupId);
+      let hintFromStorage = getHintFromStorage(hintId, groupId);
       if( hintFromStorage !== null ){
         hintNameFieldValue = hintFromStorage.NAME;
         hintDescriptionFieldValue = hintFromStorage.DETAIL_TEXT;
