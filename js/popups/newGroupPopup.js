@@ -55,6 +55,8 @@ BX.ready(function () {
         NAME: groupName.value,
         HINTS: groupHints,
       })
+
+      return true;
     }
 
     const closeGroupPopup = () => {
@@ -72,8 +74,9 @@ BX.ready(function () {
     }
 
     const onSaveGroupButtonPress = () => {
-      saveNewGroup();
-      closeGroupPopup();
+      if( saveNewGroup() ){
+        closeGroupPopup();
+      }
     }
 
     const onApplyGroupHintButtonPress = () => {

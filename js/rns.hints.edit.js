@@ -24,7 +24,7 @@ BX.ready(function () {
       //
       let autoHintsButton = BX.create("span", {
         props: {
-          className: "menu-popup-item",
+          className: "menu-popup-item menu-popup-no-icon",
         },
         html: '<span class="menu-popup-item-text">' + "Автоподсказки" + "</span>",
         events: {

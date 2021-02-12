@@ -65,4 +65,13 @@
   white-space: nowrap;
 }
 
+.popup-window-ui-tour {
+  border-radius: 12px !important;
+}
+
+.popup-window-close-icon:after {
+  width: 16px;
+  height: 16px;
+}
+
 /*# sourceMappingURL=hint-style.css.map */
