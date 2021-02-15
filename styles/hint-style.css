@@ -74,4 +74,8 @@
   height: 16px;
 }
 
+.ui-tour-overlay {
+  position: absolute !important;
+}
+
 /*# sourceMappingURL=hint-style.css.map */

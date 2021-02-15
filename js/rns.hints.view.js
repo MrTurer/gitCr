@@ -2,6 +2,33 @@ BX.ready(function () {
   BX.bind(document, "readystatechange", function () {
     const currentPageUrl = window.location.href.split('?')[0];
 
+    const getElementBySelector = (selector) => {
+      if( !selector || !selector.selector ){
+        return null;
+      }
+
+      if( selector.children.length === 0 ){
+        return {
+          element: document.querySelector(selector.selector),
+          id: selector.selector
+        };
+      }
+
+      let element = document.querySelector(selector.selector);
+      let id = selector.selector;
+      for( child of selector.children ){
+        if( element.children[child.sibling] ) {
+          element = element.children[child.sibling];
+          id += '-' + child.sibling;
+        }
+      }
+
+      return {
+        element,
+        id
+      };
+    }
+
     let hintsPerPage = getHintsGeneralListFromStorage();
 
     if (
@@ -17,20 +44,17 @@ BX.ready(function () {
               let steps = [];
 
               for(let hint of item.HINTS){
-                const hintElement =
-                  document.querySelector(`.${hint.HINT_ELEMENT.split('.').join('-')}`) === null
-                    ? document.getElementById(`${hint.HINT_ELEMENT}`)
-                    : document.querySelector(`.${hint.HINT_ELEMENT.split('.').join('-')}`);
+                const hintElement = getElementBySelector(hint.HINT_ELEMENT);
 
                 steps.push({
-                  target: hintElement,
-                  id: hint.HINT_ELEMENT.split('.').join('-'),
+                  target: hintElement.element,
+                  id: hintElement.id,
                   text: hint.DETAIL_TEXT,
                   areaPadding: 0,
                   link: "",
                   rounded: false,
                   title: hint.NAME,
-                  position: null
+                  position: 'right',
                 })
               }
 
@@ -42,17 +66,14 @@ BX.ready(function () {
             }
           } else {
 
-            const hintElement =
-              document.querySelector(`.${item.HINT_ELEMENT.split('.').join('-')}`) === null
-                ? document.getElementById(`${item.HINT_ELEMENT}`)
-                : document.querySelector(`.${item.HINT_ELEMENT.split('.').join('-')}`);
+            const hintElement = getElementBySelector(item.HINT_ELEMENT);
 
             BX.UI.Tour.Manager.add({
               id: 'id-single-hint-tour-' + item.ID,
               simpleMode: true,
               steps: [{
-                target: hintElement,
-                id: item.HINT_ELEMENT.split('.').join('-'),
+                target: hintElement.element,
+                id: hintElement.id,
                 text: item.DETAIL_TEXT,
                 areaPadding: 0,
                 link: "",
