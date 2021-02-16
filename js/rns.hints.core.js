@@ -103,8 +103,13 @@ function saveGroupToStorage(group) {
   localStorage.setItem('hints-info-per-page', JSON.stringify(items));
 }
 
-function getHintsGeneralListFromStorage() {
+function getHintsGeneralListFromStorage(currentUrl) {
   let items = JSON.parse(localStorage.getItem("hints-info-per-page"));
+
+  if( items && currentUrl ){
+    items = items.filter(item => item.CURRENT_PAGE_URL === currentUrl);
+  }
+
   return items ? items.sort((a, b) => a.SORT - b.SORT) : [];
 }
 

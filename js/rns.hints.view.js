@@ -1,42 +1,46 @@
-BX.ready(function () {
-  BX.bind(document, "readystatechange", function () {
-    const currentPageUrl = window.location.href.split('?')[0];
+class rnsHintsView {
+  #currentPageUrl = '';
+  #guides = [];
+  #hintsPerPage = [];
+  #currentGuide = null;
+  #manager = null;
 
-    const getElementBySelector = (selector) => {
-      if( !selector || !selector.selector ){
-        return null;
-      }
+  constructor() {
+    this.#currentPageUrl = window.location.href.split('?')[0];
+    this.#manager = BX.UI.Tour.Manager;
+    this.#hintsPerPage = getHintsGeneralListFromStorage(this.#currentPageUrl);
+  }
 
-      if( selector.children.length === 0 ){
-        return {
-          element: document.querySelector(selector.selector),
-          id: selector.selector
-        };
-      }
+  getElementBySelector = (selector) => {
+    if( !selector || !selector.selector ){
+      return null;
+    }
 
-      let element = document.querySelector(selector.selector);
-      let id = selector.selector;
-      for( child of selector.children ){
-        if( element.children[child.sibling] ) {
-          element = element.children[child.sibling];
-          id += '-' + child.sibling;
-        }
-      }
-
+    if( selector.children.length === 0 ){
       return {
-        element,
-        id
+        element: document.querySelector(selector.selector),
+        id: selector.selector
       };
     }
 
-    let hintsPerPage = getHintsGeneralListFromStorage();
+    let element = document.querySelector(selector.selector);
+    let id = selector.selector;
+    for( let child of selector.children ){
+      if( element.children[child.sibling] ) {
+        element = element.children[child.sibling];
+        id += '-' + child.sibling;
+      }
+    }
 
-    if (
-      hintsPerPage !== null &&
-      hintsPerPage.length &&
-      hintsPerPage[0].CURRENT_PAGE_URL === currentPageUrl
-    ) {
-      hintsPerPage.forEach((item, index) => {
+    return {
+      element,
+      id
+    };
+  }
+
+  render = () => {
+    if ( this.#hintsPerPage.length > 0 ) {
+      this.#hintsPerPage.forEach((item, index) => {
 
         if (item.ACTIVE) {
           if( item.TYPE === 'group' ){
@@ -44,7 +48,7 @@ BX.ready(function () {
               let steps = [];
 
               for(let hint of item.HINTS){
-                const hintElement = getElementBySelector(hint.HINT_ELEMENT);
+                const hintElement = this.getElementBySelector(hint.HINT_ELEMENT);
 
                 steps.push({
                   target: hintElement.element,
@@ -58,19 +62,45 @@ BX.ready(function () {
                 })
               }
 
-              BX.UI.Tour.Manager.add({
-                id: 'id-hint-tour-' + item.ID,
-                steps: steps
-              });
-
+              this.#guides.push(
+                this.#manager.create({
+                  id: 'id-hint-tour-' + item.ID,
+                  events: {
+                    onFinish: () => {
+                      if( this.#guides.length > 0 ){
+                        setTimeout(() => {
+                          this.#currentGuide = this.#guides.shift();
+                          this.#currentGuide.start();
+                        }, 300)
+                      }
+                    }
+                  },
+                  steps: steps,
+                })
+              );
             }
           } else {
 
-            const hintElement = getElementBySelector(item.HINT_ELEMENT);
+            const hintElement = this.getElementBySelector(item.HINT_ELEMENT);
 
-            BX.UI.Tour.Manager.add({
+            this.#guides.push(this.#manager.create({
               id: 'id-single-hint-tour-' + item.ID,
-              simpleMode: true,
+              events: {
+                onStart: () => {
+                  setTimeout(() => {
+                    this.#currentGuide.getCurrentCounter().classList.add('hidden');
+                    this.#currentGuide.getCounterItems().classList.add('hidden');
+                  });
+                },
+                onFinish: () => {
+                  if( this.#guides.length > 0 ){
+                    setTimeout(() => {
+                      this.#currentGuide = this.#guides.shift();
+                      this.#currentGuide.start();
+                    }, 300)
+                  }
+                }
+              },
               steps: [{
                 target: hintElement.element,
                 id: hintElement.id,
@@ -81,14 +111,17 @@ BX.ready(function () {
                 title: item.NAME,
                 position: 'right',
               }]
-            });
+            }));
           }
         }
       });
-    }
 
-    setTimeout(() => {
-      document.querySelector('body').classList.remove('ui-tour-body-overflow');
-    });
-  });
-});
+      if( this.#guides.length > 0 ){
+        this.#currentGuide = this.#guides.shift();
+        this.#currentGuide.start();
+      }
+    }
+  }
+}
+
+

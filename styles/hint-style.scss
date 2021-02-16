@@ -85,7 +85,13 @@
   }
 }
 
-// TODO: fix overlay
-.ui-tour-overlay {
-  position: absolute!important;
+.ui-tour-popup-counter {
+  &.hidden {
+    visibility: hidden;
+  }
+}
+.ui-tour-popup-index-items {
+  &.hidden {
+    visibility: hidden;
+  }
 }

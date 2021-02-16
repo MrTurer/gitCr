@@ -29,11 +29,13 @@ class newHintPopup {
     if( element.getAttribute('id') ){
       selector = '#' + element.getAttribute('id');
     } else if( element.getAttribute('class') ){
-      selector = '.' + element.getAttribute('class').split(' ').join('.');
-      //TODO: querySelectorAll
-    }
+      selector = '.' + element.getAttribute('class').trim().split(' ').join('.');
 
-    console.log('selector', selector);
+      let similarItems = document.querySelectorAll(selector);
+      if( similarItems.length > 1 ){
+        return null;
+      }
+    }
 
     return selector;
   }
@@ -56,10 +58,6 @@ class newHintPopup {
       element = element.parentElement;
       selector = this.checkSelector(element);
     }
-
-    console.log('children', children);
-    console.log('element', element);
-    console.log('selector', selector);
 
     return selector ? {
       selector: selector,
@@ -177,7 +175,7 @@ class newHintPopup {
 
     this.#popup.destroy();
     if( this.#hintGroupId !== null ){
-      setTimeout(() => getHintsListPopup(groupId).show(), 500);
+      setTimeout(() => getHintsListPopup(this.#hintGroupId).show(), 500);
     } else {
       setTimeout(() => getHintsListPopup().show(), 500);
     }
