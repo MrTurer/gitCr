@@ -126,7 +126,8 @@ BX.ready(function () {
                       if( item.TYPE === 'group' ){
                         setTimeout(getNewGroupPopup(item.ID).show(), 1000);
                       } else {
-                        setTimeout(getNewHintPopup(item.ID, groupId).show(), 1000);
+                        let popup = new newHintPopup(item.ID, groupId);
+                        setTimeout(popup.render().show(), 1000);
                       }
                     },
                   },
@@ -262,7 +263,8 @@ BX.ready(function () {
             events: {
               click: function () {
                 hintsListPopup.destroy();
-                setTimeout(getNewHintPopup(null, groupId).show(), 1000);
+                let popup = new newHintPopup(null, groupId);
+                setTimeout(popup.render().show(), 1000);
               },
             },
           }),

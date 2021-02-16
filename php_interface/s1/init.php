@@ -7,8 +7,11 @@ use Bitrix\Main\Page\Asset;
 \Bitrix\Main\UI\Extension::load("ui.tour");
 
 $arJsConfig = array(
-    'hintStorage' => array(
-        'js' => '/local/js/hint-storage.js',
+    'rnsHintsCore' => array(
+        'js' => '/local/js/rns.hints.core.js',
+    ),
+    'rnsHintsView' => array(
+        'js'=> '/local/js/rns.hints.view.js',
     ),
     'rnsHintsEdit' => array(
         'js'=> '/local/js/rns.hints.edit.js',
@@ -30,14 +33,15 @@ foreach ($arJsConfig as $ext => $arExt) {
 
 
 CJSCore::Init(array('ajax', 'popup', 'jquery',
-'hintStorage',
+'rnsHintsCore',
+'rnsHintsView',
 'rnsHintsEdit',
 'newHintPopup',
 'newGroupPopup',
 'hintsListPopup'));
 
 AddEventHandler('main', 'onProlog', function(){
-    Asset::getInstance()->addJs("/local/js/rns.hints.view.js");
+    Asset::getInstance()->addJs("/local/js/hints-init.js");
     Asset::getInstance()->addCss("/local/styles/hint-style.css");
 }, 99999999);
 

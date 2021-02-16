@@ -74,4 +74,12 @@
   height: 16px;
 }
 
+.ui-tour-popup-counter.hidden {
+  visibility: hidden;
+}
+
+.ui-tour-popup-index-items.hidden {
+  visibility: hidden;
+}
+
 /*# sourceMappingURL=hint-style.css.map */

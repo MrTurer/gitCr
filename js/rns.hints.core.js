@@ -26,19 +26,18 @@
   }
 }
 */
-
 function getHintFromStorage(hintId, groupId){
   let items = JSON.parse(localStorage.getItem('hints-info-per-page'));
 
   if( items ){
     if( typeof groupId === 'undefined' || groupId === null ){
-      let filteredItem = items.filter(item => item.ID === hintId);
+      let filteredItem = items.filter(item => parseInt(item.ID) === parseInt(hintId));
       return filteredItem.length > 0 ? filteredItem[0] : null;
     } else {
-      let filteredGroup = items.filter(item => item.ID === groupId);
+      let filteredGroup = items.filter(item => parseInt(item.ID) === parseInt(groupId));
 
       if( filteredGroup.length > 0 ){
-        let filteredItem = filteredGroup[0].HINTS.filter(item => item.ID === hintId);
+        let filteredItem = filteredGroup[0].HINTS.filter(item => parseInt(item.ID) === parseInt(hintId));
         return filteredItem.length > 0 ? filteredItem[0] : null;
       }
     }
@@ -51,7 +50,7 @@ function getGroupFromStorage(groupId){
   let items = JSON.parse(localStorage.getItem('hints-info-per-page'));
 
   if( items ){
-    let filteredGroup = items.filter(item => item.ID === groupId);
+    let filteredGroup = items.filter(item => parseInt(item.ID) === parseInt(groupId));
 
     if( filteredGroup.length > 0 ){
       return filteredGroup[0];
@@ -62,18 +61,17 @@ function getGroupFromStorage(groupId){
 }
 
 function saveHintToStorage(hint) {
-  console.log(hint);
   let items = JSON.parse(localStorage.getItem('hints-info-per-page')) || [];
 
   if( hint.GROUP_ID ) {
-    let filteredGroup = items.filter(item => item.ID === hint.GROUP_ID);
+    let filteredGroup = items.filter(item => parseInt(item.ID) === parseInt(hint.GROUP_ID));
     if( filteredGroup.length > 0 ){
-      filteredGroup[0].HINTS = filteredGroup[0].HINTS.filter(item => item.ID !== hint.ID);
+      filteredGroup[0].HINTS = filteredGroup[0].HINTS.filter(item => parseInt(item.ID) !== parseInt(hint.ID));
 
       filteredGroup[0].HINTS.push(hint);
 
       items = items.filter(
-        item => item.ID !== hint.GROUP_ID
+        item => parseInt(item.ID) !== parseInt(hint.GROUP_ID)
       );
 
       items.push(filteredGroup[0]);
@@ -81,7 +79,7 @@ function saveHintToStorage(hint) {
   } else {
     if( items ){
       items = items.filter(
-        item => item.ID !== hint.ID
+        item => parseInt(item.ID) !== parseInt(hint.ID)
       );
     }
 
@@ -96,7 +94,7 @@ function saveGroupToStorage(group) {
 
   if( items ){
     items = items.filter(
-      item => item.ID !== group.ID
+      item => parseInt(item.ID) !== parseInt(group.ID)
     );
   }
 
@@ -105,15 +103,20 @@ function saveGroupToStorage(group) {
   localStorage.setItem('hints-info-per-page', JSON.stringify(items));
 }
 
-function getHintsGeneralListFromStorage() {
+function getHintsGeneralListFromStorage(currentUrl) {
   let items = JSON.parse(localStorage.getItem("hints-info-per-page"));
+
+  if( items && currentUrl ){
+    items = items.filter(item => item.CURRENT_PAGE_URL === currentUrl);
+  }
+
   return items ? items.sort((a, b) => a.SORT - b.SORT) : [];
 }
 
 function getHintsInGroupListFromStorage(groupId) {
   let items = JSON.parse(localStorage.getItem("hints-info-per-page"));
   if( items ){
-    let filteredGroup = items.filter(item => item.ID === groupId);
+    let filteredGroup = items.filter(item => parseInt(item.ID) === parseInt(groupId));
     if( filteredGroup ){
       return filteredGroup[0].HINTS ? filteredGroup[0].HINTS.sort((a, b) => a.SORT - b.SORT) : [];
     }
@@ -124,7 +127,7 @@ function getHintsInGroupListFromStorage(groupId) {
 
 function deleteHintFromStorage(hintId) {
   let filteredHints = JSON.parse(localStorage.getItem('hints-info-per-page')).filter(
-    item => item.ID !== hintId.ID
+    item => parseInt(item.ID) !== parseInt(hintId)
   );
 
   localStorage.setItem('hints-info-per-page', JSON.stringify(filteredHints));
@@ -132,7 +135,7 @@ function deleteHintFromStorage(hintId) {
 
 function deleteGroupFromStorage(groupId) {
   let filteredHints = JSON.parse(localStorage.getItem('hints-info-per-page')).filter(
-    item => item.ID !== groupId.ID
+    item => parseInt(item.ID) !== parseInt(groupId)
   );
 
   localStorage.setItem('hints-info-per-page', JSON.stringify(filteredHints));

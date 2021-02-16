@@ -1,197 +1,202 @@
 /**
  * Форма добавления новой подсказки
  */
-let getNewHintPopup;
-BX.ready(function () {
-  getNewHintPopup = (editHintId, groupId) => {
-    const currentPageUrl = window.location.href.split('?')[0];
+class newHintPopup {
+  #popup = null;
+  #currentPageUrl = '';
+  #hintId = '';
+  #hintNameFieldValue = '';
+  #hintDescriptionFieldValue = '';
+  #hintSerialFieldValue = 500;
+  #hintGroupId = null;
+  #hintElementSelector = null;
 
-    let bindElement = null;
-    let hintId = parseInt(Math.random() * 100000).toString();
-    let hintNameFieldValue = ""
-    let hintDescriptionFieldValue = "";
-    let hintSerialFieldValue = 500;
-    let hintGroupId = null;
-    let hintElementSelector = '';
-    const hintWindowTitle = 'Окно создания автоподсказки';
-    const hintNameFieldLabel = 'Название';
-    const hintDescriptionFieldLabel = 'Описание';
-    const hintSerialFieldLabel = 'Сортировка';
-    const hintBindLabel = 'Привязать к элементу';
-    let hintBindButtonText = 'Привязать элемент';
-    const hintBindButtonSuccessText = 'Элемент привязан';
-    const hintBindButtonFailText = '';
-    const hintBindAboutText = 'кликните на кнопку привязать элемент, а затем кликните правой кнопкой мыши по нужному элементу';
-    const saveBtnText = 'Сохранить';
-    const applyBtnText = 'Применить';
-    const cancelBtnText = 'Отмена';
+  #hintWindowTitle = '';
+  #hintNameFieldLabel = '';
+  #hintDescriptionFieldLabel = '';
+  #hintSerialFieldLabel = '';
+  #hintBindLabel = '';
+  #hintBindButtonText = '';
+  #hintBindButtonSuccessText = '';
+  #hintBindButtonFailText = '';
+  #hintBindAboutText = '';
+  #saveBtnText = '';
+  #applyBtnText = '';
+  #cancelBtnText = '';
 
-    const getHintElementInfo = (e) => {
-      // TODO: рекурсивно перебирать родителей и запоминать вложенность и порядок, чтобы однозначно определить элемент
-      if (e.target.getAttribute("class") === "menu-item-link-text ") {
-        hintElementSelector = e.target.parentElement.parentElement.getAttribute("id");
-      } else {
-        hintElementSelector =
-          e.target.getAttribute("id") ||
-          e.target.getAttribute("class") ||
-          e.target.parentElement.getAttribute("id") ||
-          e.target.parentElement.getAttribute("class");
+  checkSelector = (element) => {
+    let selector = null;
+    if( element.getAttribute('id') ){
+      selector = '#' + element.getAttribute('id');
+    } else if( element.getAttribute('class') ){
+      selector = '.' + element.getAttribute('class').trim().split(' ').join('.');
+
+      let similarItems = document.querySelectorAll(selector);
+      if( similarItems.length > 1 ){
+        return null;
       }
-
-      return hintElementSelector && (document.getElementById(hintElementSelector) ||
-        document.body.querySelector("." + hintElementSelector.split(' ').join('.')));
-    };
-
-    const bindHintToElement = () => {
-      const overlay = document.getElementById('popup-window-overlay-new-hint-popup');
-      const newHintPopupWrapper = document.getElementById('new-hint-popup');
-      overlay.style.display = "none";
-      newHintPopupWrapper.style.display = "none";
-
-      const chooseItemListener = (e) => {
-        $(function () {
-          e.preventDefault();
-
-          bindElement = getHintElementInfo(e);
-
-          if( bindElement ) {
-            document.getElementById('button-bind-element').classList.remove('ui-btn-secondary');
-            document.getElementById('button-bind-element').classList.add('ui-btn-success');
-            document.getElementById('button-bind-element').innerText = hintBindButtonSuccessText;
-          } else {
-            alert('Ошибка привязки элемента');
-          }
-
-          overlay.style.display = "block";
-          newHintPopupWrapper.style.display = "block";
-
-          document.removeEventListener("contextmenu", chooseItemListener);
-          return false;
-        });
-      };
-      document.addEventListener( "contextmenu", chooseItemListener );
     }
 
-    const saveNewHint = () => {
-      const hintName = document.getElementById('id-hint-name');
-      const hintDescription = document.getElementById('id-hint-description');
-      const hintSerial = document.getElementById('id-hint-serial');
-      const bindButton = document.getElementById('button-bind-element');
+    return selector;
+  }
 
-      //
-      // validation
-      //
-      let error = false;
-      if( hintName.value === '' ) {
-        hintName.parentElement.classList.add('ui-ctl-danger');
-        error = true;
-      } else {
-        hintName.parentElement.classList.remove('ui-ctl-danger');
-      }
+  countSibling = (element) => {
+    let i=0;
+    while((element=element.previousElementSibling)!=null) ++i;
+    return i;
+  }
 
-      if( hintDescription.value === '' ) {
-        hintDescription.parentElement.classList.add('ui-ctl-danger');
-        error = true;
-      } else {
-        hintDescription.parentElement.classList.remove('ui-ctl-danger');
-      }
+  getHintElementInfo = (e) => {
+    let element = e.target;
+    let selector = this.checkSelector(element);
+    let children = [];
 
-      if( hintSerial.value === '' ) {
-        hintSerial.parentElement.classList.add('ui-ctl-danger');
-        error = true;
-      } else {
-        hintSerial.parentElement.classList.remove('ui-ctl-danger');
-      }
-
-      if( !bindElement ) {
-        error = true;
-        bindButton.classList.remove('ui-btn-secondary');
-        bindButton.classList.remove('ui-btn-success');
-        bindButton.classList.add('ui-btn-danger');
-      }
-
-      if( error ){
-        return false;
-      }
-
-      saveHintToStorage({
-        ID: hintId,
-        TYPE: 'hint',
-        CURRENT_PAGE_URL: currentPageUrl,
-        CREATED_BY: "UNKNOWN",
-        DATE_EDIT: new Date(),
-        DATE_CREATE: new Date(),
-        SORT: hintSerial.value,
-        ACTIVE: true,
-        GROUP_ID: hintGroupId,
-        NAME: hintName.value,
-        DETAIL_TEXT: hintDescription.value,
-        HINT_ELEMENT: hintElementSelector,
+    while( !selector ){
+      children.unshift({
+        sibling: this.countSibling(element)
       })
-
-      return true;
+      element = element.parentElement;
+      selector = this.checkSelector(element);
     }
 
-    const closeHintPopup = () => {
-      const hintName = document.getElementById('id-hint-name');
-      const hintDescription = document.getElementById('id-hint-description');
-      const hintSerial = document.getElementById('id-hint-serial');
-      const bindButton = document.getElementById("button-bind-element");
+    return selector ? {
+      selector: selector,
+      children: children
+    } : null;
+  };
 
-      //
-      // clear fields
-      //
-      hintName.value = '';
-      hintDescription.value = '';
-      hintSerial.value = 500;
+  chooseItemListener = (e) => {
+    e.preventDefault();
+    const overlay = document.getElementById('popup-window-overlay-new-hint-popup');
+    const newHintPopupWrapper = document.getElementById('new-hint-popup');
+
+    this.#hintElementSelector = this.getHintElementInfo(e);
+
+    if( this.#hintElementSelector ) {
+      document.getElementById('button-bind-element').classList.remove('ui-btn-secondary');
+      document.getElementById('button-bind-element').classList.add('ui-btn-success');
+      document.getElementById('button-bind-element').innerText = this.#hintBindButtonSuccessText;
+    } else {
+      alert('Ошибка привязки элемента');
+    }
+
+    overlay.style.display = "block";
+    newHintPopupWrapper.style.display = "block";
+
+    document.removeEventListener("contextmenu", this.chooseItemListener);
+    return false;
+  };
+
+  bindHintToElement = () => {
+    const overlay = document.getElementById('popup-window-overlay-new-hint-popup');
+    const newHintPopupWrapper = document.getElementById('new-hint-popup');
+
+    overlay.style.display = "none";
+    newHintPopupWrapper.style.display = "none";
+
+    document.addEventListener( "contextmenu", this.chooseItemListener );
+  }
+
+  saveNewHint = () => {
+    const hintName = document.getElementById('id-hint-name');
+    const hintDescription = document.getElementById('id-hint-description');
+    const hintSerial = document.getElementById('id-hint-serial');
+    const bindButton = document.getElementById('button-bind-element');
+
+    //
+    // validation
+    //
+    let error = false;
+    if( hintName.value === '' ) {
+      hintName.parentElement.classList.add('ui-ctl-danger');
+      error = true;
+    } else {
+      hintName.parentElement.classList.remove('ui-ctl-danger');
+    }
+
+    if( hintDescription.value === '' ) {
+      hintDescription.parentElement.classList.add('ui-ctl-danger');
+      error = true;
+    } else {
+      hintDescription.parentElement.classList.remove('ui-ctl-danger');
+    }
+
+    if( hintSerial.value === '' ) {
+      hintSerial.parentElement.classList.add('ui-ctl-danger');
+      error = true;
+    } else {
+      hintSerial.parentElement.classList.remove('ui-ctl-danger');
+    }
+
+    if( !this.#hintElementSelector ) {
+      error = true;
+      bindButton.classList.remove('ui-btn-secondary');
       bindButton.classList.remove('ui-btn-success');
-      bindButton.classList.remove('ui-btn-danger');
-      bindButton.classList.add('ui-btn-secondary');
-
-      newHintPopup.destroy();
-      if( typeof groupId !== 'undefined' && groupId !== null ){
-        setTimeout(() => getHintsListPopup(groupId).show(), 500);
-      } else {
-        setTimeout(() => getHintsListPopup().show(), 500);
-      }
+      bindButton.classList.add('ui-btn-danger');
     }
 
-    const onSaveHintButtonPress = () => {
-      if( saveNewHint() ){
-        closeHintPopup();
-      }
+    if( error ){
+      return false;
     }
 
-    const onApplyHintButtonPress = () => {
-      saveNewHint();
-    }
+    saveHintToStorage({
+      ID: this.#hintId,
+      TYPE: 'hint',
+      CURRENT_PAGE_URL: this.#currentPageUrl,
+      CREATED_BY: "UNKNOWN",
+      DATE_EDIT: new Date(),
+      DATE_CREATE: new Date(),
+      SORT: hintSerial.value,
+      ACTIVE: true,
+      GROUP_ID: this.#hintGroupId,
+      NAME: hintName.value,
+      DETAIL_TEXT: hintDescription.value,
+      HINT_ELEMENT: this.#hintElementSelector,
+    })
 
-    const onCancelHintButtonPress = () => {
-      closeHintPopup();
-    }
+    return true;
+  }
+
+  closeHintPopup = () => {
+    const hintName = document.getElementById('id-hint-name');
+    const hintDescription = document.getElementById('id-hint-description');
+    const hintSerial = document.getElementById('id-hint-serial');
+    const bindButton = document.getElementById("button-bind-element");
 
     //
-    // if edit
+    // clear fields
     //
-    if( typeof groupId !== 'undefined' && groupId !== null ){
-      hintGroupId = groupId;
-    }
+    hintName.value = '';
+    hintDescription.value = '';
+    hintSerial.value = 500;
+    bindButton.classList.remove('ui-btn-success');
+    bindButton.classList.remove('ui-btn-danger');
+    bindButton.classList.add('ui-btn-secondary');
 
-    if( typeof editHintId !== 'undefined' && editHintId !== null ){
-      hintId = editHintId;
-      let hintFromStorage = getHintFromStorage(hintId, groupId);
-      if( hintFromStorage !== null ){
-        hintNameFieldValue = hintFromStorage.NAME;
-        hintDescriptionFieldValue = hintFromStorage.DETAIL_TEXT;
-        hintSerialFieldValue = hintFromStorage.SORT;
-        hintElementSelector = hintFromStorage.HINT_ELEMENT;
-        hintBindButtonText = 'Изменить элемент';
-        bindElement = document.getElementById(hintElementSelector) ||
-          document.body.querySelector("." + hintElementSelector.split(' ').join('.'))
-      }
+    this.#popup.destroy();
+    if( this.#hintGroupId !== null ){
+      setTimeout(() => getHintsListPopup(this.#hintGroupId).show(), 500);
+    } else {
+      setTimeout(() => getHintsListPopup().show(), 500);
     }
+  }
 
-    const newHintPopup = BX.PopupWindowManager.create(
+  onSaveHintButtonPress = () => {
+    if( this.saveNewHint() ){
+      this.closeHintPopup();
+    }
+  }
+
+  onApplyHintButtonPress = () => {
+    this.saveNewHint();
+  }
+
+  onCancelHintButtonPress = () => {
+    this.closeHintPopup();
+  }
+
+  render = () => {
+    this.#popup = BX.PopupWindowManager.create(
       "new-hint-popup",
       BX("element"),
       {
@@ -229,7 +234,7 @@ BX.ready(function () {
         //
         // заголовок
         //
-        titleBar: hintWindowTitle,
+        titleBar: this.#hintWindowTitle,
         //
         // контент
         //
@@ -251,7 +256,7 @@ BX.ready(function () {
                     for: "id-hint-name",
                     className: "new-hint-form-label"
                   },
-                  text: hintNameFieldLabel,
+                  text: this.#hintNameFieldLabel,
                 }),
               ],
             }),
@@ -267,9 +272,9 @@ BX.ready(function () {
                     id: "id-hint-name",
                     type: "text",
                     className: "ui-ctl-element",
-                    placeholder: hintNameFieldLabel,
+                    placeholder: this.#hintNameFieldLabel,
                     name: "hintName",
-                    value: hintNameFieldValue,
+                    value: this.#hintNameFieldValue,
                   },
                 }),
               ],
@@ -286,7 +291,7 @@ BX.ready(function () {
                     for: "id-hint-description",
                     className: "new-hint-form-label"
                   },
-                  text: hintDescriptionFieldLabel,
+                  text: this.#hintDescriptionFieldLabel,
                 }),
               ],
             }),
@@ -303,8 +308,8 @@ BX.ready(function () {
                     name: "hintDescription",
                     rows: 3,
                     className: "ui-ctl-element",
-                    placeholder: hintDescriptionFieldLabel,
-                    value: hintDescriptionFieldValue,
+                    placeholder: this.#hintDescriptionFieldLabel,
+                    value: this.#hintDescriptionFieldValue,
                   },
                 })
               ],
@@ -333,7 +338,7 @@ BX.ready(function () {
                             for: "id-hint-serial",
                             className: "new-hint-form-label"
                           },
-                          text: hintSerialFieldLabel,
+                          text: this.#hintSerialFieldLabel,
                         }),
                       ],
                     }),
@@ -350,7 +355,7 @@ BX.ready(function () {
                             id: "id-hint-serial",
                             name: "hintSerial",
                             className: "ui-ctl-element",
-                            value: hintSerialFieldValue,
+                            value: this.#hintSerialFieldValue,
                           },
                         }),
                       ],
@@ -375,20 +380,20 @@ BX.ready(function () {
                             for: "new-hint-number",
                             className: "new-hint-form-label"
                           },
-                          text: hintBindLabel,
+                          text: this.#hintBindLabel,
                         }),
                       ],
                     }),
                     BX.create({
                       tag: "button",
-                      text: hintBindButtonText,
+                      text: this.#hintBindButtonText,
                       events: {
-                        click: bindHintToElement,
+                        click: this.bindHintToElement,
                       },
                       props: {
                         id: "button-bind-element",
                         type: "button",
-                        className: "ui-btn" + (hintElementSelector === '' ? " ui-btn-secondary" : " ui-btn-success"),
+                        className: "ui-btn" + (this.#hintElementSelector === '' ? " ui-btn-secondary" : " ui-btn-success"),
                       },
                     }),
                   ]
@@ -399,7 +404,7 @@ BX.ready(function () {
               tag: "p",
               html:
                 "<span class='asterix'>*</span> " +
-                "<span class='text'>" + hintBindAboutText + "</span>",
+                "<span class='text'>" + this.#hintBindAboutText + "</span>",
               props: {
                 className: "new-hint-bottom-label",
               },
@@ -408,36 +413,72 @@ BX.ready(function () {
         }),
         buttons: [
           new BX.PopupWindowButton({
-            text: saveBtnText,
+            text: this.#saveBtnText,
             id: "id-save-btn",
             className: "ui-btn ui-btn-success",
             events: {
-              click: onSaveHintButtonPress,
+              click: this.onSaveHintButtonPress,
             },
           }),
           new BX.PopupWindowButton({
-            text: applyBtnText,
+            text: this.#applyBtnText,
             id: "id-apply-btn",
             className: "ui-btn ui-btn-light-border",
             events: {
-              click: onApplyHintButtonPress,
+              click: this.onApplyHintButtonPress,
             },
           }),
           new BX.PopupWindowButton({
-            text: cancelBtnText,
+            text: this.#cancelBtnText,
             id: "id-cancel-btn",
             className: "ui-btn ui-btn-link",
             events: {
-              click: onCancelHintButtonPress,
+              click: this.onCancelHintButtonPress,
             },
           }),
         ],
         events: {
-          onPopupClose: onCancelHintButtonPress,
+          onPopupClose: this.onCancelHintButtonPress,
         },
       }
     );
-    return newHintPopup;
-  };
-});
+
+    return this.#popup;
+  }
+
+  constructor(editHintId, groupId) {
+    this.#currentPageUrl = window.location.href.split('?')[0];
+    this.#hintId = parseInt(Math.random() * 100000).toString();
+
+    this.#hintWindowTitle = 'Окно создания автоподсказки';
+    this.#hintNameFieldLabel = 'Название';
+    this.#hintDescriptionFieldLabel = 'Описание';
+    this.#hintSerialFieldLabel = 'Сортировка';
+    this.#hintBindLabel = 'Привязать к элементу';
+    this.#hintBindButtonText = 'Привязать элемент';
+    this.#hintBindButtonSuccessText = 'Элемент привязан';
+    this.#hintBindButtonFailText = '';
+    this.#hintBindAboutText = 'кликните на кнопку привязать элемент, а затем кликните правой кнопкой мыши по нужному элементу';
+    this.#saveBtnText = 'Сохранить';
+    this.#applyBtnText = 'Применить';
+    this.#cancelBtnText = 'Отмена';
+
+    if( typeof groupId !== 'undefined' && groupId !== null ){
+      this.#hintGroupId = groupId;
+    }
+
+    if( typeof editHintId !== 'undefined' && editHintId !== null ){
+      this.#hintId = editHintId;
+      let hintFromStorage = getHintFromStorage(this.#hintId, groupId);
+      if( hintFromStorage !== null ){
+        this.#hintNameFieldValue = hintFromStorage.NAME;
+        this.#hintDescriptionFieldValue = hintFromStorage.DETAIL_TEXT;
+        this.#hintSerialFieldValue = hintFromStorage.SORT;
+        this.#hintElementSelector = hintFromStorage.HINT_ELEMENT;
+        this.#hintBindButtonText = 'Изменить элемент';
+        this.#hintWindowTitle = 'Окно редактирования автоподсказки';
+      }
+    }
+  }
+}
 
